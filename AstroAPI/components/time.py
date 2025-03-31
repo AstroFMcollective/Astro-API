@@ -1,6 +1,17 @@
 from time import time
 import json
 
+
+
+"""
+	--- UNIX TIME FUNCTIONS ---
+
+	Commands that return Unix epoch timestamps (and save_json() because I didn't
+	know where else to put it).
+"""
+
+
+
 def current_unix_time():
 	return int(time())
 

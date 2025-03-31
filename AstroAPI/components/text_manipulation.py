@@ -3,6 +3,20 @@ import difflib
 import re
 from AstroAPI.components.time import save_json
 
+
+
+"""
+	--- TEXT MANIPULATION FUCTIONS ---
+
+	A collection of functions used to manipulate and change text to be more
+	easy to work with in filtering or query search.
+
+	All of these are pretty terribly made and will be rewritten whenever everything
+	else works great. But hey, they work!
+"""
+
+
+
 def remove_punctuation(string: str, remove_all: bool):
 	all_punc = f'''!()[];:'",<>./?@#$%^&*`_~'''
 	some_punc = f'''!()[];:'",<>./?^*_~`'''
