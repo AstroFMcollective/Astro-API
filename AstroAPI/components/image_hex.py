@@ -16,7 +16,8 @@ from io import BytesIO
 	built into the API in the a2.2 update because
 	technical limitations disallowed the client's function
 	to be asynchronous. It never caused any obnoxious
-	blocking, but this is a nicer approach in general.
+	blocking, but this is a nicer and more sane approach
+	in general.
 """
 
 
