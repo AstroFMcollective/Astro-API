@@ -8,12 +8,17 @@ astro_yellow = int(config['color_hex']['astro_yellow'])
 """
 	--- MEDIA OBJECTS ---
 
-	This is the reference sheet of all Astro's supported media types.
+	Astro uses these to form usable representations of a piece of media (song, album, etc.)
 
-	This is a more sophisticated method of forming media objects, so devs have to work less
-	to get nice, proper media objects. 
+	Astro's media objects are an useful and efficient way of forming these representations,
+	with a few key details they're able to:
+	- Nicely format everything in more usable formats
+	- Generate censored titles and names of select objects
+	- Generate JSON versions of these objects for use in the REST interface
+	- Include an abundance of technical and debug info.
 
-	All objects must contain a service, type and meta (technical metadata) variables.
+	Use these literally whenever you have to form a media object. They're easily reusable
+	and simple to form.
 """
 
 
@@ -118,7 +123,7 @@ class Song:
 		 :param ids: The song's ID(s).
 		 :param title: The song's title.
 		 :param artists: The song's artists.
-		 :param collection: The song's collection (album or EP).
+		 :param collection: Optional. The song's collection (album or EP).
 		 :param cover: The song's cover art.
 		 :param genre: Optional. The song's genre.
 		 :param is_explicit: Optional. Whether the song is explicit or not.
@@ -228,7 +233,6 @@ class Collection:
 		urls = {service: urls} if not isinstance(urls, dict) else urls
 		ids = {service: str(ids)} if not isinstance(ids, dict) else ids
 		censored_title = title
-		release_year = int(release_year) if release_year != None else None
 		
 		self.service = service
 		self.type = type
@@ -321,7 +325,6 @@ class PodcastEpisode:
 		urls = {service: urls} if not isinstance(urls, dict) else urls
 		ids = {service: str(ids)} if not isinstance(ids, dict) else ids
 		censored_title = title
-		release_year = None if release_year == None else int(release_year)
 
 		self.service = service
 		self.type = type
@@ -346,7 +349,6 @@ class PodcastEpisode:
 			'meta': meta.json
 		}
 
-
 class Playlist:
 	"""
 		# Astro Playlist Object
@@ -359,8 +361,8 @@ class Playlist:
 		 :param ids: The playlist's ID(s).
 		 :param title: The playlist's title.
 		 :param owner: The playlist's owner (creator).
-		 :param songs: The playlist's owner (creator).
-		 :param owner: The playlist's owner (creator).
+		 :param songs: The playlist's songs.
+		 :param cover: The playlist's cover.
 		 :param meta: The technical metadata of the playlist.
 	"""
 	def __init__(self, service: str, urls: str | dict, ids: any | dict, title: str, owner: str, songs: list[object], cover: object, meta: object) -> object:
@@ -393,70 +395,212 @@ class Playlist:
 		}
 
 class Audiobook:
-	def __init__(self, service: str, url: str | dict, id: any, title: str, authors: list, narrators: list, publisher: str, chapters: int, cover_url: str, is_explicit: bool, meta = object, cover_color_hex: int = None) -> object:
+	"""
+		# Astro Audiobook Object
+
+		This is a built-in Astro API object which identifies audiobooks.
+		JSON representation available.
+
+		 :param	service: The API service in which the object was formed.
+		 :param urls: The audiobook's URL(s).
+		 :param ids: The audiobook's ID(s).
+		 :param title: The audiobook's title.
+		 :param authors: The audiobook's authors.
+		 :param narrators: The audiobook's narrators.
+		 :param publisher: The audiobook's publisher.
+		 :param chapters: The number of chapters the audiobook has.
+		 :param cover: The audiobook's cover.
+		 :param is_explicit: Whether the audiobook is explicit or not.
+		 :param meta: The technical metadata of the audiobook.
+	"""
+	def __init__(self, service: str, urls: str | dict, ids: any | dict, title: str, authors: list, narrators: list, publisher: str, chapters: int, cover: object, is_explicit: bool, meta: object) -> object:
+		type = 'audiobook'
+		urls = {service: urls} if not isinstance(urls, dict) else urls
+		ids = {service: str(ids)} if not isinstance(ids, dict) else ids
+		censored_title = title
+
 		self.service = service
 		self.type = 'audiobook'
-		self.url = {service: url} if isinstance(url, str) else url
-		self.id = {service: str(id)} if not isinstance(id, dict) else id
+		self.urls = urls
+		self.ids = ids
 		self.title = title
-		self.censored_title = title
+		self.censored_title = censored_title
 		self.authors = authors
 		self.narrators = narrators
 		self.publisher = publisher
 		self.chapters = chapters
-		self.cover_url = cover_url
-		self.cover_color_hex = cover_color_hex
+		self.cover = cover
 		self.is_explicit = is_explicit
 		self.meta = meta
+		self.json = {
+			'service': service,
+			'type': type,
+			'urls': urls,
+			'ids': ids,
+			'title': title,
+			'censored_title': censored_title,
+			'authors': authors,
+			'narrators': narrators,
+			'publisher': publisher,
+			'chapters': chapters,
+			'cover': cover.json,
+			'is_explicit': is_explicit,
+			'meta': meta.json
+		}
 
 class Artist:
-	def __init__(self, service: str, urls: str | dict, ids: any, name: str, meta = object, profile_pic_url: str = None, profile_pic_color_hex: int = None, genres: list = None) -> object:
-		urls = {service: urls} if isinstance(urls, str) else urls
+	"""
+		# Astro Artist Object
+
+		This is a built-in Astro API object which identifies artists.
+		JSON representation available.
+
+		 :param	service: The API service in which the object was formed.
+		 :param urls: The artist's URL(s).
+		 :param ids: The artist's ID(s).
+		 :param name: The artist's name.
+		 :param genres: Optional. The artist's genres.
+		 :param profile_picture: The artist's profile picture.
+		 :param meta: The technical metadata of the artist.
+	"""
+	def __init__(self, service: str, urls: str | dict, ids: any | dict, name: str, profile_picture: object, meta: object, genres: list = None) -> object:
+		type = 'artist'
+		urls = {service: urls} if not isinstance(urls, dict) else urls
 		ids = {service: str(ids)} if not isinstance(ids, dict) else ids
 		profile_pic_url = profile_pic_url if profile_pic_url != None else missing_image
 		
 		self.service = service
-		self.type = 'artist'
+		self.type = type
 		self.urls = urls
 		self.ids = ids
 		self.name = name
 		self.genres = genres
-		self.profile_pic_url = profile_pic_url
-		self.profile_pic_color_hex = profile_pic_color_hex
+		self.profile_picture = profile_picture
 		self.meta = meta
 		self.json = {
 			'service': service,
-			'type': 'artist',
+			'type': type,
 			'urls': urls,
 			'ids': ids,
 			'name': name,
 			'genres': genres,
-			'profile_pic': {
-				'url': profile_pic_url,
-				'color_hex': profile_pic_color_hex
-			},
+			'profile_picture': profile_picture.json,
 			'meta': meta.json
 		}
 
 class Cover:
-	def __init__(self, service: str, type: str, hq_url: str | dict, lq_url: str | dict, title: str, artists: list, meta = object, color_hex: int = None) -> object:
-		hq_url = {service: hq_url} if isinstance(hq_url, str) else hq_url if hq_url != None else missing_image
-		lq_url = {service: lq_url} if isinstance(lq_url, str) else lq_url if lq_url != None else missing_image
+	"""
+		# Astro Cover Object
+
+		This is a built-in Astro API object which identifies covers.
+		Astro identifies two types of covers: regular covers and thumbnails.
+		Use thumbnails for music videos, covers for everything else.
+		JSON representation available.
+
+		 :param	service: The API service in which the object was formed.
+		 :param media_type: The cover's media type.
+		 :param title: The media's title.
+		 :param artists: The media's artists.
+		 :param hq_urls: The cover's high quality URL(s).
+		 :param lq_urls: The cover's low quality URL(s).
+		 :param color_hex: The cover's color hex code.
+		 :param meta: The technical metadata of the artist.
+	"""
+	def __init__(self, service: str, media_type: str, title: str, artists: list[object], hq_urls: str | dict, lq_urls: str | dict, meta: object, color_hex: int = None) -> object:
+		type = 'cover'
+		hq_urls = {service: hq_urls} if isinstance(hq_urls, str) else hq_urls if hq_urls != None else missing_image
+		lq_urls = {service: lq_urls} if isinstance(lq_urls, str) else lq_urls if lq_urls != None else missing_image
+		censored_title = title
 		color_hex = color_hex if color_hex != None else astro_yellow
 		
 		self.service = service
-		self.type = 'cover'
-		self.media_type = type
+		self.type = type
+		self.media_type = media_type
 		self.title = title
-		self.censored_title = title
+		self.censored_title = censored_title
 		self.artists = artists
-		self.hq_url = {service: hq_url} if isinstance(hq_url, str) else hq_url
-		self.lq_url = {service: lq_url} if isinstance(lq_url, str) else lq_url
+		self.hq_urls = hq_urls
+		self.lq_urls = lq_urls
 		self.color_hex = color_hex
 		self.meta = meta
+		self.json = {
+			'service': service,
+			'type': type,
+			'media_type': media_type,
+			'title': title,
+			'censored_title': censored_title,
+			'artists': [artist.json for artist in artists],
+			'hq_urls': hq_urls,
+			'lq_urls': lq_urls,
+			'color_hex': color_hex,
+			'meta': meta.json
+		}
+
+class ProfilePicture:
+	"""
+		# Astro Profile Picture Object
+
+		This is a built-in Astro API object which identifies profile pictures.
+		Use this instead of covers for artists.
+		JSON representation available.
+
+		 :param	service: The API service in which the object was formed.
+		 :param user_type: The type of user of the profile picture, can either be `user` or `artist`.
+		 :param name: The user's name (or username).
+		 :param hq_urls: The profile picture's high quality URL(s).
+		 :param lq_urls: The profile picture's low quality URL(s).
+		 :param color_hex: The profile picture's color hex code.
+		 :param meta: The technical metadata of the artist.
+	"""
+	def __init__(self, service: str, user_type: str, name: str, hq_urls: str | dict, lq_urls: str | dict, meta: object, color_hex: int | None = None):
+		type = 'profile_picture'
+		hq_urls = {service: hq_urls} if isinstance(hq_urls, str) else hq_urls if hq_urls != None else missing_image
+		lq_urls = {service: lq_urls} if isinstance(lq_urls, str) else lq_urls if lq_urls != None else missing_image
+		color_hex = color_hex if color_hex != None else astro_yellow
+
+		self.service = service
+		self.type = type
+		self.user_type = user_type
+		self.name = name
+		self.hq_urls = hq_urls
+		self.lq_urls = lq_urls
+		self.color_hex = color_hex
+		self.meta = meta
+		self.json = {
+			'service': service,
+			'type': type,
+			'user_type': user_type,
+			'name': name,
+			'hq_urls': hq_urls,
+			'lq_urls': lq_urls,
+			'color_hex': color_hex,
+			'meta': meta.json
+		}
 
 class Knowledge:
-	def __init__(self, service: str, media_type: str, url: str | dict, id: any, title: str, artists: list, cover_url: str, meta: object, description: str = None, cover_color_hex: int = None, collection: str = None, release_date: str = None, is_explicit: bool = None, genre: str = None, bpm: float = None, key: int = None, length: int = None, time_signature: int = None) -> object:
+	"""
+		# Astro Knowledge Object
+
+		This is a built-in Astro API object which identifies song knowledge.
+		It provides more details about a song, such as a small content description, length, BPM, etc.
+		JSON representation available.
+
+		 :param	service: The API service in which the object was formed.
+		 :param media_type: The song type, can either be `track` or `single`.
+		 :param urls: The song's URL(s).
+		 :param ids: The song's ID(s).
+		 :param title: The song's title.
+		 :param collection: Optional. The song's collection (album or EP).
+		 :param artists: The song's artists.
+		 :param description: The song's description.
+		 :param release_date: The song's full release date.
+		 :param cover: The song's cover.
+		 :param genre: Optional. The song's genre.
+		 :param is_explicit: Optional. Whether the song is explicit or not.
+		 :param profile_picture: The artist's profile picture.
+		 :param meta: The technical metadata of the artist.
+	"""
+	def __init__(self, service: str, media_type: str, url: str | dict, id: any | dict, title: str, artists: list[object], cover: object, meta: object, description: str = None, collection: str = None, release_date: str = None, is_explicit: bool = None, genre: str = None, bpm: float = None, key: int = None, length: int = None, time_signature: int = None) -> object:
 		pitch_class = {
 			0: 'C',
 			1: 'C♯/D♭',
@@ -473,6 +617,8 @@ class Knowledge:
 			-1: None,
 			None: None
 		}
+		description = description if description != '?' or description != '' else None
+		censored_description = description
 
 		self.service = service
 		self.type = 'knowledge'
@@ -481,12 +627,12 @@ class Knowledge:
 		self.id = {service: str(id)} if not isinstance(id, dict) else id
 		self.title = title
 		self.censored_title = title
-		self.collection = collection
 		self.artists = artists
-		self.description = description if description != '?' or description != '' else None
+		self.collection = collection
+		self.description = description
+		self.censored_description = censored_description
 		self.release_date = release_date
-		self.cover_url = cover_url
-		self.cover_color_hex = cover_color_hex
+		self.cover = cover
 		self.genre = genre
 		self.is_explicit = is_explicit
 		self.bpm = bpm
