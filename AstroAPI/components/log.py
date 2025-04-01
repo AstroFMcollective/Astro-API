@@ -1,7 +1,6 @@
 import discord as discord
 from discord import Webhook
 from AstroAPI.components.ini import config, keys, text
-from AstroDiscord.components.ini import config as discord_config
 import aiohttp
 
 
@@ -20,7 +19,7 @@ import aiohttp
 
 async def log(media: object):
 	async with aiohttp.ClientSession() as session:
-		deployment_channel = discord_config['client']['deployment_channel']
+		deployment_channel = config['system']['deployment_channel']
 		embed = discord.Embed(
 			title = f'Astro API - `{media.type}`',
 			colour = 0x0097f5,
@@ -49,8 +48,8 @@ async def log(media: object):
 				inline = False
 			)
 			
-			webhook = Webhook.from_url(url = keys['webhooks'][f'{deployment_channel}_logs'], session = session)
-			await webhook.send(embed = embed, username = 'Astro API', avatar_url = config['images']['astro_trans'])
+			webhook = Webhook.from_url(url = keys['webhooks'][f'{deployment_channel}'], session = session)
+			await webhook.send('<@&1330182314831122492>', embed = embed, username = 'Astro API', avatar_url = text['images']['astro_trans'])
 			return
 
 		elif media.type == 'empty_response':
@@ -62,5 +61,5 @@ async def log(media: object):
 			)
 
 			webhook = Webhook.from_url(url = keys['webhooks'][f'{deployment_channel}_logs'], session = session)
-			await webhook.send(embed = embed, username = 'Astro API', avatar_url = config['images']['astro_trans'])
+			await webhook.send(embed = embed, username = 'Astro API', avatar_url = text['images']['astro_trans'])
 			return

@@ -3,7 +3,9 @@ from AstroAPI.components import *
 from asyncio import *
 
 from AstroAPI.media_services.knowledge_services import genius_api
-from AstroAPI.media_services.music_services import apple_music_api, deezer_api, spotify_api, tidal_api, youtube_music_api
+from AstroAPI.media_services.music_services import apple_music_api, deezer_api, youtube_music_api
+from AstroAPI.media_services.music_services.spotify import spotify_api
+from AstroAPI.media_services.music_services.tidal_deprecated import tidal_api
 
 
 # --- Music API-s ---

@@ -1,7 +1,7 @@
-from AstroAPI.components.ini import config
+from AstroAPI.components.ini import text
 
-missing_image = config['images']['missing_image']
-astro_yellow = int(config['color_hex']['astro_yellow'])
+missing_image = text['images']['missing_image']
+astro_yellow = int(text['color_hex']['astro_yellow'], base=16)
 
 
 
@@ -97,12 +97,12 @@ class Meta:
 
 		 :param	service: The API service in which the parent object was formed.
 		 :param request: The request dictionary (json) of all the data used to make the request.
-		 :param http_code: Optional. The HTTP code returned by an Astro component.
+		 :param http_code: The HTTP code returned by an Astro component.
 		 :param processing_time: The amount of time in milliseconds that an Astro component took to form the orignial media object.
 		 :param filter_confidence_percentage: Optional. Astro's confidence in how accurately it got the correct media object.
 	"""
 
-	def __init__(self, service: str, request: dict, processing_time: int | dict, filter_confidence_percentage: float | dict = None, http_code: int | dict = None):
+	def __init__(self, service: str, request: dict, processing_time: int | dict, http_code: int | dict, filter_confidence_percentage: float | dict = None):
 		processing_time = {service: processing_time} if isinstance(processing_time, int) else processing_time
 		filter_confidence_percentage = {service: filter_confidence_percentage} if isinstance(filter_confidence_percentage, float) else filter_confidence_percentage
 		
@@ -143,9 +143,9 @@ class Song:
 		 :param meta: The technical metadata of the song.
 	"""
 
-	def __init__(self, service: str, type: str, urls: str | dict, ids: any | dict, title: str, artists: list[object], cover: object, meta: object, collection: object = None, genre: str = None, is_explicit: bool = None) -> object:
+	def __init__(self, service: str, type: str, urls: str | dict, ids: str | dict, title: str, artists: list[object], cover: object, meta: object, collection: object = None, genre: str = None, is_explicit: bool = None) -> object:
 		urls = {service: urls} if not isinstance(urls, dict) else urls
-		ids = {service: str(ids)} if not isinstance(ids, dict) else ids
+		ids = {service: ids} if not isinstance(ids, dict) else ids
 		censored_title = title
 		
 		self.service = service
@@ -196,10 +196,10 @@ class MusicVideo:
 		 :param meta: The technical metadata of the music video.
 	"""
 
-	def __init__(self, service: str, urls: str | dict, ids: any | dict, title: str, artists: list[object], cover: object, meta: object, is_explicit: bool = None, genre: str = None) -> object:
+	def __init__(self, service: str, urls: str | dict, ids: str | dict, title: str, artists: list[object], cover: object, meta: object, is_explicit: bool = None, genre: str = None) -> object:
 		type = 'music_video'
 		urls = {service: urls} if not isinstance(urls, dict) else urls
-		ids = {service: str(ids)} if not isinstance(ids, dict) else ids
+		ids = {service: ids} if not isinstance(ids, dict) else ids
 		censored_title = title
 		
 		self.service = service
@@ -251,9 +251,9 @@ class Collection:
 		 :param meta: The technical metadata of the collection.
 	"""
 
-	def __init__(self, service: str, type: str, urls: str | dict, ids: any | dict, title: str, artists: list[object], cover: object, meta = object, release_year: int = None, genre: str = None) -> object:
+	def __init__(self, service: str, type: str, urls: str | dict, ids: str | dict, title: str, artists: list[object], cover: object, meta = object, release_year: int = None, genre: str = None) -> object:
 		urls = {service: urls} if not isinstance(urls, dict) else urls
-		ids = {service: str(ids)} if not isinstance(ids, dict) else ids
+		ids = {service: ids} if not isinstance(ids, dict) else ids
 		censored_title = title
 		
 		self.service = service
@@ -301,10 +301,10 @@ class Podcast:
 		 :param meta: The technical metadata of the podcast.
 	"""
 
-	def __init__(self, service: str, urls: str | dict, ids: any | dict, title: str, publisher: str, cover: object, meta = object, is_explicit: bool = None) -> object:
+	def __init__(self, service: str, urls: str | dict, ids: str | dict, title: str, publisher: str, cover: object, meta = object, is_explicit: bool = None) -> object:
 		type = 'podcast'
 		urls = {service: urls} if not isinstance(urls, dict) else urls
-		ids = {service: str(ids)} if not isinstance(ids, dict) else ids
+		ids = {service: ids} if not isinstance(ids, dict) else ids
 		censored_title = title
 		
 		self.service = service
@@ -350,10 +350,10 @@ class PodcastEpisode:
 		 :param meta: The technical metadata of the podcast episode.
 	"""
 
-	def __init__(self, service: str, urls: str | dict, ids: any | dict, title: str, release_year: int, cover: object, meta = object, is_explicit: bool = None) -> object:
+	def __init__(self, service: str, urls: str | dict, ids: str | dict, title: str, release_year: int, cover: object, meta = object, is_explicit: bool = None) -> object:
 		type = 'podcast_episode'
 		urls = {service: urls} if not isinstance(urls, dict) else urls
-		ids = {service: str(ids)} if not isinstance(ids, dict) else ids
+		ids = {service: ids} if not isinstance(ids, dict) else ids
 		censored_title = title
 
 		self.service = service
@@ -399,10 +399,10 @@ class Playlist:
 		 :param meta: The technical metadata of the playlist.
 	"""
 
-	def __init__(self, service: str, urls: str | dict, ids: any | dict, title: str, owner: str, songs: list[object], cover: object, meta: object) -> object:
+	def __init__(self, service: str, urls: str | dict, ids: str | dict, title: str, owner: str, songs: list[object], cover: object, meta: object) -> object:
 		type = 'playlist'
 		urls = {service: urls} if not isinstance(urls, dict) else urls
-		ids = {service: str(ids)} if not isinstance(ids, dict) else ids
+		ids = {service: ids} if not isinstance(ids, dict) else ids
 		censored_title = title
 
 		self.service = service
@@ -451,10 +451,10 @@ class Audiobook:
 		 :param meta: The technical metadata of the audiobook.
 	"""
 
-	def __init__(self, service: str, urls: str | dict, ids: any | dict, title: str, authors: list, narrators: list, publisher: str, chapters: int, cover: object, is_explicit: bool, meta: object) -> object:
+	def __init__(self, service: str, urls: str | dict, ids: str | dict, title: str, authors: list, narrators: list, publisher: str, chapters: int, cover: object, is_explicit: bool, meta: object) -> object:
 		type = 'audiobook'
 		urls = {service: urls} if not isinstance(urls, dict) else urls
-		ids = {service: str(ids)} if not isinstance(ids, dict) else ids
+		ids = {service: ids} if not isinstance(ids, dict) else ids
 		censored_title = title
 
 		self.service = service
@@ -505,11 +505,10 @@ class Artist:
 		 :param meta: The technical metadata of the artist.
 	"""
 
-	def __init__(self, service: str, urls: str | dict, ids: any | dict, name: str, profile_picture: object, meta: object, genres: list = None) -> object:
+	def __init__(self, service: str, urls: str | dict, ids: str | dict, name: str, meta: object, profile_picture: object = None, genres: list = None) -> object:
 		type = 'artist'
 		urls = {service: urls} if not isinstance(urls, dict) else urls
-		ids = {service: str(ids)} if not isinstance(ids, dict) else ids
-		profile_pic_url = profile_pic_url if profile_pic_url != None else missing_image
+		ids = {service: ids} if not isinstance(ids, dict) else ids
 		
 		self.service = service
 		self.type = type
@@ -526,7 +525,7 @@ class Artist:
 			'ids': ids,
 			'name': name,
 			'genres': genres,
-			'profile_picture': profile_picture.json,
+			'profile_picture': profile_picture.json if profile_picture != None else None,
 			'meta': meta.json
 		}
 
@@ -552,7 +551,7 @@ class Cover:
 		 :param meta: The technical metadata of the artist.
 	"""
 
-	def __init__(self, service: str, media_type: str, title: str, artists: list[object], hq_urls: str | dict, lq_urls: str | dict, meta: object, color_hex: int = None) -> object:
+	def __init__(self, service: str, media_type: str, title: str, artists: list[object], hq_urls: str | dict | None, lq_urls: str | dict | None, meta: object, color_hex: int = None) -> object:
 		type = 'cover'
 		hq_urls = {service: hq_urls} if isinstance(hq_urls, str) else hq_urls if hq_urls != None else missing_image
 		lq_urls = {service: lq_urls} if isinstance(lq_urls, str) else lq_urls if lq_urls != None else missing_image
@@ -595,14 +594,13 @@ class ProfilePicture:
 
 		 :param	service: The API service in which the object was formed.
 		 :param user_type: The type of user of the profile picture, can either be `user` or `artist`.
-		 :param name: The user's name (or username).
 		 :param hq_urls: The profile picture's high quality URL(s).
 		 :param lq_urls: The profile picture's low quality URL(s).
 		 :param color_hex: Optional The profile picture's color hex code.
 		 :param meta: The technical metadata of the artist.
 	"""
 
-	def __init__(self, service: str, user_type: str, name: str, hq_urls: str | dict, lq_urls: str | dict, meta: object, color_hex: int = None):
+	def __init__(self, service: str, user_type: str, meta: object, hq_urls: str | dict = None, lq_urls: str | dict = None, color_hex: int = None):
 		type = 'profile_picture'
 		hq_urls = {service: hq_urls} if isinstance(hq_urls, str) else hq_urls if hq_urls != None else missing_image
 		lq_urls = {service: lq_urls} if isinstance(lq_urls, str) else lq_urls if lq_urls != None else missing_image
@@ -611,7 +609,6 @@ class ProfilePicture:
 		self.service = service
 		self.type = type
 		self.user_type = user_type
-		self.name = name
 		self.hq_urls = hq_urls
 		self.lq_urls = lq_urls
 		self.color_hex = color_hex
@@ -620,7 +617,6 @@ class ProfilePicture:
 			'service': service,
 			'type': type,
 			'user_type': user_type,
-			'name': name,
 			'hq_urls': hq_urls,
 			'lq_urls': lq_urls,
 			'color_hex': color_hex,
@@ -657,10 +653,10 @@ class Knowledge:
 		 :param meta: The technical metadata of the song.
 	"""
 
-	def __init__(self, service: str, media_type: str, urls: str | dict, ids: any | dict, title: str, artists: list[object], cover: object, meta: object, description: str = None, collection: object = None, release_date: str = None, is_explicit: bool = None, genre: str = None, bpm: float = None, key: int = None, length: int = None, time_signature: int = None) -> object:
+	def __init__(self, service: str, media_type: str, urls: str | dict, ids: str | dict, title: str, artists: list[object], cover: object, meta: object, description: str = None, collection: object = None, release_date: str = None, is_explicit: bool = None, genre: str = None, bpm: float = None, key: int = None, length: int = None, time_signature: int = None) -> object:
 		type = 'knowledge'
 		urls = {service: urls} if not isinstance(urls, dict) else urls
-		ids = {service: str(ids)} if not isinstance(ids, dict) else ids
+		ids = {service: ids} if not isinstance(ids, dict) else ids
 		description = description if description != '?' or description != '' else None
 		censored_description = description
 		time_signature = f'1/{time_signature}' if time_signature is not None else None
