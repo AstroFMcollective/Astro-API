@@ -245,8 +245,7 @@ class Collection:
 		 :param title: The collection's title.
 		 :param artists: The collection's artists.
 		 :param release_year: Optional. The collection's release year.
-		 :param cover_url: The collection's cover art URL.
-		 :param cover_color_hex: Optional. The hex code of the average color of the collection's cover art.
+		 :param cover: The collection's cover art.
 		 :param genre: Optional. The collection's genre.
 		 :param meta: The technical metadata of the collection.
 	"""
