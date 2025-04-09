@@ -1,6 +1,7 @@
 from AstroAPI.components.media import *
 from AstroAPI.components.log import *
 from AstroAPI.components.text_manipulation import *
+from AstroAPI.components.time import current_unix_time_ms
 
 
 
@@ -50,6 +51,7 @@ async def filter_song(service: str, query_request: dict, songs: list, query_arti
 
 	# This function relies on a "scoring" system out of which is then calculated the final percentage (for readability)
 	# The more crucial parameters are provided, the higher the score ceiling is (the more precise the filtering algorithm is)
+	start_time = current_unix_time_ms()
 	max_score = 2000
 	if query_collection != None:
 		max_score += 1000
@@ -63,7 +65,7 @@ async def filter_song(service: str, query_request: dict, songs: list, query_arti
 		song_similarity = 0 # Song similarity overall score, the beginning score is always zero
 
 		artist_input = bare_bones(query_artists[0]) # Strip down the artist name of any stylization and convert all characters into their latin counterparts
-		artists_reference = song.artists
+		artists_reference = [artist.name for artist in song.artists]
 		artists_with_similarity = []
 
 		# This accounts all the artists in a song: checks their similarity with the query data, sorts that data from the highest to lowest, and then applies the highest score to the song similarity overall score
@@ -98,19 +100,40 @@ async def filter_song(service: str, query_request: dict, songs: list, query_arti
 	
 	data_with_similarity = sort_similarity_lists(data_with_similarity) # Sort the list from the biggest to smallest score
 	if data_with_similarity != []: # Check if the list is empty
-		top_data = data_with_similarity[0]
-		if percentage(max_score, top_data[0]) > 30: # Check if the similarity percentage is above 30%, if it's not discard the song and return an empty object
-			top_data[1].meta.filter_confidence_percentage = {service: percentage(max_score, top_data[0])} # Set the song object's confidence percentage to the calculated accuracy percentage
-			return top_data[1]
+		top_result = data_with_similarity[0]
+		top_data = top_result[1]
+		filtering_time = current_unix_time_ms() - start_time
+		if percentage(max_score, top_result[0]) > 30: # Check if the similarity percentage is above 30%, if it's not discard the song and return an empty object			
+			top_song = Song(
+				service = top_data.service,
+				type = top_data.type,
+				urls = top_data.urls,
+				ids =  top_data.ids,
+				title = top_data.title,
+				artists = top_data.artists,
+				collection = top_data.collection,
+				cover = top_data.cover,
+				genre = top_data.genre,
+				is_explicit = top_data.is_explicit,
+				meta = Meta(
+					service = top_data.service,
+					request = top_data.meta.request,
+					http_code = top_data.meta.http_code,
+					processing_time = top_data.meta.processing_time[top_data.service] + filtering_time,
+					filter_confidence_percentage = {top_data.service: percentage(max_score, top_result[0])}
+				)
+			)
+			
+			return top_song
 		else:
 			response = Empty(
 				service = service,
 				meta = Meta(
-					service = top_data[1].service,
-					request = top_data[1].meta.request,
-					processing_time = top_data[1].meta.processing_time,
-					filter_confidence_percentage = {service: percentage(max_score, top_data[0])},
-					http_code = 204
+					service = top_data.service,
+					request = top_data.meta.request,
+					http_code = 204,
+					processing_time = top_data.meta.processing_time,
+					filter_confidence_percentage = {service: percentage(max_score, top_result[0])}
 				)
 			)
 			await log(response)
@@ -122,9 +145,9 @@ async def filter_song(service: str, query_request: dict, songs: list, query_arti
 			meta = Meta(
 				service = service,
 				request = query_request,
+				http_code = 204,
 				processing_time = 0,
-				filter_confidence_percentage = {service: 0.0},
-				http_code = 204
+				filter_confidence_percentage = {service: 0.0}
 			)
 		)
 		await log(response)
