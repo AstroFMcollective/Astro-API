@@ -8,6 +8,7 @@ import aiohttp
 async def lookup_song(id: str, country_code: str = 'us') -> object:
 	async with aiohttp.ClientSession() as session:
 		request = {'request': 'lookup_song', 'id': id, 'country_code': country_code}
+
 		api_url = f'{api}/tracks/{id}'
 		api_params = {
 			'market': country_code.upper(),
@@ -30,7 +31,7 @@ async def lookup_song(id: str, country_code: str = 'us') -> object:
 				collection_type = 'album' if song['album']['album_type'] != 'single' else 'ep'
 				collection_url = song['album']['external_urls']['spotify']
 				collection_id = song['album']['id']
-				collection_title = song['album']['name']
+				collection_title = remove_feat(song['album']['name'])
 				collection_artists = get_artists_of_media(request, song['album']['artists'])
 				collection_year = song['album']['release_date'][:4]
 
