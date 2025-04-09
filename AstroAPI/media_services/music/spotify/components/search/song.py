@@ -15,7 +15,7 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 		songs = []
 		api_url = f'{api}/search'
 		api_params = {
-			'q': (f'artist:{artists[0]} track:{title}' if collection == None or song_type == 'single' else f'artist:{artists[0]} track:{title} album:{collection}'),
+			'q': f'artist:{artists[0]} track:{title}' if collection == None or song_type == 'single' else f'artist:{artists[0]} track:{title} album:{collection}',
 			'type': 'track',
 			'market': country_code.upper(),
 			'limit': 50,
