@@ -167,12 +167,24 @@ class Song:
 			'ids': ids,
 			'title': title,
 			'censored_title': censored_title,
-			'artists': [artist.json for artist in artists],
-			'collection': collection.json,
-			'cover': cover.json,
+			'artists': [artist.json_lite for artist in artists],
+			'collection': collection.json_lite,
+			'cover': cover.json_lite,
 			'genre': genre,
 			'is_explicit': is_explicit,
 			'meta': meta.json
+		}
+		self.json_lite = {
+			'type': type,
+			'urls': urls,
+			'ids': ids,
+			'title': title,
+			'censored_title': censored_title,
+			'artists': [artist.json_lite for artist in artists],
+			'collection': collection.json_lite,
+			'cover': cover.json_lite,
+			'genre': genre,
+			'is_explicit': is_explicit,
 		}
 
 
@@ -220,11 +232,22 @@ class MusicVideo:
 			'ids': ids,
 			'title': title,
 			'censored_title': censored_title,
-			'artists': [artist.json for artist in artists],
-			'cover': cover.json,
+			'artists': [artist.json_lite for artist in artists],
+			'cover': cover.json_lite,
 			'genre': genre,
 			'is_explicit': is_explicit,
 			'meta': meta.json
+		}
+		self.json_lite = {
+			'type': type,
+			'urls': urls,
+			'ids': ids,
+			'title': title,
+			'censored_title': censored_title,
+			'artists': [artist.json_lite for artist in artists],
+			'cover': cover.json_lite,
+			'genre': genre,
+			'is_explicit': is_explicit,
 		}
 
 
@@ -273,11 +296,22 @@ class Collection:
 			'ids': ids,
 			'title': title,
 			'censored_title': censored_title,
-			'artists': [artist.json for artist in artists],
+			'artists': [artist.json_lite for artist in artists],
 			'release_year': release_year,
-			'cover': cover.json,
+			'cover': cover.json_lite,
 			'genre': genre,
 			'meta': meta.json
+		}
+		self.json_lite = {
+			'type': type,
+			'urls': urls,
+			'ids': ids,
+			'title': title,
+			'censored_title': censored_title,
+			'artists': [artist.json_lite for artist in artists],
+			'release_year': release_year,
+			'cover': cover.json_lite,
+			'genre': genre,
 		}
 
 
@@ -324,9 +358,19 @@ class Podcast:
 			'title': title,
 			'censored_title': censored_title,
 			'publisher': publisher,
-			'cover': cover.json,
+			'cover': cover.json_lite,
 			'is_explicit': is_explicit,
 			'meta': meta.json
+		}
+		self.json_lite = {
+			'type': type,
+			'urls': urls,
+			'ids': ids,
+			'title': title,
+			'censored_title': censored_title,
+			'publisher': publisher,
+			'cover': cover.json_lite,
+			'is_explicit': is_explicit,
 		}
 
 
@@ -377,6 +421,16 @@ class PodcastEpisode:
 			'is_explicit': is_explicit,
 			'meta': meta.json
 		}
+		self.json_lite = {
+			'type': type,
+			'urls': urls,
+			'ids': ids,
+			'title': title,
+			'censored_title': censored_title,
+			'release_year': release_year,
+			'cover': cover.json,
+			'is_explicit': is_explicit,
+		}
 
 
 
@@ -422,9 +476,19 @@ class Playlist:
 			'title': title,
 			'censored_title': title,
 			'owner': owner,
-			'songs': [song.json for song in songs],
-			'cover': cover.json,
+			'songs': [song.json_lite for song in songs],
+			'cover': cover.json_lite,
 			'meta': meta.json
+		}
+		self.json_lite = {
+			'type': type,
+			'urls': urls,
+			'ids': ids,
+			'title': title,
+			'censored_title': title,
+			'owner': owner,
+			'songs': [song.json_lite for song in songs],
+			'cover': cover.json_lite,
 		}
 
 
@@ -484,6 +548,19 @@ class Audiobook:
 			'is_explicit': is_explicit,
 			'meta': meta.json
 		}
+		self.json_lite = {
+			'type': type,
+			'urls': urls,
+			'ids': ids,
+			'title': title,
+			'censored_title': censored_title,
+			'authors': authors,
+			'narrators': narrators,
+			'publisher': publisher,
+			'chapters': chapters,
+			'cover': cover.json,
+			'is_explicit': is_explicit,
+		}
 
 
 
@@ -504,7 +581,7 @@ class Artist:
 		 :param meta: The technical metadata of the artist.
 	"""
 
-	def __init__(self, service: str, urls: str | dict, ids: str | dict, name: str, meta: object, profile_picture: object = None, genres: list = None) -> object:
+	def __init__(self, service: str, urls: str | dict, ids: str | dict, name: str, meta: object, profile_picture: object = None, genre: str = None) -> object:
 		type = 'artist'
 		urls = {service: urls} if not isinstance(urls, dict) else urls
 		ids = {service: ids} if not isinstance(ids, dict) else ids
@@ -514,7 +591,7 @@ class Artist:
 		self.urls = urls
 		self.ids = ids
 		self.name = name
-		self.genres = genres
+		self.genre = genre
 		self.profile_picture = profile_picture
 		self.meta = meta
 		self.json = {
@@ -523,9 +600,17 @@ class Artist:
 			'urls': urls,
 			'ids': ids,
 			'name': name,
-			'genres': genres,
-			'profile_picture': profile_picture.json if profile_picture != None else None,
+			'genres': genre,
+			'profile_picture': profile_picture.json_lite if profile_picture != None else None,
 			'meta': meta.json
+		}
+		self.json_lite = {
+			'type': type,
+			'urls': urls,
+			'ids': ids,
+			'name': name,
+			'genres': genre,
+			'profile_picture': profile_picture.json_lite if profile_picture != None else None,
 		}
 
 
@@ -573,11 +658,17 @@ class Cover:
 			'media_type': media_type,
 			'title': title,
 			'censored_title': censored_title,
-			'artists': [artist.json for artist in artists],
+			'artists': [artist.json_lite for artist in artists],
 			'hq_urls': hq_urls,
 			'lq_urls': lq_urls,
 			'color_hex': color_hex,
 			'meta': meta.json
+		}
+		self.json_lite = {
+			'type': type,
+			'hq_urls': hq_urls,
+			'lq_urls': lq_urls,
+			'color_hex': color_hex,
 		}
 
 
@@ -620,6 +711,12 @@ class ProfilePicture:
 			'lq_urls': lq_urls,
 			'color_hex': color_hex,
 			'meta': meta.json
+		}
+		self.json_lite = {
+			'type': type,
+			'hq_urls': hq_urls,
+			'lq_urls': lq_urls,
+			'color_hex': color_hex,
 		}
 
 
@@ -705,12 +802,12 @@ class Knowledge:
 			'ids': ids,
 			'title': title,
 			'censored_title': title,
-			'artists': [artist.json for artist in artists],
-			'collection': collection.json,
+			'artists': [artist.json_lite for artist in artists],
+			'collection': collection.json_lite,
 			'description': description,
 			'censored_description': censored_description,
 			'release_date': release_date,
-			'cover': cover.json,
+			'cover': cover.json_lite,
 			'genre': genre,
 			'is_explicit': is_explicit,
 			'bpm': bpm,
@@ -718,4 +815,24 @@ class Knowledge:
 			'length': length,
 			'time_signature': time_signature,
 			'meta': meta.json
+		}
+		self.json = {
+			'type': type,
+			'media_type': media_type,
+			'urls': urls,
+			'ids': ids,
+			'title': title,
+			'censored_title': title,
+			'artists': [artist.json_lite for artist in artists],
+			'collection': collection.json_lite,
+			'description': description,
+			'censored_description': censored_description,
+			'release_date': release_date,
+			'cover': cover.json_lite,
+			'genre': genre,
+			'is_explicit': is_explicit,
+			'bpm': bpm,
+			'key': key,
+			'length': length,
+			'time_signature': time_signature,
 		}
