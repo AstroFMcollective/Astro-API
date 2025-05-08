@@ -6,7 +6,7 @@ from .components.generic import *
 #from .components.search.music_video import search_music_video
 from .components.lookup.song import lookup_song
 from .components.lookup.collection import lookup_collection
-#from .components.lookup.music_video import music_video
+from .components.lookup.music_video import lookup_music_video
 from .components.lookup.artist import lookup_artist
 
 class AppleMusic:
@@ -28,6 +28,10 @@ class AppleMusic:
 
 	async def lookup_collection(self, id: str, country_code: str = 'us') -> Collection | Empty | Error:
 		collection = await lookup_collection(id = id, country_code = country_code)
+		return collection
+	
+	async def lookup_music_video(self, id: str, country_code: str = 'us') -> Collection | Empty | Error:
+		collection = await lookup_music_video(id = id, country_code = country_code)
 		return collection
 
 	async def lookup_artist(self, id: str, country_code: str = 'us') -> Song | Empty | Error:
