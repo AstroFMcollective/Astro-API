@@ -53,6 +53,13 @@ class Error:
 			'error_msg': error_msg,
 			'meta': meta.json
 		}
+		self.json_lite = {
+			'service': service,
+			'type': type,
+			'component': component,
+			'error_msg': error_msg,
+			'meta': meta.json
+		}
 
 
 
@@ -77,6 +84,11 @@ class Empty:
 		self.type = type
 		self.meta = meta
 		self.json = {
+			'service': service,
+			'type': type,
+			'meta': meta.json
+		}
+		self.json_lite = {
 			'service': service,
 			'type': type,
 			'meta': meta.json
