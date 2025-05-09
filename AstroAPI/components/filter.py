@@ -48,10 +48,10 @@ async def filter_song(service: str, query_request: dict, songs: list, query_arti
 	"""
 
 
+	start_time = current_unix_time_ms()
 
 	# This function relies on a "scoring" system out of which is then calculated the final percentage (for readability)
 	# The more crucial parameters are provided, the higher the score ceiling is (the more precise the filtering algorithm is)
-	start_time = current_unix_time_ms()
 	max_score = 2000
 	if query_collection != None:
 		max_score += 1000
@@ -85,7 +85,7 @@ async def filter_song(service: str, query_request: dict, songs: list, query_arti
 
 		if query_collection != None and song.collection != None: 
 			collection_input = bare_bones(query_collection)
-			collection_reference = song.collection
+			collection_reference = song.collection.title
 			song_similarity += calculate_similarity(bare_bones(collection_reference), collection_input)
 
 		if query_is_explicit != None and song.is_explicit != None: # Since these are boolean values, you can just check them and then add the points or not
@@ -174,6 +174,7 @@ async def filter_mv(service: str, query_request: dict, videos: list, query_artis
 	"""
 	
 	
+	start_time = current_unix_time_ms()
 
 	# This function relies on a "scoring" system out of which is then calculated the final percentage (for readability)
 	# The more crucial parameters are provided, the higher the score ceiling is (the more precise the filtering algorithm is)
@@ -182,11 +183,11 @@ async def filter_mv(service: str, query_request: dict, videos: list, query_artis
 		max_score += 500
 
 	data_with_similarity = [] # Empty list for music videos with their similiarity score
-	for data in videos:
+	for video in videos:
 		song_similarity = 0 # Music video similarity overall score, the beginning score is always zero
 		
 		artist_input = bare_bones(query_artists[0]) # Strip down the artist name of any stylization and convert all characters into their latin counterparts
-		artists_reference = data.artists
+		artists_reference = [artist.name for artist in video.artists]
 		artists_with_similarity = []
 
 		# This accounts all the artists in a music video: checks their similarity with the query data, sorts that data from the highest to lowest, and then applies the highest score to the music video similarity overall score
@@ -201,48 +202,67 @@ async def filter_mv(service: str, query_request: dict, videos: list, query_artis
 			continue
 
 		title_input = bare_bones(query_title) # Strips down the title
-		title_reference = remove_feat(data.title) # Removes all features included in the title
+		title_reference = remove_feat(video.title) # Removes all features included in the title
 		song_similarity += calculate_similarity(bare_bones(title_reference), title_input) # Calculates their similarity and adds it to the overall score
 
-		if query_is_explicit != None and data.is_explicit != None: # Since these are boolean values, you can just check them and then add the points or not
-			if query_is_explicit == data.is_explicit:
+		if query_is_explicit != None and video.is_explicit != None: # Since these are boolean values, you can just check them and then add the points or not
+			if query_is_explicit == video.is_explicit:
 				song_similarity += 500
 
-		data_with_similarity.append([song_similarity, data])
+		data_with_similarity.append([song_similarity, video])
 	
 	data_with_similarity = sort_similarity_lists(data_with_similarity) # Sort the list from the biggest to smallest score
 	if data_with_similarity != []: # Check if the list is empty
-		top_data = data_with_similarity[0]
-		if percentage(max_score, top_data[0]) > 30: # Check if the similarity percentage is above 30%, if it's not discard the music video and return an empty object
-			top_data[1].meta.filter_confidence_percentage = {service: percentage(max_score, top_data[0])} # Set the music video object's confidence percentage to the calculated accuracy percentage
-			return top_data[1]
-		else:
-			empty_response = Empty(
-				service = service,
+		top_result = data_with_similarity[0]
+		top_data = top_result[1]
+		filtering_time = current_unix_time_ms() - start_time
+		if percentage(max_score, top_result[0]) > 30: # Check if the similarity percentage is above 30%, if it's not discard the music video and return an empty object
+			top_video = MusicVideo(
+				service = top_data.service,
+				urls = top_data.urls,
+				ids =  top_data.ids,
+				title = top_data.title,
+				artists = top_data.artists,
+				cover = top_data.cover,
+				genre = top_data.genre,
+				is_explicit = top_data.is_explicit,
 				meta = Meta(
-					service = top_data[1].service,
-					request = top_data[1].meta.request,
-					processing_time = top_data[1].meta.processing_time,
-					filter_confidence_percentage = {service: percentage(max_score, top_data[0])},
-					http_code = 204
+					service = top_data.service,
+					request = top_data.meta.request,
+					http_code = top_data.meta.http_code,
+					processing_time = top_data.meta.processing_time[top_data.service] + filtering_time,
+					filter_confidence_percentage = {top_data.service: percentage(max_score, top_result[0])}
 				)
 			)
-			await log(empty_response)
-			return empty_response
 
-	else: # Return empty if there is no music video that has passed filtering
-		empty_response = Empty(
+			return top_video
+		else:
+			response = Empty(
+				service = service,
+				meta = Meta(
+					service = top_data.service,
+					request = top_data.meta.request,
+					http_code = 204,
+					processing_time = top_data.meta.processing_time,
+					filter_confidence_percentage = {service: percentage(max_score, top_result[0])}
+				)
+			)
+			await log(response)
+			return response
+
+	else: # Return empty if there is no video that has passed filtering
+		response = Empty(
 			service = service,
 			meta = Meta(
 				service = service,
 				request = query_request,
+				http_code = 204,
 				processing_time = 0,
-				filter_confidence_percentage = {service: 0.0},
-				http_code = 204
+				filter_confidence_percentage = {service: 0.0}
 			)
 		)
-		await log(empty_response)
-		return empty_response
+		await log(response)
+		return response
 
 
 
@@ -266,10 +286,10 @@ async def filter_collection(service: str, query_request: dict, collections: list
 	"""
 	
 	
+	start_time = current_unix_time_ms()
 
 	# This function relies on a "scoring" system out of which is then calculated the final percentage (for readability)
 	# The more crucial parameters are provided, the higher the score ceiling is (the more precise the filtering algorithm is)
-	start_time = current_unix_time_ms()
 	max_score = 2000
 	if query_year != None:
 		max_score += 1000
