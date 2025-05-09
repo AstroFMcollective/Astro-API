@@ -90,6 +90,7 @@ async def lookup_music_video(id: str, country_code: str = 'us') -> object:
 			meta = Meta(
 				service = service,
 				request = request,
+				http_code = 500,
 				processing_time = {service: current_unix_time_ms() - start_time}
 			)
 		)
