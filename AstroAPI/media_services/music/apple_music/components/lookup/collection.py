@@ -85,7 +85,7 @@ async def lookup_collection(id: str, country_code: str = 'us') -> object:
 							title = song_title,
 							artists = song_artists,
 							hq_urls = collection['artworkUrl100'],
-							lq_urls = collection['artworkUrl30'],
+							lq_urls = collection['artworkUrl60'],
 							color_hex = None,
 							meta = Meta(
 								service = service,
@@ -158,6 +158,7 @@ async def lookup_collection(id: str, country_code: str = 'us') -> object:
 			meta = Meta(
 				service = service,
 				request = request,
+				http_code = 500,
 				processing_time = {service: current_unix_time_ms() - start_time}
 			)
 		)
