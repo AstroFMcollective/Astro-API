@@ -588,7 +588,7 @@ class Artist:
 		 :param urls: The artist's URL(s).
 		 :param ids: The artist's ID(s).
 		 :param name: The artist's name.
-		 :param genres: Optional. The artist's genres.
+		 :param genre: Optional. The artist's main genre.
 		 :param profile_picture: The artist's profile picture.
 		 :param meta: The technical metadata of the artist.
 	"""
