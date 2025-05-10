@@ -8,6 +8,7 @@ import aiohttp
 async def lookup_collection(id: str, country_code: str = 'us') -> object:
 	request = {'request': 'lookup_collection', 'id': id, 'country_code': country_code}
 	start_time = current_unix_time_ms()
+
 	try:
 		async with aiohttp.ClientSession() as session:
 			api_url = f'{api}/albums/{id}'
@@ -76,6 +77,7 @@ async def lookup_collection(id: str, country_code: str = 'us') -> object:
 					)
 					await log(error)
 					return error
+
 	except Exception as error:
 		error = Error(
 			service = service,

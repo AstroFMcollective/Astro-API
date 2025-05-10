@@ -8,6 +8,7 @@ import aiohttp
 async def search_collection(artists: list, title: str, year: int = None, country_code: str = 'us') -> object:
 	request = {'request': 'search_collection', 'artists': artists, 'title': title, 'year': year, 'country_code': country_code}
 	start_time = current_unix_time_ms()
+
 	try:
 		async with aiohttp.ClientSession() as session:
 			artists = [optimize_for_search(artist) for artist in artists]
@@ -85,6 +86,7 @@ async def search_collection(artists: list, title: str, year: int = None, country
 					)
 					await log(error)
 					return error
+
 	except Exception as error:
 		error = Error(
 			service = service,

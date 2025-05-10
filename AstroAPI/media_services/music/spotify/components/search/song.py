@@ -8,6 +8,7 @@ import aiohttp
 async def search_song(artists: list, title: str, song_type: str = None, collection: str = None, is_explicit: bool = None, country_code: str = 'us') -> object:
 	request = {'request': 'search_song', 'artists': artists, 'title': title, 'song_type': song_type, 'collection': collection, 'is_explicit': is_explicit, 'country_code': country_code}
 	start_time = current_unix_time_ms()
+
 	try:
 		async with aiohttp.ClientSession() as session:
 			artists = [optimize_for_search(artist) for artist in artists]
@@ -112,6 +113,7 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 					)
 					await log(error)
 					return error
+
 	except Exception as error:
 		error = Error(
 			service = service,
