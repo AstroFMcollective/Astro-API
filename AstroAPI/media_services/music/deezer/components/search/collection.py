@@ -35,39 +35,10 @@ async def search_collection(artists: list, title: str, year: int = None, country
 							collection_type = 'album' if collection['record_type'] != 'ep' else 'ep'
 							collection_url = collection['link']
 							collection_id = collection['id']
-							collection_title = collection['title']
+							collection_title = remove_feat(collection['title'])
 							collection_year = collection['release_date'][:4]
 							collection_genre = collection['genres']['data'][0]['name']
-
-							collection_artists = [
-								Artist(
-									service = service,
-									urls = artist['link'],
-									ids = artist['id'],
-									name = artist['name'],
-									profile_picture = ProfilePicture(
-										service = service,
-										user_type = 'artist',
-										hq_urls = artist['picture_xl'],
-										lq_urls = artist['picture_medium'],
-										color_hex = None,
-										meta = Meta(
-											service = service,
-											request = request,
-											processing_time = current_unix_time_ms() - start_time,
-											filter_confidence_percentage = {service: 100.0},
-											http_code = response.status
-										)
-									),
-									meta = Meta(
-										service = service,
-										request = request,
-										processing_time = current_unix_time_ms() - start_time,
-										filter_confidence_percentage = {service: 100.0},
-										http_code = response.status
-									)
-								) for artist in collection['contributors']
-							]
+							collection_artists = get_artists_of_media(request, collection['contributors'])
 
 							collection_cover = Cover(
 								service = service,

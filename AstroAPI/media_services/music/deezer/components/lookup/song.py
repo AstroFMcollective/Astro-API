@@ -26,36 +26,7 @@ async def lookup_song(id: str, country_code: str = 'us') -> object:
 					song_id = song['id']
 					song_title = song['title']
 					song_is_explicit = song['explicit_lyrics']
-
-					song_artists = [
-						Artist(
-							service = service,
-							urls = artist['link'],
-							ids = artist['id'],
-							name = artist['name'],
-							profile_picture = ProfilePicture(
-								service = service,
-								user_type = 'artist',
-								hq_urls = artist['picture_xl'],
-								lq_urls = artist['picture_medium'],
-								color_hex = None,
-								meta = Meta(
-									service = service,
-									request = request,
-									processing_time = current_unix_time_ms() - start_time,
-									filter_confidence_percentage = {service: 100.0},
-									http_code = response.status
-								)
-							),
-							meta = Meta(
-								service = service,
-								request = request,
-								processing_time = current_unix_time_ms() - start_time,
-								filter_confidence_percentage = {service: 100.0},
-								http_code = response.status
-							)
-						) for artist in song['contributors']
-					]
+					song_artists = get_artists_of_media(request, song['contributors'])
 
 					song_cover = Cover(
 						service = service,
