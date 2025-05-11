@@ -1,8 +1,8 @@
 from AstroAPI.components import *
 from .components.generic import *
 
-#from .components.search.song import search_song
-#from .components.search.collection import search_collection
+from .components.search.song import search_song
+from .components.search.collection import search_collection
 from .components.lookup.song import lookup_song
 from .components.lookup.collection import lookup_collection
 
