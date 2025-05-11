@@ -60,6 +60,6 @@ async def log(media: object):
 				inline = False
 			)
 
-			webhook = Webhook.from_url(url = keys['webhooks'][f'{deployment_channel}_logs'], session = session)
+			webhook = Webhook.from_url(url = keys['webhooks'][f'{deployment_channel}'], session = session)
 			await webhook.send(embed = embed, username = 'Astro API', avatar_url = text['images']['astro_trans'])
 			return
