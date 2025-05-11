@@ -26,7 +26,6 @@ async def lookup_song(id: str, country_code: str = 'us') -> object:
 					song_id = song['id']
 					song_title = song['title']
 					song_is_explicit = song['explicit_lyrics']
-					song_collection = remove_feat(song['album']['title'])
 
 					song_artists = [
 						Artist(
@@ -79,7 +78,7 @@ async def lookup_song(id: str, country_code: str = 'us') -> object:
 						type = 'album' if song['album']['type'] != 'ep' else 'ep',
 						urls = song['album']['link'],
 						ids = song['album']['id'],
-						title = song['album']['title'],
+						title = remove_feat(song['album']['title']),
 						artists = [song_artists[0]],
 						release_year = song['album']['release_date'][:4],
 						cover = song_cover,
