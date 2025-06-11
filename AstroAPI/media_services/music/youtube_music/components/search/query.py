@@ -19,7 +19,7 @@ async def search_query(query: str, country_code: str = 'us') -> object: # TODO: 
 			result_artists = [
 				Artist(
 					service = service,
-					urls = f'https://music.youtube.com/artist?id={artist["id"]}',
+					urls = f'https://music.youtube.com/channel/{artist["id"]}',
 					ids = artist['id'],
 					name = artist['name'],
 					meta = Meta(
@@ -120,7 +120,7 @@ async def search_query(query: str, country_code: str = 'us') -> object: # TODO: 
 			result_artists = [
 				Artist(
 					service = service,
-					urls = f'https://music.youtube.com/artist?id={artist["id"]}',
+					urls = f'https://music.youtube.com/channel/{artist["id"]}',
 					ids = artist['id'],
 					name = artist['name'],
 					meta = Meta(
