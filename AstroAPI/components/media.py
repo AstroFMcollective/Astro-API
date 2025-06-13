@@ -1,7 +1,6 @@
 from AstroAPI.components.ini import text
 
 missing_image = text['images']['missing_image']
-astro_yellow = int(text['color_hex']['astro_yellow'], base=16)
 
 
 
@@ -46,21 +45,23 @@ class Error:
 		self.component = component
 		self.error_msg = error_msg
 		self.meta = meta
+		self.regenerate_json()
+
+	def regenerate_json(self):
 		self.json = {
-			'service': service,
-			'type': type,
-			'component': component,
-			'error_msg': error_msg,
-			'meta': meta.json
+			'service': self.service,
+			'type': self.type,
+			'component': self.component,
+			'error_msg': self.error_msg,
+			'meta': self.meta.json
 		}
 		self.json_lite = {
-			'service': service,
-			'type': type,
-			'component': component,
-			'error_msg': error_msg,
-			'meta': meta.json
+			'service': self.service,
+			'type': self.type,
+			'component': self.component,
+			'error_msg': self.error_msg,
+			'meta': self.meta.json
 		}
-
 
 
 class Empty:
@@ -83,15 +84,18 @@ class Empty:
 		self.service = service
 		self.type = type
 		self.meta = meta
+		self.regenerate_json()
+
+	def regenerate_json(self):
 		self.json = {
-			'service': service,
-			'type': type,
-			'meta': meta.json
+			'service': self.service,
+			'type': self.type,
+			'meta': self.meta.json
 		}
 		self.json_lite = {
-			'service': service,
-			'type': type,
-			'meta': meta.json
+			'service': self.service,
+			'type': self.type,
+			'meta': self.meta.json
 		}
 
 
@@ -122,11 +126,14 @@ class Meta:
 		self.http_code = http_code
 		self.processing_time = processing_time
 		self.filter_confidence_percentage = filter_confidence_percentage
+		self.regenerate_json()
+
+	def regenerate_json(self):
 		self.json = {
-			'request': request,
-			'http_code': http_code,
-			'processing_time': processing_time,
-			'filter_confidence_percentage': filter_confidence_percentage
+			'request': self.request,
+			'http_code': self.http_code,
+			'processing_time': self.processing_time,
+			'filter_confidence_percentage': self.filter_confidence_percentage
 		}
 
 
@@ -157,7 +164,7 @@ class Song:
 
 	def __init__(self, service: str, type: str, urls: str | dict, ids: str | dict, title: str, artists: list[object], cover: object, meta: object, collection: object = None, genre: str = None, is_explicit: bool = None) -> object:
 		urls = {service: urls} if not isinstance(urls, dict) else urls
-		ids = {service: ids} if not isinstance(ids, dict) else ids
+		ids = {service: str(ids)} if not isinstance(ids, dict) else ids
 		censored_title = title
 		
 		self.service = service
@@ -172,32 +179,36 @@ class Song:
 		self.genre = genre
 		self.is_explicit = is_explicit
 		self.meta = meta
+		self.regenerate_json()
+
+	def regenerate_json(self):
 		self.json = {
-			'service': service,
-			'type': type,
-			'urls': urls,
-			'ids': ids,
-			'title': title,
-			'censored_title': censored_title,
-			'artists': [artist.json_lite for artist in artists],
-			'collection': collection.json_lite if collection else None,
-			'cover': cover.json_lite,
-			'genre': genre,
-			'is_explicit': is_explicit,
-			'meta': meta.json
+			'service': self.service,
+			'type': self.type,
+			'urls': self.urls,
+			'ids': self.ids,
+			'title': self.title,
+			'censored_title': self.censored_title,
+			'artists': [artist.json_lite for artist in self.artists],
+			'collection': self.collection.json_lite if self.collection else None,
+			'cover': self.cover.json_lite if self.cover else None,
+			'genre': self.genre,
+			'is_explicit': self.is_explicit,
+			'meta': self.meta.json
 		}
 		self.json_lite = {
-			'type': type,
-			'urls': urls,
-			'ids': ids,
-			'title': title,
-			'censored_title': censored_title,
-			'artists': [artist.json_lite for artist in artists],
-			'collection': collection.json_lite if collection else None,
-			'cover': cover.json_lite,
-			'genre': genre,
-			'is_explicit': is_explicit,
+			'type': self.type,
+			'urls': self.urls,
+			'ids': self.ids,
+			'title': self.title,
+			'censored_title': self.censored_title,
+			'artists': [artist.json_lite for artist in self.artists],
+			'collection': self.collection.json_lite if self.collection else None,
+			'cover': self.cover.json_lite if self.cover else None,
+			'genre': self.genre,
+			'is_explicit': self.is_explicit,
 		}
+
 
 
 
@@ -223,7 +234,7 @@ class MusicVideo:
 	def __init__(self, service: str, urls: str | dict, ids: str | dict, title: str, artists: list[object], cover: object, meta: object, is_explicit: bool = None, genre: str = None) -> object:
 		type = 'music_video'
 		urls = {service: urls} if not isinstance(urls, dict) else urls
-		ids = {service: ids} if not isinstance(ids, dict) else ids
+		ids = {service: str(ids)} if not isinstance(ids, dict) else ids
 		censored_title = title
 		
 		self.service = service
@@ -237,29 +248,32 @@ class MusicVideo:
 		self.genre = genre
 		self.is_explicit = is_explicit
 		self.meta = meta
+		self.regenerate_json()
+
+	def regenerate_json(self):
 		self.json = {
-			'service': service,
-			'type': type,
-			'urls': urls,
-			'ids': ids,
-			'title': title,
-			'censored_title': censored_title,
-			'artists': [artist.json_lite for artist in artists],
-			'cover': cover.json_lite,
-			'genre': genre,
-			'is_explicit': is_explicit,
-			'meta': meta.json
+			'service': self.service,
+			'type': self.type,
+			'urls': self.urls,
+			'ids': self.ids,
+			'title': self.title,
+			'censored_title': self.censored_title,
+			'artists': [artist.json_lite for artist in self.artists],
+			'cover': self.cover.json_lite,
+			'genre': self.genre,
+			'is_explicit': self.is_explicit,
+			'meta': self.meta.json
 		}
 		self.json_lite = {
-			'type': type,
-			'urls': urls,
-			'ids': ids,
-			'title': title,
-			'censored_title': censored_title,
-			'artists': [artist.json_lite for artist in artists],
-			'cover': cover.json_lite,
-			'genre': genre,
-			'is_explicit': is_explicit,
+			'type': self.type,
+			'urls': self.urls,
+			'ids': self.ids,
+			'title': self.title,
+			'censored_title': self.censored_title,
+			'artists': [artist.json_lite for artist in self.artists],
+			'cover': self.cover.json_lite,
+			'genre': self.genre,
+			'is_explicit': self.is_explicit,
 		}
 
 
@@ -287,7 +301,7 @@ class Collection:
 
 	def __init__(self, service: str, type: str, urls: str | dict, ids: str | dict, title: str, artists: list[object], cover: object, meta = object, release_year: int = None, genre: str = None) -> object:
 		urls = {service: urls} if not isinstance(urls, dict) else urls
-		ids = {service: ids} if not isinstance(ids, dict) else ids
+		ids = {service: str(ids)} if not isinstance(ids, dict) else ids
 		censored_title = title
 		
 		self.service = service
@@ -301,29 +315,32 @@ class Collection:
 		self.cover = cover
 		self.genre = genre
 		self.meta = meta
+		self.regenerate_json()
+
+	def regenerate_json(self):
 		self.json = {
-			'service': service,
-			'type': type,
-			'urls': urls,
-			'ids': ids,
-			'title': title,
-			'censored_title': censored_title,
-			'artists': [artist.json_lite for artist in artists],
-			'release_year': release_year,
-			'cover': cover.json_lite,
-			'genre': genre,
-			'meta': meta.json
+			'service': self.service,
+			'type': self.type,
+			'urls': self.urls,
+			'ids': self.ids,
+			'title': self.title,
+			'censored_title': self.censored_title,
+			'artists': [artist.json_lite for artist in self.artists],
+			'release_year': self.release_year,
+			'cover': self.cover.json_lite,
+			'genre': self.genre,
+			'meta': self.meta.json
 		}
 		self.json_lite = {
-			'type': type,
-			'urls': urls,
-			'ids': ids,
-			'title': title,
-			'censored_title': censored_title,
-			'artists': [artist.json_lite for artist in artists],
-			'release_year': release_year,
-			'cover': cover.json_lite,
-			'genre': genre,
+			'type': self.type,
+			'urls': self.urls,
+			'ids': self.ids,
+			'title': self.title,
+			'censored_title': self.censored_title,
+			'artists': [artist.json_lite for artist in self.artists],
+			'release_year': self.release_year,
+			'cover': self.cover.json_lite,
+			'genre': self.genre,
 		}
 
 
@@ -349,7 +366,7 @@ class Podcast:
 	def __init__(self, service: str, urls: str | dict, ids: str | dict, title: str, publisher: str, cover: object, meta = object, is_explicit: bool = None) -> object:
 		type = 'podcast'
 		urls = {service: urls} if not isinstance(urls, dict) else urls
-		ids = {service: ids} if not isinstance(ids, dict) else ids
+		ids = {service: str(ids)} if not isinstance(ids, dict) else ids
 		censored_title = title
 		
 		self.service = service
@@ -362,27 +379,30 @@ class Podcast:
 		self.cover = cover
 		self.is_explicit = is_explicit
 		self.meta = meta
+		self.regenerate_json()
+
+	def regenerate_json(self):
 		self.json = {
-			'service': service,
-			'type': type,
-			'urls': urls,
-			'ids': ids,
-			'title': title,
-			'censored_title': censored_title,
-			'publisher': publisher,
-			'cover': cover.json_lite,
-			'is_explicit': is_explicit,
-			'meta': meta.json
+			'service': self.service,
+			'type': self.type,
+			'urls': self.urls,
+			'ids': self.ids,
+			'title': self.title,
+			'censored_title': self.censored_title,
+			'publisher': self.publisher,
+			'cover': self.cover.json_lite,
+			'is_explicit': self.is_explicit,
+			'meta': self.meta.json
 		}
 		self.json_lite = {
-			'type': type,
-			'urls': urls,
-			'ids': ids,
-			'title': title,
-			'censored_title': censored_title,
-			'publisher': publisher,
-			'cover': cover.json_lite,
-			'is_explicit': is_explicit,
+			'type': self.type,
+			'urls': self.urls,
+			'ids': self.ids,
+			'title': self.title,
+			'censored_title': self.censored_title,
+			'publisher': self.publisher,
+			'cover': self.cover.json_lite,
+			'is_explicit': self.is_explicit,
 		}
 
 
@@ -408,7 +428,7 @@ class PodcastEpisode:
 	def __init__(self, service: str, urls: str | dict, ids: str | dict, title: str, release_year: int, cover: object, meta = object, is_explicit: bool = None) -> object:
 		type = 'podcast_episode'
 		urls = {service: urls} if not isinstance(urls, dict) else urls
-		ids = {service: ids} if not isinstance(ids, dict) else ids
+		ids = {service: str(ids)} if not isinstance(ids, dict) else ids
 		censored_title = title
 
 		self.service = service
@@ -421,27 +441,30 @@ class PodcastEpisode:
 		self.cover = cover
 		self.is_explicit = is_explicit
 		self.meta = meta
+		self.regenerate_json()
+
+	def regenerate_json(self):
 		self.json = {
-			'service': service,
-			'type': type,
-			'urls': urls,
-			'ids': ids,
-			'title': title,
-			'censored_title': censored_title,
-			'release_year': release_year,
-			'cover': cover.json,
-			'is_explicit': is_explicit,
-			'meta': meta.json
+			'service': self.service,
+			'type': self.type,
+			'urls': self.urls,
+			'ids': self.ids,
+			'title': self.title,
+			'censored_title': self.censored_title,
+			'release_year': self.release_year,
+			'cover': self.cover.json,
+			'is_explicit': self.is_explicit,
+			'meta': self.meta.json
 		}
 		self.json_lite = {
-			'type': type,
-			'urls': urls,
-			'ids': ids,
-			'title': title,
-			'censored_title': censored_title,
-			'release_year': release_year,
-			'cover': cover.json,
-			'is_explicit': is_explicit,
+			'type': self.type,
+			'urls': self.urls,
+			'ids': self.ids,
+			'title': self.title,
+			'censored_title': self.censored_title,
+			'release_year': self.release_year,
+			'cover': self.cover.json,
+			'is_explicit': self.is_explicit,
 		}
 
 
@@ -467,7 +490,7 @@ class Playlist:
 	def __init__(self, service: str, urls: str | dict, ids: str | dict, title: str, owner: str, songs: list[object], cover: object, meta: object) -> object:
 		type = 'playlist'
 		urls = {service: urls} if not isinstance(urls, dict) else urls
-		ids = {service: ids} if not isinstance(ids, dict) else ids
+		ids = {service: str(ids)} if not isinstance(ids, dict) else ids
 		censored_title = title
 
 		self.service = service
@@ -480,27 +503,30 @@ class Playlist:
 		self.songs = songs
 		self.cover = cover
 		self.meta = meta
+		self.regenerate_json()
+
+	def regenerate_json(self):
 		self.json = {
-			'service': service,
-			'type': type,
-			'urls': urls,
-			'ids': ids,
-			'title': title,
-			'censored_title': title,
-			'owner': owner,
-			'songs': [song.json_lite for song in songs],
-			'cover': cover.json_lite,
-			'meta': meta.json
+			'service': self.service,
+			'type': self.type,
+			'urls': self.urls,
+			'ids': self.ids,
+			'title': self.title,
+			'censored_title': self.censored_title,
+			'owner': self.owner,
+			'songs': [song.json_lite for song in self.songs],
+			'cover': self.cover.json_lite,
+			'meta': self.meta.json
 		}
 		self.json_lite = {
-			'type': type,
-			'urls': urls,
-			'ids': ids,
-			'title': title,
-			'censored_title': title,
-			'owner': owner,
-			'songs': [song.json_lite for song in songs],
-			'cover': cover.json_lite,
+			'type': self.type,
+			'urls': self.urls,
+			'ids': self.ids,
+			'title': self.title,
+			'censored_title': self.censored_title,
+			'owner': self.owner,
+			'songs': [song.json_lite for song in self.songs],
+			'cover': self.cover.json_lite,
 		}
 
 
@@ -529,7 +555,7 @@ class Audiobook:
 	def __init__(self, service: str, urls: str | dict, ids: str | dict, title: str, authors: list, narrators: list, publisher: str, chapters: int, cover: object, is_explicit: bool, meta: object) -> object:
 		type = 'audiobook'
 		urls = {service: urls} if not isinstance(urls, dict) else urls
-		ids = {service: ids} if not isinstance(ids, dict) else ids
+		ids = {service: str(ids)} if not isinstance(ids, dict) else ids
 		censored_title = title
 
 		self.service = service
@@ -545,33 +571,36 @@ class Audiobook:
 		self.cover = cover
 		self.is_explicit = is_explicit
 		self.meta = meta
+		self.regenerate_json()
+
+	def regenerate_json(self):
 		self.json = {
-			'service': service,
-			'type': type,
-			'urls': urls,
-			'ids': ids,
-			'title': title,
-			'censored_title': censored_title,
-			'authors': authors,
-			'narrators': narrators,
-			'publisher': publisher,
-			'chapters': chapters,
-			'cover': cover.json,
-			'is_explicit': is_explicit,
-			'meta': meta.json
+			'service': self.service,
+			'type': self.type,
+			'urls': self.urls,
+			'ids': self.ids,
+			'title': self.title,
+			'censored_title': self.censored_title,
+			'authors': self.authors,
+			'narrators': self.narrators,
+			'publisher': self.publisher,
+			'chapters': self.chapters,
+			'cover': self.cover.json,
+			'is_explicit': self.is_explicit,
+			'meta': self.meta.json
 		}
 		self.json_lite = {
-			'type': type,
-			'urls': urls,
-			'ids': ids,
-			'title': title,
-			'censored_title': censored_title,
-			'authors': authors,
-			'narrators': narrators,
-			'publisher': publisher,
-			'chapters': chapters,
-			'cover': cover.json,
-			'is_explicit': is_explicit,
+			'type': self.type,
+			'urls': self.urls,
+			'ids': self.ids,
+			'title': self.title,
+			'censored_title': self.censored_title,
+			'authors': self.authors,
+			'narrators': self.narrators,
+			'publisher': self.publisher,
+			'chapters': self.chapters,
+			'cover': self.cover.json,
+			'is_explicit': self.is_explicit,
 		}
 
 
@@ -596,8 +625,8 @@ class Artist:
 	def __init__(self, service: str, urls: str | dict, ids: str | dict, name: str, meta: object, profile_picture: object = None, genre: str = None) -> object:
 		type = 'artist'
 		urls = {service: urls} if not isinstance(urls, dict) else urls
-		ids = {service: ids} if not isinstance(ids, dict) else ids
-		
+		ids = {service: str(ids)} if not isinstance(ids, dict) else ids
+
 		self.service = service
 		self.type = type
 		self.urls = urls
@@ -606,23 +635,26 @@ class Artist:
 		self.genre = genre
 		self.profile_picture = profile_picture
 		self.meta = meta
+		self.regenerate_json()
+
+	def regenerate_json(self):
 		self.json = {
-			'service': service,
-			'type': type,
-			'urls': urls,
-			'ids': ids,
-			'name': name,
-			'genres': genre,
-			'profile_picture': profile_picture.json_lite if profile_picture != None else None,
-			'meta': meta.json
+			'service': self.service,
+			'type': self.type,
+			'urls': self.urls,
+			'ids': self.ids,
+			'name': self.name,
+			'genre': self.genre,
+			'profile_picture': self.profile_picture.json_lite if self.profile_picture else None,
+			'meta': self.meta.json
 		}
 		self.json_lite = {
-			'type': type,
-			'urls': urls,
-			'ids': ids,
-			'name': name,
-			'genres': genre,
-			'profile_picture': profile_picture.json_lite if profile_picture != None else None,
+			'type': self.type,
+			'urls': self.urls,
+			'ids': self.ids,
+			'name': self.name,
+			'genre': self.genre,
+			'profile_picture': self.profile_picture.json_lite if self.profile_picture else None,
 		}
 
 
@@ -643,16 +675,14 @@ class Cover:
 		 :param artists: The media's artists.
 		 :param hq_urls: The cover's high quality URL(s).
 		 :param lq_urls: The cover's low quality URL(s).
-		 :param color_hex: Optional. The cover's color hex code.
 		 :param meta: The technical metadata of the artist.
 	"""
 
-	def __init__(self, service: str, media_type: str, title: str, artists: list[object], hq_urls: str | dict | None, lq_urls: str | dict | None, meta: object, color_hex: int = None) -> object:
+	def __init__(self, service: str, media_type: str, title: str, artists: list[object], hq_urls: str | dict | None, lq_urls: str | dict | None, meta: object) -> object:
 		type = 'cover'
 		hq_urls = {service: hq_urls} if isinstance(hq_urls, str) else hq_urls if hq_urls != None else missing_image
 		lq_urls = {service: lq_urls} if isinstance(lq_urls, str) else lq_urls if lq_urls != None else missing_image
 		censored_title = title
-		color_hex = color_hex if color_hex != None else astro_yellow
 		
 		self.service = service
 		self.type = type
@@ -662,25 +692,25 @@ class Cover:
 		self.artists = artists
 		self.hq_urls = hq_urls
 		self.lq_urls = lq_urls
-		self.color_hex = color_hex
 		self.meta = meta
+		self.regenerate_json()
+
+	def regenerate_json(self):
 		self.json = {
-			'service': service,
-			'type': type,
-			'media_type': media_type,
-			'title': title,
-			'censored_title': censored_title,
-			'artists': [artist.json_lite for artist in artists],
-			'hq_urls': hq_urls,
-			'lq_urls': lq_urls,
-			'color_hex': color_hex,
-			'meta': meta.json
+			'service': self.service,
+			'type': self.type,
+			'media_type': self.media_type,
+			'title': self.title,
+			'censored_title': self.censored_title,
+			'artists': [artist.json_lite for artist in self.artists],
+			'hq_urls': self.hq_urls,
+			'lq_urls': self.lq_urls,
+			'meta': self.meta.json
 		}
 		self.json_lite = {
-			'type': type,
-			'hq_urls': hq_urls,
-			'lq_urls': lq_urls,
-			'color_hex': color_hex,
+			'type': self.type,
+			'hq_urls': self.hq_urls,
+			'lq_urls': self.lq_urls,
 		}
 
 
@@ -698,37 +728,35 @@ class ProfilePicture:
 		 :param user_type: The type of user of the profile picture, can either be `user` or `artist`.
 		 :param hq_urls: The profile picture's high quality URL(s).
 		 :param lq_urls: The profile picture's low quality URL(s).
-		 :param color_hex: Optional The profile picture's color hex code.
 		 :param meta: The technical metadata of the artist.
 	"""
 
-	def __init__(self, service: str, user_type: str, meta: object, hq_urls: str | dict = None, lq_urls: str | dict = None, color_hex: int = None):
+	def __init__(self, service: str, user_type: str, meta: object, hq_urls: str | dict = None, lq_urls: str | dict = None) -> object:
 		type = 'profile_picture'
 		hq_urls = {service: hq_urls} if isinstance(hq_urls, str) else hq_urls if hq_urls != None else missing_image
 		lq_urls = {service: lq_urls} if isinstance(lq_urls, str) else lq_urls if lq_urls != None else missing_image
-		color_hex = color_hex if color_hex != None else astro_yellow
 
 		self.service = service
 		self.type = type
 		self.user_type = user_type
 		self.hq_urls = hq_urls
 		self.lq_urls = lq_urls
-		self.color_hex = color_hex
 		self.meta = meta
+		self.regenerate_json()
+
+	def regenerate_json(self):
 		self.json = {
-			'service': service,
-			'type': type,
-			'user_type': user_type,
-			'hq_urls': hq_urls,
-			'lq_urls': lq_urls,
-			'color_hex': color_hex,
-			'meta': meta.json
+			'service': self.service,
+			'type': self.type,
+			'user_type': self.user_type,
+			'hq_urls': self.hq_urls,
+			'lq_urls': self.lq_urls,
+			'meta': self.meta.json
 		}
 		self.json_lite = {
-			'type': type,
-			'hq_urls': hq_urls,
-			'lq_urls': lq_urls,
-			'color_hex': color_hex,
+			'type': self.type,
+			'hq_urls': self.hq_urls,
+			'lq_urls': self.lq_urls,
 		}
 
 
@@ -764,7 +792,7 @@ class Knowledge:
 	def __init__(self, service: str, media_type: str, urls: str | dict, ids: str | dict, title: str, artists: list[object], cover: object, meta: object, description: str = None, collection: object = None, release_date: str = None, is_explicit: bool = None, genre: str = None, bpm: float = None, key: int = None, length: int = None, time_signature: int = None) -> object:
 		type = 'knowledge'
 		urls = {service: urls} if not isinstance(urls, dict) else urls
-		ids = {service: ids} if not isinstance(ids, dict) else ids
+		ids = {service: str(ids)} if not isinstance(ids, dict) else ids
 		description = description if description != '?' or description != '' else None
 		censored_description = description
 		time_signature = f'1/{time_signature}' if time_signature is not None else None
@@ -806,45 +834,48 @@ class Knowledge:
 		self.length = length
 		self.time_signature = time_signature
 		self.meta = meta
+		self.regenerate_json()
+
+	def regenerate_json(self):
 		self.json = {
-			'service': service,
-			'type': type,
-			'media_type': media_type,
-			'urls': urls,
-			'ids': ids,
-			'title': title,
-			'censored_title': title,
-			'artists': [artist.json_lite for artist in artists],
-			'collection': collection.json_lite if collection else None,
-			'description': description,
-			'censored_description': censored_description,
-			'release_date': release_date,
-			'cover': cover.json_lite,
-			'genre': genre,
-			'is_explicit': is_explicit,
-			'bpm': bpm,
-			'key': key,
-			'length': length,
-			'time_signature': time_signature,
-			'meta': meta.json
+			'service': self.service,
+			'type': self.type,
+			'media_type': self.media_type,
+			'urls': self.urls,
+			'ids': self.ids,
+			'title': self.title,
+			'censored_title': self.censored_title,
+			'artists': [artist.json_lite for artist in self.artists],
+			'collection': self.collection.json_lite if self.collection else None,
+			'description': self.description,
+			'censored_description': self.censored_description,
+			'release_date': self.release_date,
+			'cover': self.cover.json_lite,
+			'genre': self.genre,
+			'is_explicit': self.is_explicit,
+			'bpm': self.bpm,
+			'key': self.key,
+			'length': self.length,
+			'time_signature': self.time_signature,
+			'meta': self.meta.json
 		}
-		self.json = {
-			'type': type,
-			'media_type': media_type,
-			'urls': urls,
-			'ids': ids,
-			'title': title,
-			'censored_title': title,
-			'artists': [artist.json_lite for artist in artists],
-			'collection': collection.json_lite if collection else None,
-			'description': description,
-			'censored_description': censored_description,
-			'release_date': release_date,
-			'cover': cover.json_lite,
-			'genre': genre,
-			'is_explicit': is_explicit,
-			'bpm': bpm,
-			'key': key,
-			'length': length,
-			'time_signature': time_signature,
+		self.json_lite = {
+			'type': self.type,
+			'media_type': self.media_type,
+			'urls': self.urls,
+			'ids': self.ids,
+			'title': self.title,
+			'censored_title': self.censored_title,
+			'artists': [artist.json_lite for artist in self.artists],
+			'collection': self.collection.json_lite if self.collection else None,
+			'description': self.description,
+			'censored_description': self.censored_description,
+			'release_date': self.release_date,
+			'cover': self.cover.json_lite,
+			'genre': self.genre,
+			'is_explicit': self.is_explicit,
+			'bpm': self.bpm,
+			'key': self.key,
+			'length': self.length,
+			'time_signature': self.time_signature,
 		}
