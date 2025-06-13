@@ -59,7 +59,6 @@ async def search_collection(artists: list, title: str, year: int = None, country
 							artists = collection_artists,
 							hq_urls = collection['artworkUrl100'],
 							lq_urls = collection['artworkUrl60'],
-							color_hex = None,
 							meta = Meta(
 								service = service,
 								request = request,

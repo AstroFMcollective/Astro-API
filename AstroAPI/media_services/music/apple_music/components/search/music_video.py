@@ -57,7 +57,6 @@ async def search_music_video(artists: list, title: str, is_explicit: bool = None
 							artists = mv_artists,
 							hq_urls = video['artworkUrl100'],
 							lq_urls = video['artworkUrl60'],
-							color_hex = None,
 							meta = Meta(
 								service = service,
 								request = request,

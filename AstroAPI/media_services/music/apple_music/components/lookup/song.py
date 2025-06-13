@@ -44,7 +44,6 @@ async def lookup_song(id: str, country_code: str = 'us') -> object:
 						artists = song_artists,
 						hq_urls = song['artworkUrl100'],
 						lq_urls = song['artworkUrl30'],
-						color_hex = None,
 						meta = Meta(
 							service = service,
 							request = request,

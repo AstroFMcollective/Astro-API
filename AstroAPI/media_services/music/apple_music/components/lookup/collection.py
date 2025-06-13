@@ -41,7 +41,6 @@ async def lookup_collection(id: str, country_code: str = 'us') -> object:
 							artists = collection_artists,
 							hq_urls = collection['artworkUrl100'],
 							lq_urls = collection['artworkUrl60'],
-							color_hex = None,
 							meta = Meta(
 								service = service,
 								request = request,

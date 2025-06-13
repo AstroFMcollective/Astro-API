@@ -47,6 +47,7 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 									service = service,
 									request = request,
 									processing_time = current_unix_time_ms() - start_time,
+									filter_confidence_percentage = 100.0,
 									http_code = response.status
 								)
 							) for artist in split_artists(song['artistName'])
@@ -59,11 +60,11 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 							artists = song_artists,
 							hq_urls = song['artworkUrl100'],
 							lq_urls = song['artworkUrl60'],
-							color_hex = None,
 							meta = Meta(
 								service = service,
 								request = request,
 								processing_time = current_unix_time_ms() - start_time,
+								filter_confidence_percentage = 100.0,
 								http_code = response.status
 							)
 						)
@@ -80,6 +81,7 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 								service = service,
 								request = request,
 								processing_time = current_unix_time_ms() - start_time,
+								filter_confidence_percentage = 100.0,
 								http_code = response.status
 							)
 						)
@@ -113,6 +115,7 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 							service = service,
 							request = request,
 							processing_time = current_unix_time_ms() - start_time,
+							filter_confidence_percentage = 0.0,
 							http_code = response.status
 						)
 					)
@@ -128,6 +131,7 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 				service = service,
 				request = request,
 				http_code = 500,
+				filter_confidence_percentage = 0.0,
 				processing_time = {service: current_unix_time_ms() - start_time}
 			)
 		)

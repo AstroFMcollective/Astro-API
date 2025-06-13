@@ -39,7 +39,6 @@ async def lookup_music_video(id: str, country_code: str = 'us') -> object:
 						artists = mv_artist,
 						hq_urls = video['artworkUrl100'],
 						lq_urls = video['artworkUrl60'],
-						color_hex = None,
 						meta = Meta(
 							service = service,
 							request = request,
