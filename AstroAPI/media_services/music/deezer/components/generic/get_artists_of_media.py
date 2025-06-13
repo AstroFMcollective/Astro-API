@@ -15,7 +15,6 @@ def get_artists_of_media(request: dict, artists_json: dict):
 					user_type = 'artist',
 					hq_urls = artist['picture_xl'],
 					lq_urls = artist['picture_medium'],
-					color_hex = None,
 					meta = Meta(
 						service = service,
 						request = request,
