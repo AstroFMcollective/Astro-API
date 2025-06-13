@@ -10,17 +10,6 @@ def get_artists_of_media(request: dict, artists_json: dict):
 				urls = artist['external_urls']['spotify'],
 				ids = artist['id'],
 				name = artist['name'],
-				profile_picture = ProfilePicture(
-					service = service,
-					user_type = 'artist',
-					meta = Meta(
-						service = service,
-						request = request,
-						processing_time = 0,
-						filter_confidence_percentage = 100.0,
-						http_code = 200
-					)
-				),
 				meta = Meta(
 					service = service,
 					request = request,
