@@ -11,15 +11,15 @@ from asyncio import create_task, gather
 
 
 async def search_song(artists: list, title: str, song_type: str = None, collection: str = None, is_explicit: bool = None, country_code: str = 'us', include_premade_media: list = [], exclude_services: list = []) -> object:
-		request = {'request': 'search_song', 'artists': artists, 'title': title, 'song_type': song_type, 'collection': collection, 'is_explicit': is_explicit, 'country_code': country_code, 'exclude_services': exclude_services}
-		start_time = current_unix_time_ms()
+	request = {'request': 'search_song', 'artists': artists, 'title': title, 'song_type': song_type, 'collection': collection, 'is_explicit': is_explicit, 'country_code': country_code, 'exclude_services': exclude_services}
+	start_time = current_unix_time_ms()
 
-	# try:
+	try:
 		# Define service objects
 		service_objs = [spotify, apple_music, youtube_music, deezer]
 		services = [obj.service for obj in service_objs]
 
-		legal_results = ['track', 'single']
+		legal_results = ['track', 'single']	
 
 		# Exclude services if they already have a premade media object
 		# This is to prevent duplicate searches, increasing performance
@@ -70,8 +70,6 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 		# Some services have lesser quality or straight-up do not carry certain information, so we prioritize the ones who do
 		general_order = [spotify.service, apple_music.service, youtube_music.service, deezer.service]
 		type_order = [apple_music.service, spotify.service, deezer.service, youtube_music.service]
-		urls_order = [spotify.service, apple_music.service, youtube_music.service, deezer.service]
-		ids_order = [spotify.service, apple_music.service, youtube_music.service, deezer.service]
 		title_order = [spotify.service, apple_music.service, deezer.service, youtube_music.service]
 		explicitness_order = [spotify.service, apple_music.service, deezer.service, youtube_music.service]
 		genre_order = [apple_music.service, spotify.service, deezer.service, youtube_music.service]
@@ -81,8 +79,6 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 			if labeled_results[service].type not in legal_results:
 				general_order.remove(service)
 				type_order.remove(service)
-				urls_order.remove(service)
-				ids_order.remove(service)
 				title_order.remove(service)
 				explicitness_order.remove(service)
 				genre_order.remove(service)
@@ -162,18 +158,18 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 			return error
 
 	# If sinister things happen
-	# except Exception as error:
-	# 	error = Error(
-	# 		service = gservice,
-	# 		component = gcomponent,
-	# 		error_msg = f'Error when searching song: "{error}"',
-	# 		meta = Meta(
-	# 			service = gservice,
-	# 			request = request,
-	# 			http_code = 500,
-	# 			filter_confidence_percentage = {gservice: 0.0},
-	# 			processing_time = current_unix_time_ms() - start_time
-	# 		)
-	# 	)
-	# 	await log(error)
-	# 	return error
+	except Exception as error:
+		error = Error(
+			service = gservice,
+			component = gcomponent,
+			error_msg = f'Error when searching song: "{error}"',
+			meta = Meta(
+				service = gservice,
+				request = request,
+				http_code = 500,
+				filter_confidence_percentage = {gservice: 0.0},
+				processing_time = current_unix_time_ms() - start_time
+			)
+		)
+		await log(error)
+		return error

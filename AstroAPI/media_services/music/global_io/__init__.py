@@ -3,8 +3,8 @@ from AstroAPI.media_services.music.global_io.components.generic import *
 from asyncio import create_task, gather
 
 from AstroAPI.media_services.music.global_io.components.search.song import search_song
-# from AstroAPI.media_services.music.global_io.components.search.music_video import search_music_video
-# from AstroAPI.media_services.music.global_io.components.search.collection import search_collection
+from AstroAPI.media_services.music.global_io.components.search.music_video import search_music_video
+from AstroAPI.media_services.music.global_io.components.search.collection import search_collection
 # from AstroAPI.media_services.music.global_io.components.search.query import search_query
 # from AstroAPI.media_services.music.global_io.components.lookup.song import lookup_song
 # from AstroAPI.media_services.music.global_io.components.lookup.music_video import lookup_music_video
@@ -28,5 +28,27 @@ class GlobalIO:
 				exclude_services.append(premade.service)
 						
 		return await search_song(artists, title, song_type, collection, is_explicit, country_code, include_premade_media, exclude_services)
+	
+	async def search_music_video(self, artists: list, title: str, is_explicit: bool = None, country_code: str = 'us', include_premade_media: list = [], exclude_services: list = []) -> object:
+		exclude_services.extend(self.exclude_services)
+		exclude_services = remove_duplicates(exclude_services)
+
+		for premade in include_premade_media:
+			if premade.service not in exclude_services:
+				exclude_services.append(premade.service)
+
+		return await search_music_video(artists, title, is_explicit, country_code, include_premade_media, exclude_services)
+	
+	async def search_collection(self, artists: list, title: str, year: int = None, country_code: str = 'us', include_premade_media: list = [], exclude_services: list = []) -> object:
+		exclude_services.extend(self.exclude_services)
+		exclude_services = remove_duplicates(exclude_services)
+
+		for premade in include_premade_media:
+			if premade.service not in exclude_services:
+				exclude_services.append(premade.service)
+
+		return await search_collection(artists, title, year, country_code, include_premade_media, exclude_services)
+
+
 	
 global_io = GlobalIO()
