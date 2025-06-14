@@ -7,7 +7,7 @@ from AstroAPI.media_services.music.global_io.components.generic import *
 def compiled_artists(request: dict, unlabeled_artists: dict) -> list[Artist]:	
 	# Results order based on service priority
 	# Some services have lesser quality or straight-up do not carry certain information, so we prioritize the ones who do
-	artist_lift_from_template = [spotify.service, apple_music.service, youtube_music.service, deezer.service]
+	artist_lift_from_template = [spotify.service, youtube_music.service, deezer.service, apple_music.service]
 	profile_picture_lift_from_template = [deezer.service, spotify.service, apple_music.service, youtube_music.service]
 	general_order = [spotify.service, apple_music.service, youtube_music.service, deezer.service]
 	urls_order = [spotify.service, apple_music.service, youtube_music.service, deezer.service]
@@ -37,7 +37,7 @@ def compiled_artists(request: dict, unlabeled_artists: dict) -> list[Artist]:
 		if artists == []:
 			artists = labeled_artists[service]
 
-	# Iterating through the ordered list to find the first non-None result for each field
+	# Processing each artist object
 	for artist in artists:
 		artist_index = artists.index(artist)
 
@@ -52,7 +52,7 @@ def compiled_artists(request: dict, unlabeled_artists: dict) -> list[Artist]:
 		result_processing_time = {}
 		result_confidence = {}
 
-		
+		# Iterating through the ordered list to find the first non-None result for each field
 		for service_index in range(len(general_order)):
 			if result_name is None:
 				if artist_index < len(labeled_artists[name_order[service_index]]):
@@ -80,8 +80,7 @@ def compiled_artists(request: dict, unlabeled_artists: dict) -> list[Artist]:
 				if artist_index < len(labeled_artists[profile_picture_lift_from_template[service_index]]):
 					profile_picture = labeled_artists[profile_picture_lift_from_template[service_index]][artist_index].profile_picture
 					
-					# This catastrophe shoves the other HQ/LQ URLs from other music services into the profile picture object
-					# If a profile picture was found, attempt to fill in HQ and LQ URLs from all prioritized services
+					# This catastrophe attempts to fill in HQ and LQ URLs from all prioritized services if a profile picture was found
 					if profile_picture is not None:
 						# Populate HQ URLs if not already set
 						if not result_profile_picture_hq_urls:
