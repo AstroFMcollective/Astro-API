@@ -5,12 +5,16 @@ from AstroAPI.media_services.music.global_io.components.generic.compile_global.a
 from AstroAPI.media_services.music.global_io.components.generic.compile_global.cover import compiled_cover
 
 def compiled_collection(request: dict, unlabeled_collections: list) -> Collection:
+	while None in unlabeled_collections:
+		unlabeled_collections.remove(None)
+	
 	labeled_collections = {result.service: result for result in unlabeled_collections}
 
 	unlabeled_artists = [result.artists for result in unlabeled_collections]
 	
 	# Results order based on service priority
 	# Some services have lesser quality or straight-up do not carry certain information, so we prioritize the ones who do
+	all_services = [spotify.service, apple_music.service, youtube_music.service, deezer.service]
 	general_order = [spotify.service, apple_music.service, youtube_music.service, deezer.service]
 	urls_order = [spotify.service, apple_music.service, youtube_music.service, deezer.service]
 	ids_order = [spotify.service, apple_music.service, youtube_music.service, deezer.service]
@@ -19,7 +23,7 @@ def compiled_collection(request: dict, unlabeled_collections: list) -> Collectio
 	genre_order = [apple_music.service, spotify.service, deezer.service, youtube_music.service]
 
 	# Removing services from order if there were no results from those services
-	for service in general_order:
+	for service in all_services:
 		if service not in labeled_collections:
 			general_order.remove(service)
 			urls_order.remove(service)

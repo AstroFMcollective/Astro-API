@@ -26,7 +26,7 @@ async def search_query(query: str, country_code: str = 'us', exclude_services: l
 				[artist.name for artist in query_result.artists],
 				query_result.title,
 				query_result.type,
-				query_result.collection.title,
+				query_result.collection.title if query_result.collection is not None else None,
 				query_result.is_explicit,
 				country_code,
 				[query_result],
