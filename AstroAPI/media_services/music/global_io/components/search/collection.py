@@ -3,7 +3,6 @@ from AstroAPI.media_services.music.global_io.components.generic import *
 from AstroAPI.media_services.music.global_io.components.generic import service as gservice, component as gcomponent
 
 from AstroAPI.media_services.music.global_io.components.generic.compile_global.artists import compiled_artists
-from AstroAPI.media_services.music.global_io.components.generic.compile_global.collection import compiled_collection
 from AstroAPI.media_services.music.global_io.components.generic.compile_global.cover import compiled_cover
 
 from asyncio import create_task, gather
