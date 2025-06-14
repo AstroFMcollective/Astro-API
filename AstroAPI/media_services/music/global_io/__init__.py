@@ -5,7 +5,7 @@ from asyncio import create_task, gather
 from AstroAPI.media_services.music.global_io.components.search.song import search_song
 from AstroAPI.media_services.music.global_io.components.search.music_video import search_music_video
 from AstroAPI.media_services.music.global_io.components.search.collection import search_collection
-# from AstroAPI.media_services.music.global_io.components.search.query import search_query
+from AstroAPI.media_services.music.global_io.components.search.query import search_query
 # from AstroAPI.media_services.music.global_io.components.lookup.song import lookup_song
 # from AstroAPI.media_services.music.global_io.components.lookup.music_video import lookup_music_video
 # from AstroAPI.media_services.music.global_io.components.lookup.collection import lookup_collection
@@ -29,7 +29,7 @@ class GlobalIO:
 						
 		return await search_song(artists, title, song_type, collection, is_explicit, country_code, include_premade_media, exclude_services)
 	
-	async def search_music_video(self, artists: list, title: str, is_explicit: bool = None, country_code: str = 'us', include_premade_media: list = [], exclude_services: list = []) -> object:
+	async def search_music_video(self, artists: list, title: str, is_explicit: bool = None, country_code: str = 'us', include_premade_media: list = [], exclude_services: list = []) -> MusicVideo | Empty | Error:
 		exclude_services.extend(self.exclude_services)
 		exclude_services = remove_duplicates(exclude_services)
 
@@ -48,6 +48,12 @@ class GlobalIO:
 				exclude_services.append(premade.service)
 
 		return await search_collection(artists, title, year, country_code, include_premade_media, exclude_services)
+
+	async def search_query(self, query: str, country_code: str = 'us', exclude_services: list = []) -> object:
+		exclude_services.extend(self.exclude_services)
+		exclude_services = remove_duplicates(exclude_services)
+		
+		return await search_query(query, country_code, exclude_services)
 
 
 	
