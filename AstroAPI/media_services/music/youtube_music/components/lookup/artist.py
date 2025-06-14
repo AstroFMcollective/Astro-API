@@ -5,9 +5,10 @@ from AstroAPI.media_services.music.youtube_music.components.generic import ytm
 
 
 async def lookup_artist(id: str = None, video_id: str = None, country_code: str = 'us') -> object:
+	request = {'request': 'lookup_artist', 'id': id, 'video_id': video_id, 'country_code': country_code}
+	start_time = current_unix_time_ms()
+	
 	try:
-		request = {'request': 'lookup_artist', 'id': id, 'video_id': video_id, 'country_code': country_code}
-		start_time = current_unix_time_ms()
 		try:
 			if video_id == None and id == None:
 				return Empty(

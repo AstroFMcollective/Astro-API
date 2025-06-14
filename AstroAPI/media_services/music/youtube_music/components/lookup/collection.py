@@ -6,9 +6,10 @@ from AstroAPI.media_services.music.youtube_music.components.generic import ytm
 
 
 async def lookup_collection(id: str, country_code: str = 'us') -> object:
+	request = {'request': 'lookup_collection', 'id': id, 'country_code': country_code, 'url': f'https://music.youtube.com/playlist?list={id}'}
+	start_time = current_unix_time_ms()
+	
 	try:
-		request = {'request': 'lookup_collection', 'id': id, 'country_code': country_code, 'url': f'https://music.youtube.com/playlist?list={id}'}
-		start_time = current_unix_time_ms()
 		browse_id = ytm.get_album_browse_id(id)
 		collection = ytm.get_album(browse_id)
 			

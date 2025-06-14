@@ -6,13 +6,14 @@ from AstroAPI.media_services.music.youtube_music.components.generic import ytm
 
 
 async def search_collection(artists: list, title: str, year: int = None, country_code: str = 'us') -> object:
+	request = {'request': 'search_collection', 'artists': artists, 'title': title, 'year': year, 'country_code': country_code}
+	start_time = current_unix_time_ms()
+	
 	try:
-		request = {'request': 'search_collection', 'artists': artists, 'title': title, 'year': year, 'country_code': country_code}
 		artists = [optimize_for_search(artist) for artist in artists]
 		title = optimize_for_search(title)
 
 		collections = []
-		start_time = current_unix_time_ms()
 		results = ytm.search(
 			query = f'{artists[0]} {title}',
 			filter = 'albums'

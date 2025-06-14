@@ -6,9 +6,10 @@ from AstroAPI.media_services.music.youtube_music.components.generic import ytm
 
 
 async def search_query(query: str, country_code: str = 'us') -> object: # TODO: Dovrši
+	request = {'request': 'search_query', 'query': query, 'country_code': country_code}
+	start_time = current_unix_time_ms()
+
 	try:
-		request = {'request': 'search_query', 'query': query, 'country_code': country_code}
-		start_time = current_unix_time_ms()
 		results = ytm.search(
 			query = query
 		)
@@ -172,6 +173,7 @@ async def search_query(query: str, country_code: str = 'us') -> object: # TODO: 
 					service = service,
 					request = request,
 					processing_time = current_unix_time_ms() - start_time,
+					filter_confidence_percentage = {service: 0.0},
 					http_code = 204
 				)
 			)
@@ -187,6 +189,7 @@ async def search_query(query: str, country_code: str = 'us') -> object: # TODO: 
 				service = service,
 				request = request,
 				processing_time = current_unix_time_ms() - start_time,
+				filter_confidence_percentage = {service: 0.0},
 				http_code = 500
 			)
 		)
