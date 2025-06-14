@@ -7,11 +7,10 @@ from AstroAPI.media_services.music.global_io.components.generic import *
 def compiled_artists(request: dict, unlabeled_artists: dict) -> list[Artist]:	
 	# Results order based on service priority
 	# Some services have lesser quality or straight-up do not carry certain information, so we prioritize the ones who do
+	all_services = [spotify.service, apple_music.service, youtube_music.service, deezer.service]
 	artist_lift_from_template = [spotify.service, youtube_music.service, deezer.service, apple_music.service]
 	profile_picture_lift_from_template = [deezer.service, spotify.service, apple_music.service, youtube_music.service]
 	general_order = [spotify.service, apple_music.service, youtube_music.service, deezer.service]
-	urls_order = [spotify.service, apple_music.service, youtube_music.service, deezer.service]
-	ids_order = [spotify.service, apple_music.service, youtube_music.service, deezer.service]
 	name_order = [spotify.service, apple_music.service, deezer.service, youtube_music.service]
 	genre_order = [apple_music.service, spotify.service, deezer.service, youtube_music.service]
 
@@ -19,13 +18,11 @@ def compiled_artists(request: dict, unlabeled_artists: dict) -> list[Artist]:
 
 
 	# Removing services from order if there were no results from those services
-	for service in general_order:
+	for service in all_services:
 		if service not in labeled_artists:
 			artist_lift_from_template.remove(service)
 			profile_picture_lift_from_template.remove(service)
 			general_order.remove(service)
-			urls_order.remove(service)
-			ids_order.remove(service)
 			name_order.remove(service)
 			genre_order.remove(service)
 	

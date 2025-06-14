@@ -10,13 +10,14 @@ def compiled_cover(request: dict, unlabeled_results: list) -> Cover:
 
     # Results order based on service priority
     # Some services have lesser quality or straight-up do not carry certain information, so we prioritize the ones who do
+    all_services = [spotify.service, apple_music.service, youtube_music.service, deezer.service]
     general_order = [spotify.service, apple_music.service, youtube_music.service, deezer.service]
     ids_order = [spotify.service, apple_music.service, youtube_music.service, deezer.service]
     name_order = [spotify.service, apple_music.service, deezer.service, youtube_music.service]
     type_order = [spotify.service, apple_music.service, youtube_music.service, deezer.service]
 
     # Removing services from order if there were no results from those services
-    for service in general_order:
+    for service in all_services:
         if service not in labeled_results:
             general_order.remove(service)
             ids_order.remove(service)
