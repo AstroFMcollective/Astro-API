@@ -47,6 +47,7 @@ async def search_collection(artists: list, title: str, year: int = None, country
 									service = service,
 									request = request,
 									processing_time = current_unix_time_ms() - start_time,
+									filter_confidence_percentage = {service: 100.0},
 									http_code = response.status
 								)
 							) for artist in split_artists(collection['artistName'])
@@ -97,6 +98,7 @@ async def search_collection(artists: list, title: str, year: int = None, country
 							service = service,
 							request = request,
 							processing_time = current_unix_time_ms() - start_time,
+							filter_confidence_percentage = {service: 0.0},
 							http_code = response.status
 						)
 					)
@@ -112,6 +114,7 @@ async def search_collection(artists: list, title: str, year: int = None, country
 				service = service,
 				request = request,
 				http_code = 500,
+				filter_confidence_percentage = {service: 0.0},
 				processing_time = {service: current_unix_time_ms() - start_time}
 			)
 		)

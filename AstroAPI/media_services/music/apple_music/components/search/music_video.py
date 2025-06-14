@@ -45,6 +45,7 @@ async def search_music_video(artists: list, title: str, is_explicit: bool = None
 									service = service,
 									request = request,
 									processing_time = current_unix_time_ms() - start_time,
+									filter_confidence_percentage = 100.0,
 									http_code = response.status
 								)
 							) for artist in split_artists(video['artistName'])
@@ -94,6 +95,7 @@ async def search_music_video(artists: list, title: str, is_explicit: bool = None
 							service = service,
 							request = request,
 							processing_time = current_unix_time_ms() - start_time,
+							filter_confidence_percentage = 0.0,
 							http_code = response.status
 						)
 					)
