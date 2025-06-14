@@ -111,7 +111,9 @@ async def search_music_video(artists: list, title: str, is_explicit: bool = None
 				service = service,
 				request = request,
 				http_code = 500,
+				filter_confidence_percentage = 0.0,
 				processing_time = {service: current_unix_time_ms() - start_time}
+				
 			)
 		)
 		await log(error)
