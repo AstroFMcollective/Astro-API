@@ -78,6 +78,7 @@ def compiled_artists(request: dict, unlabeled_artists: dict) -> list[Artist]:
 					profile_picture = labeled_artists[profile_picture_lift_from_template[service_index]][artist_index].profile_picture
 					
 					# This catastrophe attempts to fill in HQ and LQ URLs from all prioritized services if a profile picture was found
+					# ts pmo 🥀
 					if profile_picture is not None:
 						# Populate HQ URLs if not already set
 						if not result_profile_picture_hq_urls:

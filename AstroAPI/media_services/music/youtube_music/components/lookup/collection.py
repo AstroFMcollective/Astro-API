@@ -5,13 +5,29 @@ from AstroAPI.media_services.music.youtube_music.components.generic import ytm
 
 
 
-async def lookup_collection(id: str, country_code: str = 'us') -> object:
+async def lookup_collection(id: str = None, browse_id: str = None, country_code: str = 'us') -> object:
 	request = {'request': 'lookup_collection', 'id': id, 'country_code': country_code, 'url': f'https://music.youtube.com/playlist?list={id}'}
 	start_time = current_unix_time_ms()
 	
 	try:
-		browse_id = ytm.get_album_browse_id(id)
-		collection = ytm.get_album(browse_id)
+		if id is not None and browse_id is None:
+			browse_id = ytm.get_album_browse_id(id)
+			collection = ytm.get_album(browse_id)
+		elif browse_id is not None:
+			collection = ytm.get_album(browse_id)
+		elif id is None and browse_id is None:
+			return Error(
+				service = service,
+				component = component,
+				error_msg = f'Neither collection id nor browse_id were given',
+				meta = Meta(
+					service = service,
+					request = request,
+					processing_time = current_unix_time_ms() - start_time,
+					http_code = 500
+				)
+			)
+
 			
 		collection_type = ('album' if collection['type'] == 'Album' else 'ep')
 		collection_url = f'https://music.youtube.com/playlist?list={collection['audioPlaylistId']}'

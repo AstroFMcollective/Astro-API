@@ -1,6 +1,7 @@
 from AstroAPI.components import *
 from AstroAPI.media_services.music.youtube_music.components.generic import *
 from AstroAPI.media_services.music.youtube_music.components.lookup.artist import lookup_artist
+from AstroAPI.media_services.music.youtube_music.components.lookup.collection import lookup_collection
 from AstroAPI.media_services.music.youtube_music.components.generic import ytm
 
 
@@ -95,7 +96,12 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 					http_code = 200
 				)
 			))
-		return await filter_song(service = service, query_request = request, songs = songs, query_artists = artists, query_title = title, query_song_type = song_type, query_collection = collection, query_is_explicit = is_explicit, query_country_code = country_code)
+
+		# TODO: Rip the filtered song, replace the collection with the lookup_collection collection
+		filtered_song = await filter_song(service = service, query_request = request, songs = songs, query_artists = artists, query_title = title, query_song_type = song_type, query_collection = collection, query_is_explicit = is_explicit, query_country_code = country_code)
+		filtered_song.collection = await lookup_collection(browse_id = filtered_song.collection.ids[service], country_code = country_code)
+		filtered_song.regenerate_json()
+		return filtered_song
 
 	except Exception as msg:
 		error = Error(
