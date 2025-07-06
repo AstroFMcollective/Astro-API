@@ -680,8 +680,8 @@ class Cover:
 
 	def __init__(self, service: str, media_type: str, title: str, artists: list[object], hq_urls: str | dict | None, lq_urls: str | dict | None, meta: object) -> object:
 		type = 'cover'
-		hq_urls = {service: hq_urls} if isinstance(hq_urls, str) else hq_urls if hq_urls != None else missing_image
-		lq_urls = {service: lq_urls} if isinstance(lq_urls, str) else lq_urls if lq_urls != None else missing_image
+		hq_urls = {service: hq_urls} if isinstance(hq_urls, str) else hq_urls if hq_urls != None else {service: missing_image}
+		lq_urls = {service: lq_urls} if isinstance(lq_urls, str) else lq_urls if lq_urls != None else {service: missing_image}
 		censored_title = title
 		
 		self.service = service
@@ -733,8 +733,8 @@ class ProfilePicture:
 
 	def __init__(self, service: str, user_type: str, meta: object, hq_urls: str | dict = None, lq_urls: str | dict = None) -> object:
 		type = 'profile_picture'
-		hq_urls = {service: hq_urls} if isinstance(hq_urls, str) else hq_urls if hq_urls != None else missing_image
-		lq_urls = {service: lq_urls} if isinstance(lq_urls, str) else lq_urls if lq_urls != None else missing_image
+		hq_urls = {service: hq_urls} if isinstance(hq_urls, str) else hq_urls if hq_urls != None else {service: missing_image}
+		lq_urls = {service: lq_urls} if isinstance(lq_urls, str) else lq_urls if lq_urls != None else {service: missing_image}
 
 		self.service = service
 		self.type = type
