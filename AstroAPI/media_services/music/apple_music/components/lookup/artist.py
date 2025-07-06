@@ -27,26 +27,12 @@ async def lookup_artist(id: str, country_code: str = 'us') -> object:
 					artist_id = artist['artistId']
 					artist_name = artist['artistName']
 					artist_genre = artist['primaryGenreName'] if 'primaryGenreName' in artist else None
-					artist_profile_picture = ProfilePicture(
-						service = service,
-						user_type = 'artist',
-						hq_urls = None,
-						lq_urls = None,
-						meta = Meta(
-							service = service,
-							request = request,
-							processing_time = current_unix_time_ms() - start_time,
-							filter_confidence_percentage = {service: 100.0},
-							http_code = response.status
-						)
-					)
 
 					return Artist(
 						service = service,
 						urls = artist_url,
 						ids = artist_id,
 						name = artist_name,
-						profile_picture = artist_profile_picture,
 						genre = artist_genre,
 						meta = Meta(
 							service = service,
