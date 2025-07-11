@@ -1,3 +1,3 @@
 service = 'deezer'
-component = 'Deezer API'
+component = 'Deezer Music API'
 api = 'https://api.deezer.com'

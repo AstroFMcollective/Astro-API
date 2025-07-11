@@ -1,2 +1,2 @@
 service = 'youtube_music'
-component = 'YouTube Music API'
+component = 'YouTube Music Music API'

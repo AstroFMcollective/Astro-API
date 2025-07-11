@@ -1,3 +1,3 @@
 service = 'spotify'
-component = 'Spotify API'
+component = 'Spotify Music API'
 api = 'https://api.spotify.com/v1'
