@@ -1,6 +1,6 @@
 from AstroAPI.components import *
+from AstroAPI.components.service_tokens.spotify.token import spotify_token
 from AstroAPI.media_services.music.spotify.components.generic import *
-from AstroAPI.media_services.music.spotify.components.generic.get_token import spotify_token
 import aiohttp
 
 
@@ -9,8 +9,11 @@ async def lookup_song(id: str, country_code: str = 'us') -> object:
 	request = {'request': 'lookup_song', 'id': id, 'country_code': country_code}
 	start_time = current_unix_time_ms()
 
+	# Try to perform the song lookup operation
 	try:
+		# Create an aiohttp session for making HTTP requests
 		async with aiohttp.ClientSession() as session:
+			# Prepare request data and Spotify API endpoint
 			api_url = f'{api}/tracks/{id}'
 			api_params = {
 				'market': country_code.upper(),
@@ -18,17 +21,21 @@ async def lookup_song(id: str, country_code: str = 'us') -> object:
 			api_headers = {'Authorization': f'Bearer {await spotify_token.get_token()}'}
 			timeout = aiohttp.ClientTimeout(total = 30)
 
+			# Make the GET request to the Spotify API
 			async with session.get(url = api_url, headers = api_headers, timeout = timeout, params = api_params) as response:
 				if response.status == 200:
+					# Parse the JSON response if the request was successful
 					song = await response.json()
 
-					song_type = ('track' if song['album']['album_type'] != 'single' else 'single')
+					# Extract song details
+					song_type = ('track' if song['album']['album_type'] != 'single' else 'single') # Determine the song type (track or single)
 					song_url = song['external_urls']['spotify']
 					song_id = song['id']
 					song_title = song['name']
 					song_artists = get_artists_of_media(request, song['artists'])
 					song_is_explicit = song['explicit']
 					
+					# Extract collection details
 					collection_type = 'album' if song['album']['album_type'] != 'single' else 'ep'
 					collection_url = song['album']['external_urls']['spotify']
 					collection_id = song['album']['id']
@@ -36,6 +43,7 @@ async def lookup_song(id: str, country_code: str = 'us') -> object:
 					collection_artists = get_artists_of_media(request, song['album']['artists'])
 					collection_year = song['album']['release_date'][:4]
 
+					# Build the cover object for the collection
 					media_cover = Cover(
 						service = service,
 						media_type = collection_type,
@@ -52,6 +60,7 @@ async def lookup_song(id: str, country_code: str = 'us') -> object:
 						)
 					)
 
+					# Build the collection object
 					song_collection = Collection(
 						service = service,
 						type = collection_type,
@@ -70,6 +79,7 @@ async def lookup_song(id: str, country_code: str = 'us') -> object:
 						)
 					)
 
+					# Return the Song object with all extracted details
 					return Song(
 						service = service,
 						type = song_type,
@@ -90,6 +100,7 @@ async def lookup_song(id: str, country_code: str = 'us') -> object:
 					)
 
 				else:
+					# Handle non-OK HTTP responses by returning an Error object
 					error = Error(
 						service = service,
 						component = component,
@@ -104,6 +115,7 @@ async def lookup_song(id: str, country_code: str = 'us') -> object:
 					await log(error)
 					return error
 
+	# Handle any exceptions that occur during the lookup process
 	except Exception as error:
 		error = Error(
 			service = service,

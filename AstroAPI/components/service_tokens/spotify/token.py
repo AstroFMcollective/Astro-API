@@ -1,6 +1,6 @@
 from AstroAPI.components import *
 from AstroAPI.components.ini import keys
-from .about import service, component
+from .components.about import *
 from asyncio import run
 import aiohttp
 
@@ -9,7 +9,7 @@ import aiohttp
 class Token:
 	def __init__(self, client_id: str, client_secret: str):
 		self.service = service
-		self.component = f'{component} Token'
+		self.component = component
 		self.client_id = client_id
 		self.client_secret = client_secret
 		self.token = None
@@ -20,7 +20,7 @@ class Token:
 		if self.token == None or (self.token_expiration_date == None or current_unix_time() > self.token_expiration_date):
 			async with aiohttp.ClientSession() as session:
 				request = 'get_token'
-				api_url = 'https://accounts.spotify.com/api/token'
+				api_url = api
 				api_data = f'grant_type=client_credentials&client_id={self.client_id}&client_secret={self.client_secret}'
 				api_headers = {'Content-Type': 'application/x-www-form-urlencoded'}
 				start_time = current_unix_time_ms()
