@@ -14,12 +14,13 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 	request = {'request': 'search_song', 'artists': artists, 'title': title, 'song_type': song_type, 'collection': collection, 'is_explicit': is_explicit, 'country_code': country_code, 'exclude_services': exclude_services}
 	start_time = current_unix_time_ms()
 
+	# Try to perform the song search operation
 	try:
 		# Define service objects
 		service_objs = [spotify, apple_music, youtube_music, deezer]
 		services = [obj.service for obj in service_objs]
 
-		legal_results = ['track', 'single']	
+		legal_results = ['track', 'single']
 
 		# Exclude services if they already have a premade media object
 		# This is to prevent duplicate searches, increasing performance

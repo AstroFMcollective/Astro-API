@@ -16,7 +16,7 @@ class Spotify:
     async def search_song(self, artists: list, title: str, song_type: str = None, collection: str = None, is_explicit: bool = None, country_code: str = 'us') -> Song | Empty | Error:
         song = await search_song(artists = artists, title = title, song_type = song_type, collection = collection, is_explicit = is_explicit, country_code = country_code)
         return song
-    
+
     async def search_collection(self, artists: list, title: str, year: int = None, country_code: str = 'us') -> Collection | Empty | Error:
         collection = await search_collection(artists = artists, title = title, year = year, country_code = country_code)
         return collection
@@ -28,7 +28,7 @@ class Spotify:
     async def lookup_collection(self, id: str, country_code: str = 'us') -> Collection | Empty | Error:
         collection = await lookup_collection(id = id, country_code = country_code)
         return collection
-    
 
-    
+
+
 spotify = Spotify()
