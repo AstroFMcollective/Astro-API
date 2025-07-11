@@ -793,7 +793,7 @@ class Knowledge:
 		type = 'knowledge'
 		urls = {service: urls} if not isinstance(urls, dict) else urls
 		ids = {service: str(ids)} if not isinstance(ids, dict) else ids
-		description = description if description != '?' or description != '' else None
+		description = description if description != '?' and description != '' else None
 		censored_description = description
 		time_signature = f'1/{time_signature}' if time_signature is not None else None
 		pitch_class = {
