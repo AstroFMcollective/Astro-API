@@ -1,2 +1,2 @@
-import AstroAPI as astro
+import ServiceCatalogAPI as astro
 from fastapi import FastAPI
