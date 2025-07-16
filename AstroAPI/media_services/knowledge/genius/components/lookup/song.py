@@ -5,7 +5,7 @@ import requests
 
 
 
-async def lookup_song_knowledge(id: str, country_code: str = 'us') -> object:
+async def lookup_song(id: str, country_code: str = 'us') -> object:
 	request = {'request': 'lookup_song', 'id': id, 'country_code': country_code}
 	start_time = current_unix_time_ms()
 

@@ -1,12 +1,12 @@
 from AstroAPI.components import *
 from AstroAPI.components.ini import keys
 from AstroAPI.media_services.knowledge.genius.components.generic import *
-from AstroAPI.media_services.knowledge.genius.components.lookup.song_knowledge import lookup_song_knowledge
+from AstroAPI.media_services.knowledge.genius.components.lookup.song import lookup_song
 import requests
 
 
 
-async def search_song_knowledge(artists: list, title: str, song_type: str = None, collection: str = None, is_explicit: bool = None, country_code: str = 'us') -> object:
+async def search_song(artists: list, title: str, song_type: str = None, collection: str = None, is_explicit: bool = None, country_code: str = 'us') -> object:
 	request = {'request': 'search_song', 'artists': artists, 'title': title, 'song_type': song_type, 'collection': collection, 'is_explicit': is_explicit, 'country_code': country_code}
 	start_time = current_unix_time_ms()
 
@@ -99,7 +99,7 @@ async def search_song_knowledge(artists: list, title: str, song_type: str = None
 					)
 				))
 			filtered_song = await filter_song(service = service, query_request = request, songs = songs, query_artists = artists, query_title = title, query_song_type = song_type, query_collection = collection, query_is_explicit = is_explicit, query_country_code = country_code)
-			song = await lookup_song_knowledge(id = filtered_song.ids['genius'], country_code = country_code)
+			song = await lookup_song(id = filtered_song.ids['genius'], country_code = country_code)
 			song.meta.processing_time[service] = current_unix_time_ms() - start_time
 			song.regenerate_json()
 			return song

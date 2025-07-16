@@ -1,12 +1,12 @@
 from AstroAPI.components import *
 from AstroAPI.components.ini import keys
 from AstroAPI.media_services.knowledge.genius.components.generic import *
-from AstroAPI.media_services.knowledge.genius.components.lookup.song_knowledge import lookup_song_knowledge
+from AstroAPI.media_services.knowledge.genius.components.lookup.song import lookup_song
 import requests
 
 
 
-async def search_query_knowledge(query: str, country_code: str = 'us') -> object:
+async def search_query(query: str, country_code: str = 'us') -> object:
 	request = {'request': 'search_query', 'query': query, 'country_code': country_code}
 	start_time = current_unix_time_ms()
 	
@@ -21,7 +21,7 @@ async def search_query_knowledge(query: str, country_code: str = 'us') -> object
 		if results.status_code == 200:
 			results_json = results.json()['response']
 			song_id = results_json['hits'][0]['result']['id']
-			song = await lookup_song_knowledge(id = song_id, country_code = country_code)
+			song = await lookup_song(id = song_id, country_code = country_code)
 			song.meta.processing_time[service] = current_unix_time_ms() - start_time
 			song.regenerate_json()
 			return song

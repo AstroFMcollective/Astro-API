@@ -1,12 +1,12 @@
 from AstroAPI.components import *
 from AstroAPI.components.service_tokens.spotify.token import spotify_token
 from AstroAPI.media_services.knowledge.spotify.components.generic import *
-from AstroAPI.media_services.music.spotify.components.lookup.song import lookup_song
+from AstroAPI.media_services.music.spotify.components.lookup.song import lookup_song as lookup_song_music_metadata
 import aiohttp
 
 
 
-async def lookup_song_knowledge(id: str, country_code: str = 'us') -> object:
+async def lookup_song(id: str, country_code: str = 'us') -> object:
 	request = {'request': 'lookup_song_knowledge', 'id': id, 'country_code': country_code}
 	start_time = current_unix_time_ms()
 	
@@ -23,7 +23,7 @@ async def lookup_song_knowledge(id: str, country_code: str = 'us') -> object:
 			timeout = aiohttp.ClientTimeout(total = 30)
 
 			# Lookup general song data using internal music function
-			song_general_data = await lookup_song(id, country_code)
+			song_general_data = await lookup_song_music_metadata(id, country_code)
 
 			illegal_results = ['empty_response', 'error']
 			# If the song lookup was successful, extract details
