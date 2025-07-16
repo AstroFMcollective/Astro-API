@@ -2,7 +2,7 @@ from AstroAPI.components import *
 from AstroAPI.media_services.music.global_io.components.generic import *
 from AstroAPI.media_services.music.global_io.components.generic import service as gservice, component as gcomponent
 
-from AstroAPI.media_services.music.global_io.components.search.song import search_song
+from AstroAPI.media_services.music.global_io.components.search.song import search_song as search_song_music
 
 
 
@@ -14,29 +14,23 @@ async def lookup_song(service: object, id: str, song_country_code: str = None, l
 		# Look up the song on its respectative service for its metadata
 		song_reference = await service.lookup_song(id = id, country_code = song_country_code)
 
+		legal_results = ['track', 'single', 'music_video', 'knowledge']
+		compatible_results = ['track', 'single', 'music_video']
+
 		# This would usually trigger had an error happened inside the lookup song function, so we can just return that empty or error object 
-		if song_reference.type != 'track' and song_reference.type != 'single' and song_reference.type != 'music_video':
+		if song_reference.type not in legal_results:
 			return song_reference
 
 		# Make the call to the Global Interface's song-searching function
-		if song_reference.type == 'music_video': # All we do here is not use anything for the collection parameter, since music videos do not have that data
-			song = await search_song(
-				artists = [artist.name for artist in song_reference.artists],
-				title = song_reference.title,
-				is_explicit = song_reference.is_explicit,
-				country_code = lookup_country_code,
-				include_premade_media = [song_reference] # Include the media from the original call
-			)
-		else:
-			song = await search_song(
-				artists = [artist.name for artist in song_reference.artists],
-				title = song_reference.title,
-				song_type = song_reference.type,
-				collection = song_reference.collection.title,
-				is_explicit = song_reference.is_explicit,
-				country_code = lookup_country_code,
-				include_premade_media = [song_reference]
-			)
+		song = await search_song_music(
+			artists = [artist.name for artist in song_reference.artists],
+			title = song_reference.title,
+			song_type = song_reference.type if song_reference.type != 'knowledge' else song_reference.media_type,
+			collection = song_reference.collection.title if song_reference.type != 'music_video' else None, # Music videos do not have a collection
+			is_explicit = song_reference.is_explicit,
+			country_code = lookup_country_code,
+			include_premade_media = [song_reference] if song_reference.type in compatible_results else []  # Include the media from the original call unless it's a knowledge result
+		)
 
 		return song
 

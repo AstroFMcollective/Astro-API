@@ -2,7 +2,7 @@ from AstroAPI.components import *
 from AstroAPI.media_services.music.global_io.components.generic import *
 from AstroAPI.media_services.music.global_io.components.generic import service as gservice, component as gcomponent
 
-from AstroAPI.media_services.music.global_io.components.search.music_video import search_music_video
+from AstroAPI.media_services.music.global_io.components.search.music_video import search_music_video as search_music_video_music
 
 
 async def lookup_music_video(service: object, id: str, mv_country_code: str = None, lookup_country_code: str = 'us') -> object:
@@ -21,7 +21,7 @@ async def lookup_music_video(service: object, id: str, mv_country_code: str = No
 			return video_reference
 
 		# Make the call to the Global Interface's song-searching function
-		music_video = await search_music_video(
+		music_video = await search_music_video_music(
 			artists = [artist.name for artist in video_reference.artists],
 			title = video_reference.title,
 			is_explicit = video_reference.is_explicit,

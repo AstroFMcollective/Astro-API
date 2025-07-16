@@ -4,9 +4,9 @@ from AstroAPI.media_services.music.global_io.components.generic import service a
 
 from AstroAPI.media_services.music.youtube_music.components.search.query import search_query as ytm_search_query
 
-from AstroAPI.media_services.music.global_io.components.search.song import search_song
-from AstroAPI.media_services.music.global_io.components.search.music_video import search_music_video
-from AstroAPI.media_services.music.global_io.components.search.collection import search_collection
+from AstroAPI.media_services.music.global_io.components.search.song import search_song as search_song_music
+from AstroAPI.media_services.music.global_io.components.search.music_video import search_music_video as search_music_video_music
+from AstroAPI.media_services.music.global_io.components.search.collection import search_collection as search_collection_music
 
 
 
@@ -22,7 +22,7 @@ async def search_query(query: str, country_code: str = 'us', exclude_services: l
 		query_result = await ytm_search_query(query, country_code)
 
 		if query_result.type in song_types:
-			return await search_song(
+			return await search_song_music(
 				[artist.name for artist in query_result.artists],
 				query_result.title,
 				query_result.type,
@@ -34,7 +34,7 @@ async def search_query(query: str, country_code: str = 'us', exclude_services: l
 			)
 
 		elif query_result.type in video_types:
-			return await search_music_video(
+			return await search_music_video_music(
 				[artist.name for artist in query_result.artists],
 				query_result.title,
 				query_result.is_explicit,
@@ -44,7 +44,7 @@ async def search_query(query: str, country_code: str = 'us', exclude_services: l
 			)
 		
 		elif query_result.type in collection_types:
-			return await search_collection(
+			return await search_collection_music(
 				[artist.name for artist in query_result.artists],
 				query_result.title,
 				query_result.release_year,

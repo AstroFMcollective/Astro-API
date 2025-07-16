@@ -2,8 +2,8 @@ from AstroAPI.components import *
 from AstroAPI.media_services.music.global_io.components.generic import *
 from AstroAPI.media_services.music.global_io.components.generic import service as gservice, component as gcomponent
 
-from AstroAPI.media_services.music.global_io.components.search.song import search_song
-from AstroAPI.media_services.music.global_io.components.search.collection import search_collection
+from AstroAPI.media_services.music.global_io.components.search.song import search_song as search_song_music
+from AstroAPI.media_services.music.global_io.components.search.collection import search_collection as search_collection_music
 
 
 
@@ -17,7 +17,7 @@ async def lookup_collection(service: object, id: str, collection_country_code: s
 
 		# If the collection ref is actually a song single, it'll use the metadata to look it up as a song, then return that data as a song
 		if collection_reference.type == 'single':
-			return await search_song(
+			return await search_song_music(
 				artists = [artist.name for artist in collection_reference.artists],
 				title = collection_reference.title,
 				song_type = collection_reference.type,
@@ -32,7 +32,7 @@ async def lookup_collection(service: object, id: str, collection_country_code: s
 			return collection_reference
 
 		# Make the call to the Global Interface's collection-searching function
-		collection = await search_collection(
+		collection = await search_collection_music(
 			[artist.name for artist in collection_reference.artists],
 			collection_reference.title,
 			collection_reference.release_year,
