@@ -26,10 +26,9 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 		# This is to prevent duplicate searches, increasing performance
 		ignore_in_excluded_services = []
 		for premade in include_premade_media:
-			if premade.service in exclude_services:
-				if premade.service not in exclude_services:
-					exclude_services.append(premade.service)
-				ignore_in_excluded_services.append(premade.service)
+			if premade.service not in exclude_services:
+				exclude_services.append(premade.service)
+			ignore_in_excluded_services.append(premade.service)
 
 		# Search services for songs
 		tasks = []
