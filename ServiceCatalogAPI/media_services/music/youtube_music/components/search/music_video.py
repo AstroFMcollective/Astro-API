@@ -6,25 +6,32 @@ from ServiceCatalogAPI.media_services.music.youtube_music.components.generic imp
 
 
 async def search_music_video(artists: list, title: str, is_explicit: bool = None, country_code: str = 'us') -> object:
+	# Prepare the request dictionary with search parameters
 	request = {'request': 'search_music_video', 'artists': artists, 'title': title, 'is_explicit': is_explicit, 'country_code': country_code}
+	# Record the start time for processing time calculation
 	start_time = current_unix_time_ms()
 
 	try:
+		# Optimize strings for query search
 		artists = [optimize_for_search(artist) for artist in artists]
 		title = optimize_for_search(replace_with_ascii(title).lower())
 		
 		videos = []
+		# Perform a search on YouTube Music for videos matching the first artist and the title
 		results = ytm.search(
 			query = f'{artists[0]} {title}',
 			filter = 'videos'
 		)
 
+		# Iterate over each video result
 		for video in results:
-			mv_url = f'https://music.youtube.com/watch?v={video['videoId']}'
+			mv_url = f'https://music.youtube.com/watch?v={video["videoId"]}'
 			mv_id = video['videoId']
 			mv_title = video['title']
 			
+			# If artist information is available in the result
 			if video['artists'] != []:
+				# Build a list of Artist objects from the result's artists
 				mv_artists = [
 					Artist(
 						service = service,
@@ -40,14 +47,17 @@ async def search_music_video(artists: list, title: str, is_explicit: bool = None
 						)
 					) for artist in video['artists']]
 			else:
+				# If no artist info, look up the artist using the video ID
+				# Because apparently that's a thing that can happen????????
+				# I should probably make an issue on the API's repo
 				mv_artists = [await lookup_artist(video_id = video['videoId'], country_code = country_code)]
 
-
+			# Create a Cover object for the music video
 			mv_cover = Cover(
 				service = service,
 				media_type = 'song',
 				title = mv_title,
-				artists	= mv_artists,
+				artists = mv_artists,
 				hq_urls = video['thumbnails'][0]['url'],
 				lq_urls = video['thumbnails'][len(video['thumbnails'])-1]['url'],
 				meta = Meta(
@@ -58,6 +68,7 @@ async def search_music_video(artists: list, title: str, is_explicit: bool = None
 				)
 			)
 
+			# Append a MusicVideo object to the videos list
 			videos.append(MusicVideo(
 				service = service,
 				urls = mv_url,
@@ -73,8 +84,10 @@ async def search_music_video(artists: list, title: str, is_explicit: bool = None
 					http_code = 200
 				)
 			))
+		# Filter and return the music video based on the query parameters
 		return await filter_mv(service = service, query_request = request, videos = videos, query_artists = artists, query_title = title, query_is_explicit = is_explicit, query_country_code = country_code)
 
+	# If sinister things happen
 	except Exception as msg:
 		error = Error(
 			service = service,

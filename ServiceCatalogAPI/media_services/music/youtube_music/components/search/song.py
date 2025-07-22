@@ -7,28 +7,35 @@ from ServiceCatalogAPI.media_services.music.youtube_music.components.generic imp
 
 
 async def search_song(artists: list, title: str, song_type: str = None, collection: str = None, is_explicit: bool = None, country_code: str = 'us') -> object:
+	# Build the request dictionary with all input parameters
 	request = {'request': 'search_song', 'artists': artists, 'title': title, 'song_type': song_type, 'collection': collection, 'is_explicit': is_explicit, 'country_code': country_code}
+	# Record the start time for processing time calculation
 	start_time = current_unix_time_ms()
 	
 	try:
+		# Optimize strings for query search
 		artists = [optimize_for_search(artist) for artist in artists]
 		title = optimize_for_search(replace_with_ascii(title).lower())
 		collection = clean_up_collection_title(optimize_for_search(collection)) if collection != None else None
 			
 		songs = []
+		# Search for songs using the first artist and the title
 		results = ytm.search(
 			query = f'{artists[0]} {title}',
 			filter = 'songs'
 		)
 
+		# Iterate through each song result
 		for song in results:
-			song_type = 'track'
+			song_type = 'track'  # Set song type to 'track' because AFAIK there is nothing differentiating singles from tracks inside the metadata
 			song_url = f'https://music.youtube.com/watch?v={song['videoId']}'
 			song_id = song['videoId']
 			song_title = song['title']
 			song_is_explicit = song['isExplicit']
 			
+			# If artist info is available in the song result
 			if song['artists'] != []:
+				# Build Artist objects for each artist in the result
 				song_artists = [
 					Artist(
 						service = service,
@@ -44,13 +51,17 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 						)
 					) for artist in song['artists']]
 			else:
+				# If no artist info, look up the artist using the video ID
+				# Because apparently that's a thing that can happen????????
+				# I should probably make an issue on the API's repo
 				song_artists = [await lookup_artist(video_id = song['videoId'], country_code = country_code)]
 
+			# Build Cover object for the song
 			song_cover = Cover(
 				service = service,
 				media_type = 'song',
 				title = song_title,
-				artists	= song_artists,
+				artists = song_artists,
 				hq_urls = song['thumbnails'][len(song['thumbnails'])-1]['url'],
 				lq_urls = song['thumbnails'][0]['url'],
 				meta = Meta(
@@ -61,6 +72,7 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 				)
 			)
 
+			# Build Collection object for the song's album
 			song_collection = Collection(
 				service = service,
 				type = 'album',
@@ -79,6 +91,7 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 				)
 			)
 
+			# Append the constructed Song object to the songs list
 			songs.append(Song(
 				service = service,
 				type = song_type,
@@ -97,12 +110,14 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 				)
 			))
 
-		# TODO: Rip the filtered song, replace the collection with the lookup_collection collection
+		# Rip the filtered song, replace the collection with the lookup_collection collection
 		filtered_song = await filter_song(service = service, query_request = request, songs = songs, query_artists = artists, query_title = title, query_song_type = song_type, query_collection = collection, query_is_explicit = is_explicit, query_country_code = country_code)
 		filtered_song.collection = await lookup_collection(browse_id = filtered_song.collection.ids[service], country_code = country_code)
+		# Regenerate the song's JSON representation
 		filtered_song.regenerate_json()
 		return filtered_song
 
+	# If sinister things happen
 	except Exception as msg:
 		error = Error(
 			service = service,

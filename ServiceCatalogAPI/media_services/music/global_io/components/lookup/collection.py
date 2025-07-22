@@ -8,7 +8,9 @@ from ServiceCatalogAPI.media_services.music.global_io.components.search.collecti
 
 
 async def lookup_collection(service: object, id: str, collection_country_code: str = None, lookup_country_code: str = 'us') -> object:
+	# Prepare the request metadata
 	request = {'request': 'lookup_collection', 'service': service.service, 'id': id, 'collection_country_code': collection_country_code, 'lookup_country_code': lookup_country_code}
+	# Record the start time for processing time calculation
 	start_time = current_unix_time_ms()
 
 	try:

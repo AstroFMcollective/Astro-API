@@ -6,26 +6,33 @@ from ServiceCatalogAPI.media_services.music.youtube_music.components.generic imp
 
 
 async def search_collection(artists: list, title: str, year: int = None, country_code: str = 'us') -> object:
+	# Prepare the request dictionary with input parameters
 	request = {'request': 'search_collection', 'artists': artists, 'title': title, 'year': year, 'country_code': country_code}
+	# Record the start time for processing time calculation
 	start_time = current_unix_time_ms()
 	
 	try:
+		# Optimize strings for query search
 		artists = [optimize_for_search(artist) for artist in artists]
 		title = optimize_for_search(title)
 
 		collections = []
+		# Perform a search on YouTube Music for albums matching the first artist and title
 		results = ytm.search(
 			query = f'{artists[0]} {title}',
 			filter = 'albums'
 		)
 
+		# Iterate over each collection result
 		for collection in results:
+			# Determine if the collection is an album or EP
 			collection_type = ('album' if collection['type'] == 'Album' else 'ep')
-			collection_url = f'https://music.youtube.com/playlist?list={collection['playlistId']}'
+			collection_url = f'https://music.youtube.com/playlist?list={collection["playlistId"]}'
 			collection_id = collection['playlistId']
 			collection_title = collection['title']
 			collection_year = collection['year']
 
+			# Build a list of Artist objects for the collection
 			collection_artists = [
 				Artist(
 					service = service,
@@ -41,6 +48,7 @@ async def search_collection(artists: list, title: str, year: int = None, country
 					)
 				) for artist in collection['artists']]
 
+			# Create a Cover object for the collection
 			collection_cover = Cover(
 				service = service,
 				media_type = collection_type,
@@ -56,6 +64,7 @@ async def search_collection(artists: list, title: str, year: int = None, country
 				)
 			)
 
+			# Append the Collection object to the collections list
 			collections.append(Collection(
 				service = service,
 				type = collection_type,
@@ -72,8 +81,10 @@ async def search_collection(artists: list, title: str, year: int = None, country
 					http_code = 200
 				)
 			))
+		# Filter and return the collection based on the query parameters
 		return await filter_collection(service = service, query_request = request, collections = collections, query_artists = artists, query_title = title, query_year = year, query_country_code = country_code)
 
+	# If sinister things happen
 	except Exception as msg:
 		error = Error(
 			service = service,

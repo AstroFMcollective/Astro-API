@@ -7,17 +7,23 @@ missing_image = text['images']['missing_image']
 """
 	--- MEDIA OBJECTS ---
 
-	Astro uses these to form usable representations of a piece of media (song, album, etc.)
+	Astro's specialty is manipulating media metadata and using it to do other things,
+	so obviously that data needs to be reusable, intelligent and efficient.
+	The Service Catalog API uses these media objects for that, to form usable representations
+	of a piece of media (song, album, etc.).
 
-	Astro's media objects are an useful and efficient way of forming these representations,
-	with a few key details they're able to:
+	Service Catalog API's media objects are able to:
 	- Nicely format everything in more usable formats
 	- Generate censored titles and names of select objects
-	- Generate JSON versions of these objects for use in the REST interface
+	- Generate JSON versions of these objects for use by the REST API for developers
 	- Include an abundance of technical and debug info.
 
 	Use these literally whenever you have to form a media object. They're easily reusable
 	and simple to form.
+
+	IMPORTANT: WHEN CHANGING DATA INSIDE AN OBJECT, CALL THE regenerate_json() FUNCTION SO IT
+	REFRESHES THE DATA INSIDE THE JSON. THE FACT THAT IT DOESN'T DO THIS AUTOMATICALLY IS A
+	MASSIVE OVERSIGHT AND I WILL FIX IT AS SOON AS I CAN.
 """
 
 
@@ -25,9 +31,9 @@ missing_image = text['images']['missing_image']
 class Error:
 
 	"""
-		# Astro Error Object
+		# Service Catalog Error Object
 
-		This is a built-in Astro API object which identifies errors.
+		This is a built-in Service Catalog API object which identifies errors.
 		Use this to return *a thing* when something internally goes wrong.
 		JSON representation available.
 
@@ -67,9 +73,9 @@ class Error:
 class Empty:
 
 	"""
-		# Astro Empty Object
+		# Service Catalog Empty Object
 
-		This is a built-in Astro API object which identifies empty responses.
+		This is a built-in Service Catalog API object which identifies empty responses.
 		Use this to return *a thing* when a service you're using doesn't end up
 		returning anything/returns an empty response.
 		JSON representation available.
@@ -103,11 +109,10 @@ class Empty:
 class Meta:
 
 	"""
-		# Astro (Technical) Metadata Object
+		# Service Catalog (Technical) Metadata Object
 
-		This is a built-in Astro API object which identifies technical metadata.
-		In it are shoved in stats and values useful for debugging or general
-		handling.
+		This is a built-in Service Catalog API object which identifies technical metadata.
+		In it are shoved in stats and values useful for debugging or general handling.
 		This is pretty much mandatory for every media object.
 		JSON representation available.
 
@@ -120,7 +125,7 @@ class Meta:
 
 	def __init__(self, service: str, request: dict, processing_time: int | dict, http_code: int | dict, filter_confidence_percentage: float | dict = None):
 		processing_time = {service: processing_time} if isinstance(processing_time, int) else processing_time
-		filter_confidence_percentage = {service: filter_confidence_percentage} if isinstance(filter_confidence_percentage, float) else filter_confidence_percentage
+		filter_confidence_percentage = {service: filter_confidence_percentage} if isinstance(filter_confidence_percentage, float) else filter_confidence_percentage if filter_confidence_percentage != None else {service: 0.0}
 		
 		self.request = request
 		self.http_code = http_code
@@ -141,12 +146,12 @@ class Meta:
 class Song:
 
 	"""
-		# Astro Song Object
+		# Service Catalog Song Object
 
-		This is a built-in Astro API object which identifies songs.
-		Astro identifies two types of songs: tracks and singles.
-		It's an unwritten rule, but Astro should sort tracks as songs off albums, while
-		singles are standalone tracks and tracks from EP-s.
+		This is a built-in Service Catalog API object which identifies songs.
+		Service Catalog API identifies two types of songs: tracks and singles.
+		It's an unwritten rule, but Service Catalog API should sort tracks as songs off albums, while
+		singles are standalone tracks and sometimes tracks from EP-s.
 		JSON representation available.
 
 		 :param	service: The API service in which the object was formed.
@@ -215,9 +220,9 @@ class Song:
 class MusicVideo:
 
 	"""
-		# Astro Music Video Object
+		# Service Catalog Music Video Object
 
-		This is a built-in Astro API object which identifies music videos.
+		This is a built-in Service Catalog API object which identifies music videos.
 		JSON representation available.
 		
 		 :param	service: The API service in which the object was formed.
@@ -281,10 +286,10 @@ class MusicVideo:
 class Collection:
 
 	"""
-		# Astro Collection Object
+		# Service Catalog Collection Object
 
-		This is a built-in Astro API object which identifies collections.
-		Astro identifies two different collection types: albums and EP-s.
+		This is a built-in AstService Catalogro API object which identifies collections.
+		Service Catalog API identifies two different collection types: albums and EP-s.
 		JSON representation available.
 
 		 :param	service: The API service in which the object was formed.
@@ -348,9 +353,10 @@ class Collection:
 class Podcast:
 
 	"""
-		# Astro Podcast Object
+		# Service Catalog Podcast Object
 
-		This is a built-in Astro API object which identifies podcasts.
+		This is a built-in Service Catalog API object which identifies podcasts.
+		This is currently unused, and I'm debating on removing this altogether.
 		JSON representation available.
 
 		 :param	service: The API service in which the object was formed.
@@ -410,9 +416,10 @@ class Podcast:
 class PodcastEpisode:
 
 	"""
-		# Astro Podcast Episode Object
+		# Service Catalog Podcast Episode Object
 
-		This is a built-in Astro API object which identifies podcast episodes.
+		This is a built-in Service Catalog API object which identifies podcast episodes.
+		This is currently unused, and I'm debating on removing this altogether.
 		JSON representation available.
 
 		 :param	service: The API service in which the object was formed.
@@ -472,9 +479,9 @@ class PodcastEpisode:
 class Playlist:
 
 	"""
-		# Astro Playlist Object
+		# Service Catalog Playlist Object
 
-		This is a built-in Astro API object which identifies service playlists.
+		This is a built-in Service Catalog API object which identifies service playlists.
 		JSON representation available.
 
 		 :param	service: The API service in which the object was formed.
@@ -534,9 +541,10 @@ class Playlist:
 class Audiobook:
 
 	"""
-		# Astro Audiobook Object
+		# Service Catalog Audiobook Object
 
-		This is a built-in Astro API object which identifies audiobooks.
+		This is a built-in Service Catalog API object which identifies audiobooks.
+		This is currently unused, and I'm debating on removing this altogether.
 		JSON representation available.
 
 		 :param	service: The API service in which the object was formed.
@@ -608,9 +616,9 @@ class Audiobook:
 class Artist:
 
 	"""
-		# Astro Artist Object
+		# Service Catalog Artist Object
 
-		This is a built-in Astro API object which identifies artists.
+		This is a built-in Service Catalog API object which identifies artists.
 		JSON representation available.
 
 		 :param	service: The API service in which the object was formed.
@@ -662,11 +670,9 @@ class Artist:
 class Cover:
 
 	"""
-		# Astro Cover Object
+		# Service Catalog Cover Object
 
-		This is a built-in Astro API object which identifies covers.
-		Astro identifies two types of covers: regular covers and thumbnails.
-		Use thumbnails for music videos, covers for everything else.
+		This is a built-in Service Catalog API object which identifies covers and thumbnails.
 		JSON representation available.
 
 		 :param	service: The API service in which the object was formed.
@@ -718,10 +724,10 @@ class Cover:
 class ProfilePicture:
 
 	"""
-		# Astro Profile Picture Object
+		# Service Catalog Profile Picture Object
 
-		This is a built-in Astro API object which identifies profile pictures.
-		Use this instead of covers for artists.
+		This is a built-in Service Catalog API object which identifies profile pictures.
+		Use this instead of covers for artists and users.
 		JSON representation available.
 
 		 :param	service: The API service in which the object was formed.
@@ -764,10 +770,12 @@ class ProfilePicture:
 class Knowledge:
 
 	"""
-		# Astro Knowledge Object
+		# Service Catalog Knowledge Object
 
-		This is a built-in Astro API object which identifies song knowledge.
+		This is a built-in Service Catalog API object which identifies song knowledge.
 		It provides more details about a song, such as a small content description, length, BPM, etc.
+		We'll likely rename this into `SongKnowledge` or refactor in a major way once we start supporting
+		knowledge for more media types.
 		JSON representation available.
 
 		 :param	service: The API service in which the object was formed.
@@ -879,3 +887,5 @@ class Knowledge:
 			'length': self.length,
 			'time_signature': self.time_signature,
 		}
+
+print('[ServiceCatalogAPI] Media objects initialized')

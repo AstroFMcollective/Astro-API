@@ -11,7 +11,9 @@ from ServiceCatalogAPI.media_services.music.global_io.components.search.collecti
 
 
 async def search_query(query: str, country_code: str = 'us', exclude_services: list = []) -> object:
+	# Prepare the request metadata
 	request = {'request': 'search_query', 'query': query, 'country_code': country_code}
+	# Record the start time for processing time calculation
 	start_time = current_unix_time_ms()
 	
 	try:

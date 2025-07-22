@@ -6,19 +6,26 @@ from ServiceCatalogAPI.media_services.music.youtube_music.components.generic imp
 
 
 async def lookup_song(id: str, country_code: str = 'us') -> object:
+	# List of allowed music video types
 	allowed_video_types = [
 		'MUSIC_VIDEO_TYPE_ATV',
 		'MUSIC_VIDEO_TYPE_OMV',
 		'MUSIC_VIDEO_TYPE_OFFICIAL_SOURCE_MUSIC'
 	]
+	# Prepare request metadata
 	request = {'request': 'lookup_song', 'id': id, 'country_code': country_code}
+	# Record the start time for processing time calculation
 	start_time = current_unix_time_ms()
 
 	try:
+		# Fetch song data from YouTube Music API
 		song_data = ytm.get_song(id)
+		# Extract video details from the response
 		song = song_data['videoDetails']
 
+		# Check if the song has a music video type
 		if 'musicVideoType' in song:
+			# Check if the music video type is allowed (filter user-generated content)
 			if song['musicVideoType'] in allowed_video_types:
 				song_url = f'https://music.youtube.com/watch?v={song['videoId']}'
 				song_id = song['videoId']
@@ -40,7 +47,9 @@ async def lookup_song(id: str, country_code: str = 'us') -> object:
 						http_code = 200
 					)
 				)
+				# If the video type is an audio track video
 				if song['musicVideoType'] == 'MUSIC_VIDEO_TYPE_ATV':
+					# Return a Song object with all relevant metadata
 					return Song(
 						service = service,
 						type = 'track',
@@ -62,6 +71,7 @@ async def lookup_song(id: str, country_code: str = 'us') -> object:
 
 				else:
 					song_title = remove_music_video_declaration(song_title)
+					# Return a MusicVideo object with all relevant metadata
 					return MusicVideo(
 						service = service,
 						urls = song_url,
@@ -80,6 +90,9 @@ async def lookup_song(id: str, country_code: str = 'us') -> object:
 					)
 				
 			else:
+				# If the music video type is not allowed, return an Empty object
+				# DO NOT LOG THIS EVER UNLESS IT'S IN TESTING
+				# THAT WILL LOG USER GENERATED CONTENT, COMPROMISING USER PRIVACY
 				return Empty(
 					service = service,
 					meta = Meta(
@@ -90,6 +103,9 @@ async def lookup_song(id: str, country_code: str = 'us') -> object:
 					)
 				)
 		else:
+			# If there is no music video type, return an Empty object
+			# DO NOT LOG THIS EVER UNLESS IT'S IN TESTING
+			# THAT WILL LOG USER GENERATED CONTENT, COMPROMISING USER PRIVACY
 			return Empty(
 				service = service,
 				meta = Meta(
@@ -100,6 +116,7 @@ async def lookup_song(id: str, country_code: str = 'us') -> object:
 				)
 			)
 
+	# If sinister things happen
 	except Exception as error:
 		error = Error(
 			service = service,

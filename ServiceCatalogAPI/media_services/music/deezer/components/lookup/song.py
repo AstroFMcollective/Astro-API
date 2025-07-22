@@ -6,19 +6,25 @@ import aiohttp
 
 
 async def lookup_song(id: str, country_code: str = 'us') -> object:
+	# Prepare the request dictionary with song lookup parameters
 	request = {'request': 'lookup_song', 'id': id, 'country_code': country_code}
+	# Record the start time for processing time calculation
 	start_time = current_unix_time_ms()
 	
 	try:
+		# Create an aiohttp session
 		async with aiohttp.ClientSession() as session:
+			# Prepare for API call
 			api_url = f'{api}/track/{id}'
 			api_headers = {
 				'Content-Type': 'application/json'
 			}
 			timeout = aiohttp.ClientTimeout(total = 30)
 
+			# Make an asynchronous GET request to the API
 			async with session.get(url = api_url, headers = api_headers, timeout = timeout) as response:
 				if response.status == 200:
+					# Parse the JSON response for the song data
 					song = await response.json()
 
 					song_type = 'track'
@@ -28,6 +34,7 @@ async def lookup_song(id: str, country_code: str = 'us') -> object:
 					song_is_explicit = song['explicit_lyrics']
 					song_artists = get_artists_of_media(request, song['contributors'])
 
+					# Create a Cover object for the song
 					song_cover = Cover(
 						service = service,
 						media_type = song_type,
@@ -44,6 +51,7 @@ async def lookup_song(id: str, country_code: str = 'us') -> object:
 						)
 					)
 
+					# Create a Collection object for the album or EP
 					song_collection = Collection(
 						service = service,
 						type = 'album' if song['album']['type'] != 'ep' else 'ep',
@@ -62,6 +70,7 @@ async def lookup_song(id: str, country_code: str = 'us') -> object:
 						)
 					)
 
+					# Return a Song object with all the extracted and constructed data
 					return Song(
 						service = service,
 						type = song_type,
@@ -96,6 +105,7 @@ async def lookup_song(id: str, country_code: str = 'us') -> object:
 					await log(error)
 					return error
 
+	# If sinister things happen
 	except Exception as error:
 		error = Error(
 			service = service,

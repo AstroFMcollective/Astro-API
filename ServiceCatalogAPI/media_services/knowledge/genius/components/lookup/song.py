@@ -6,26 +6,34 @@ import requests
 
 
 async def lookup_song(id: str, country_code: str = 'us') -> object:
+	# Prepare the request dictionary with song lookup parameters
 	request = {'request': 'lookup_song', 'id': id, 'country_code': country_code}
+	# Record the start time for processing time calculation
 	start_time = current_unix_time_ms()
 
 	try:
+		# Construct everything needed for the API call
 		api_url = f'{api}/songs/{id}'
 		api_headers = {'Authorization': f'Bearer {keys['genius']['token']}'}
+		# For some reason Genius does not like the way aiohttp forms its headers so we stick to requests for HTTP
+		# I am not a fan of this but you gotta get it working somehow, I'll figure out a workaround someday
 		result = requests.get(api_url, headers = api_headers)
 			
 		if result.status_code == 200:
-			song = result.json()['response']['song']
-			song_type = 'track'
+			song = result.json()['response']['song'] # Extract the song object from the API response
+			song_type = 'track' # Unsure of how Genius differentiates singles from tracks atm, so we treat every song as a track until I do
 			song_url = song['url']
 			song_id = song['id']
 			song_title = song['title']
+			# Convert the song's very HTML-like description to a Discord-friendly string while retaining formatting
 			song_description = convert_genius_desc_into_discord_str(song['description'])
 			song_release_date = song['release_date_for_display']
-			song_is_explicit = None
+			song_is_explicit = None # Explicit flag is not available, set to None
 
+			# Combine primary and featured artists into a single list
 			artists_data = song['primary_artists'] + song['featured_artists']
 
+			# Build a list of Artist objects for the song
 			song_artists = [
 				Artist(
 					service = service,
@@ -33,7 +41,7 @@ async def lookup_song(id: str, country_code: str = 'us') -> object:
 					urls = artist['url'],
 					ids = artist['id'],
 					profile_picture = ProfilePicture(
-					service = service,
+						service = service,
 						user_type = 'artist',
 						hq_urls = artist['image_url'],
 						lq_urls = artist['header_image_url'],
@@ -55,6 +63,7 @@ async def lookup_song(id: str, country_code: str = 'us') -> object:
 				) for artist in artists_data
 			]
 
+			# Build the Cover object for the song
 			song_cover = Cover(
 				service = service,
 				media_type = 'song',
@@ -71,7 +80,8 @@ async def lookup_song(id: str, country_code: str = 'us') -> object:
 				)
 			)
 
-			collection_data = song['album']
+			# Build the Collection object for the song's album
+			collection_data = song['album'] # Extract album (collection) data from the song
 			song_collection = Collection(
 				service = service,
 				type = 'album',
@@ -106,7 +116,8 @@ async def lookup_song(id: str, country_code: str = 'us') -> object:
 						)
 					) for artist in collection_data['primary_artists']
 				],
-				release_year = collection_data['release_date_for_display'][-4:],
+				release_year = collection_data['release_date_for_display'][-4:], # Extract the release year from the album's release date string
+				# Build the Cover object for the album
 				cover = Cover(
 					service = service,
 					media_type = 'album',
@@ -131,7 +142,7 @@ async def lookup_song(id: str, country_code: str = 'us') -> object:
 				)
 			)
 
-
+			# Return a Knowledge object with all the song's knowledge metadata
 			return Knowledge(
 				service = service,
 				media_type = song_type,
@@ -173,7 +184,7 @@ async def lookup_song(id: str, country_code: str = 'us') -> object:
 		error = Error(
 			service = service,
 			component = component,
-			error_msg = f'Error when looking up collection: "{error}"',
+			error_msg = f'Error when looking up song knowledge: "{error}"',
 			meta = Meta(
 				service = service,
 				request = request,

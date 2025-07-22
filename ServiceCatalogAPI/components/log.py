@@ -8,9 +8,15 @@ import aiohttp
 """
 	--- THE API LOGGING FUNCTION ---
 
-	A simple command that makes logs regarding API activity.
+	Like all software, Astro is not perfect, despite our best efforts.
+	But when something goes wrong, two things can happen:
 
-	It leverages Discord's webhook system to send them into a logging channel.
+	  1. Astro will make a log using the log command down below in the #api-logs channel
+	  2. A catastrophic error that takes the entire API down (hopefully never happens 🤞)
+
+	log() is a simple command that makes logs regarding API activity.
+
+	It leverages Discord's webhook system to send them [logs] into a predefined logging channel.
 
 	This function is right now pretty crude and it could be better, but it works well.
 """
@@ -21,7 +27,7 @@ async def log(media: object):
 	async with aiohttp.ClientSession() as session:
 		deployment_channel = config['system']['deployment_channel']
 		embed = discord.Embed(
-			title = f'Astro API - `{media.type}`',
+			title = f'Astro Service Catalog API - `{media.type}`', # TODO: rn this is hard coded to only work with the service catalog api
 			colour = 0x0097f5,
 		)
 		embed.add_field(
@@ -63,3 +69,5 @@ async def log(media: object):
 			webhook = Webhook.from_url(url = keys['webhooks'][f'{deployment_channel}'], session = session)
 			await webhook.send(embed = embed, username = 'Astro API', avatar_url = text['images']['astro_trans'])
 			return
+		
+print('[ServiceCatalogAPI] Logging to Discord initialized')

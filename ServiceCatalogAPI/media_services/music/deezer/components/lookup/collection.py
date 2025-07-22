@@ -6,21 +6,28 @@ import aiohttp
 
 
 async def lookup_collection(id: str, country_code: str = 'us') -> object:
+	# Prepare the request dictionary with relevant information
 	request = {'request': 'lookup_collection', 'id': id, 'country_code': country_code, 'url': f'https://www.deezer.com/album/{id}'}
+	# Record the start time for processing time calculation
 	start_time = current_unix_time_ms()
 	
 	try:
+		# Create an aiohttp session
 		async with aiohttp.ClientSession() as session:
+			# Prepare for API call
 			api_url = f'{api}/album/{id}'
 			api_headers = {
 				'Content-Type': 'application/json'
 			}
 			timeout = aiohttp.ClientTimeout(total = 30)
 
+			# Make a GET request to the Deezer API
 			async with session.get(url = api_url, headers = api_headers, timeout = timeout) as response:
 				if response.status == 200:
+					# Parse the JSON response
 					collection = await response.json()
 
+					# Determine the collection type (album or ep)
 					collection_type = ('album' if collection['record_type'] != 'ep' else 'ep')
 					collection_url = collection['link']
 					collection_id = collection['id']
@@ -29,6 +36,7 @@ async def lookup_collection(id: str, country_code: str = 'us') -> object:
 					collection_genre = collection['genres']['data'][0]['name']
 					collection_artists = get_artists_of_media(request, collection['contributors'])
 
+					# Create a Cover object for the collection
 					collection_cover = Cover(
 						service = service,
 						media_type = collection_type,
@@ -45,6 +53,7 @@ async def lookup_collection(id: str, country_code: str = 'us') -> object:
 						)
 					)
 
+					# Return a Collection object with all relevant data
 					return Collection(
 						service = service,
 						type = collection_type,
@@ -79,6 +88,7 @@ async def lookup_collection(id: str, country_code: str = 'us') -> object:
 					await log(error)
 					return error
 
+	# If sinister things happen
 	except Exception as error:
 		error = Error(
 			service = service,

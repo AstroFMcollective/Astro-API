@@ -6,15 +6,20 @@ import aiohttp
 
 
 async def search_music_video(artists: list, title: str, is_explicit: bool = None, country_code: str = 'us') -> object:
+	# Prepare the request dictionary with search parameters
 	request = {'request': 'search_music_video', 'artists': artists, 'title': title, 'is_explicit': is_explicit, 'country_code': country_code}
+	# Record the start time for processing time calculation
 	start_time = current_unix_time_ms()
 
 	try:
+		# Create an aiohttp session
 		async with aiohttp.ClientSession() as session:
+			# Optimize strings for query search
 			artists = [optimize_for_search(artist) for artist in artists]
 			title = optimize_for_search(replace_with_ascii(title).lower())
 				
 			videos = []
+			# Prepare for API call
 			api_url = f'{api}/search'
 			api_params = {
 				'term': f'{artists[0]} "{title}"',
@@ -22,19 +27,24 @@ async def search_music_video(artists: list, title: str, is_explicit: bool = None
 				'limit': 200,
 				'country': country_code.lower()
 			}
-			timeout = aiohttp.ClientTimeout(total = 30)
+			timeout = aiohttp.ClientTimeout(total = 30)  # Set a timeout for the request
 
+			# Make an asynchronous GET request to the API
 			async with session.get(url = api_url, timeout = timeout, params = api_params) as response:
 				if response.status == 200:
+					# Parse the JSON response
 					json_response = await response.json(content_type = 'text/javascript')
 
+					# Iterate over each video in the results
 					for video in json_response['results']:
 						mv_url = video['trackViewUrl']
 						mv_id = video['trackId']
 						mv_title = video['trackName']
-						mv_is_explicit = not 'not' in video['trackExplicitness']
+						# Determine if the video is explicit
+						mv_is_explicit = not 'not' in video['trackExplicitness'] # pingu be like
 						mv_genre = video['primaryGenreName'] if 'primaryGenreName' in video else None
 
+						# Create Artist objects for each artist in the video
 						mv_artists = [
 							Artist(
 								service = service,
@@ -51,6 +61,7 @@ async def search_music_video(artists: list, title: str, is_explicit: bool = None
 							) for artist in split_artists(video['artistName'])
 						]
 
+						# Create a Cover object for the music video thumbnail
 						mv_thumbnail = Cover(
 							service = service,
 							media_type = 'music_video',
@@ -67,6 +78,7 @@ async def search_music_video(artists: list, title: str, is_explicit: bool = None
 							)
 						)
 
+						# Create a MusicVideo object and add it to the list
 						videos.append(MusicVideo(
 							service = service,
 							urls = mv_url,
@@ -84,6 +96,7 @@ async def search_music_video(artists: list, title: str, is_explicit: bool = None
 								http_code = response.status
 							)
 						))
+					# Filter and return a music video
 					return await filter_mv(service = service, query_request = request, videos = videos, query_artists = artists, query_title = title, query_is_explicit = is_explicit, query_country_code = country_code)
 					
 				else:
@@ -102,6 +115,7 @@ async def search_music_video(artists: list, title: str, is_explicit: bool = None
 					await log(error)
 					return error
 
+	# If sinister things happen
 	except Exception as error:
 		error = Error(
 			service = service,
@@ -118,4 +132,3 @@ async def search_music_video(artists: list, title: str, is_explicit: bool = None
 		)
 		await log(error)
 		return error
-		  

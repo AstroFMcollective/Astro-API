@@ -6,17 +6,23 @@ from ServiceCatalogAPI.media_services.music.youtube_music.components.generic imp
 
 
 async def search_query(query: str, country_code: str = 'us') -> object: # TODO: Dovrši
+	# Prepare the request dictionary with query details
 	request = {'request': 'search_query', 'query': query, 'country_code': country_code}
+	# Record the start time for processing time calculation
 	start_time = current_unix_time_ms()
 
 	try:
+		# Perform the search using ytm (YouTube Music API wrapper)
 		results = ytm.search(
 			query = query
 		)
+		# Take the first result from the search results
 		result = results[0]
+		# Get the type of the result (song, album, video, etc.)
 		result_type = result['resultType']
 
 		if result_type == 'song':
+			# Build a list of Artist objects for the song's artists
 			result_artists = [
 				Artist(
 					service = service,
@@ -33,6 +39,7 @@ async def search_query(query: str, country_code: str = 'us') -> object: # TODO: 
 				) for artist in result['artists']
 			]
 
+			# Create a Cover object for the song
 			result_cover = Cover(
 				service = service,
 				media_type = 'track',
@@ -49,10 +56,11 @@ async def search_query(query: str, country_code: str = 'us') -> object: # TODO: 
 				)
 			)
 
+			# Return a Song object with all relevant details
 			return Song(
 				service = service,
 				type = 'track',
-				urls = f'https://music.youtube.com/watch?v={result['videoId']}',
+				urls = f'https://music.youtube.com/watch?v={result["videoId"]}',
 				ids = result['videoId'],
 				title = result['title'],
 				artists = result_artists,
@@ -68,11 +76,12 @@ async def search_query(query: str, country_code: str = 'us') -> object: # TODO: 
 				)
 			)
 		elif result_type == 'album':
+			# Build a list of Artist objects for the album's artists
 			result_artists = [
 				Artist(
 					service = service,
-					urls = f'https://music.youtube.com/playlist?list={result['playlistId']}',
-					ids = 0, # ytmusicapi does not provide artist IDs for albums via query search
+					urls = f'https://music.youtube.com/playlist?list={result["playlistId"]}',
+					ids = 0, # ytmusicapi does not provide artist IDs for albums via query search, WHY?????????????
 					name = artist['name'],
 					meta = Meta(
 						service = service,
@@ -84,6 +93,7 @@ async def search_query(query: str, country_code: str = 'us') -> object: # TODO: 
 				) for artist in result['artists']
 			]
 
+			# Create a Cover object for the album
 			result_cover = Cover(
 				service = service,
 				media_type = 'track',
@@ -100,10 +110,11 @@ async def search_query(query: str, country_code: str = 'us') -> object: # TODO: 
 				)
 			)
 
+			# Return a Collection object representing the album
 			return Collection(
 				service = service,
 				type = 'album',
-				urls = f'https://music.youtube.com/playlist?list={result['playlistId']}',
+				urls = f'https://music.youtube.com/playlist?list={result["playlistId"]}',
 				ids = result['playlistId'],
 				title = result['title'],
 				artists = result_artists,
@@ -118,6 +129,7 @@ async def search_query(query: str, country_code: str = 'us') -> object: # TODO: 
 				)
 			)
 		elif result_type == 'video':
+			# Build a list of Artist objects for the video's artists
 			result_artists = [
 				Artist(
 					service = service,
@@ -134,6 +146,7 @@ async def search_query(query: str, country_code: str = 'us') -> object: # TODO: 
 				) for artist in result['artists']
 			]
 
+			# Create a Cover object for the video
 			result_cover = Cover(
 				service = service,
 				media_type = 'track',
@@ -150,9 +163,10 @@ async def search_query(query: str, country_code: str = 'us') -> object: # TODO: 
 				)
 			)
 
+			# Return a MusicVideo object with all relevant details
 			return MusicVideo(
 				service = service,
-				urls = f'https://music.youtube.com/watch?v={result['videoId']}',
+				urls = f'https://music.youtube.com/watch?v={result["videoId"]}',
 				ids = result['videoId'],
 				title = remove_music_video_declaration(result['title']),
 				artists = result_artists,
@@ -180,6 +194,7 @@ async def search_query(query: str, country_code: str = 'us') -> object: # TODO: 
 			await log(empty_response)
 			return empty_response
 
+	# If sinister things happen
 	except Exception as msg:
 		error = Error(
 			service = service,

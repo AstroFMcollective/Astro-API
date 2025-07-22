@@ -7,31 +7,39 @@ import aiohttp
 
 
 async def lookup_music_video(id: str, country_code: str = 'us') -> object:
+	# Prepare the request metadata
 	request = {'request': 'lookup_music_video', 'id': id, 'country_code': country_code}
+	# Record the start time for processing time calculation
 	start_time = current_unix_time_ms()
 
 	try:
+		# Create an aiohttp session
 		async with aiohttp.ClientSession() as session:
+			# Prepare for API call
 			api_url = f'{api}/lookup'
 			api_params = {
 				'id': id,
 				'country': country_code.lower()
 			}
-			timeout = aiohttp.ClientTimeout(total = 30)
+			timeout = aiohttp.ClientTimeout(total = 30) # Set a timeout for the HTTP request
 
+			# Make the GET request to the API
 			async with session.get(url = api_url, params = api_params, timeout = timeout) as response:
 				if response.status == 200:
+					# Parse the JSON response
 					video = await response.json(content_type = 'text/javascript')
 					video = video['results'][0]
 
 					mv_url = video['trackViewUrl']
 					mv_id = video['trackId']
 					mv_title = video['trackName']
+					# Lookup the artist details using the artist ID
 					mv_artist = await lookup_artist(id = video['artistId'], country_code = country_code)
 					mv_artist = [mv_artist]
 					mv_is_explicit = not 'not' in video['trackExplicitness']
 					mv_genre = video['primaryGenreName'] if 'primaryGenreName' in video else None
 
+					# Create a Cover object for the music video thumbnail
 					mv_thumbnail = Cover(
 						service = service,
 						media_type = 'music_video',
@@ -48,6 +56,7 @@ async def lookup_music_video(id: str, country_code: str = 'us') -> object:
 						)
 					)
 
+					# Return a MusicVideo object with all the extracted information
 					return MusicVideo(
 						service = service,
 						urls = mv_url,
@@ -81,6 +90,7 @@ async def lookup_music_video(id: str, country_code: str = 'us') -> object:
 					await log(error)
 					return error
 
+	# If sinister things happen
 	except Exception as error:
 		error = Error(
 			service = service,

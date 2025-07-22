@@ -6,15 +6,20 @@ from ServiceCatalogAPI.media_services.music.youtube_music.components.generic imp
 
 
 async def lookup_collection(id: str = None, browse_id: str = None, country_code: str = 'us') -> object:
+	# Prepare the request dictionary with lookup details
 	request = {'request': 'lookup_collection', 'id': id, 'country_code': country_code, 'url': f'https://music.youtube.com/playlist?list={id}'}
+	# Record the start time for processing time calculation
 	start_time = current_unix_time_ms()
 	
 	try:
+		# If id is provided but browse_id is not, fetch browse_id and collection info
 		if id is not None and browse_id is None:
 			browse_id = ytm.get_album_browse_id(id)
 			collection = ytm.get_album(browse_id)
+		# If browse_id is provided, fetch collection info directly
 		elif browse_id is not None:
 			collection = ytm.get_album(browse_id)
+		# If neither id nor browse_id is provided, return an error
 		elif id is None and browse_id is None:
 			return Error(
 				service = service,
@@ -28,13 +33,14 @@ async def lookup_collection(id: str = None, browse_id: str = None, country_code:
 				)
 			)
 
-			
+		# Determine collection type (album or ep)
 		collection_type = ('album' if collection['type'] == 'Album' else 'ep')
-		collection_url = f'https://music.youtube.com/playlist?list={collection['audioPlaylistId']}'
+		collection_url = f'https://music.youtube.com/playlist?list={collection["audioPlaylistId"]}'
 		collection_id = collection['audioPlaylistId']
 		collection_title = collection['title']
 		collection_year = collection['year']
 
+		# Build a list of Artist objects for the collection's artists
 		collection_artists = [
 			Artist(
 				service = service,
@@ -51,6 +57,7 @@ async def lookup_collection(id: str = None, browse_id: str = None, country_code:
 			) for artist in collection['artists']
 		]
 
+		# Create a Cover object for the collection
 		collection_cover = Cover(
 			service = service,
 			media_type = 'collection',
@@ -66,6 +73,7 @@ async def lookup_collection(id: str = None, browse_id: str = None, country_code:
 			)
 		)
 
+		# Return a Collection object with all gathered information
 		return Collection(
 			service = service,
 			type = collection_type,
@@ -83,7 +91,8 @@ async def lookup_collection(id: str = None, browse_id: str = None, country_code:
 				http_code = 200
 			)
 		)
-			
+
+	# If sinister things happen
 	except Exception as msg:
 		error = Error(
 			service = service,

@@ -6,16 +6,21 @@ import aiohttp
 
 
 async def search_song(artists: list, title: str, song_type: str = None, collection: str = None, is_explicit: bool = None, country_code: str = 'us') -> object:
+	# Prepare the request dictionary with all input parameters
 	request = {'request': 'search_song', 'artists': artists, 'title': title, 'song_type': song_type, 'collection': collection, 'is_explicit': is_explicit, 'country_code': country_code}
+	# Record the start time for processing time calculation
 	start_time = current_unix_time_ms()
 
 	try:
+		# Create an aiottp session
 		async with aiohttp.ClientSession() as session:
+			# Optimize strings for query search
 			artists = [optimize_for_search(artist) for artist in artists]
 			title = optimize_for_search(title)
 			collection = clean_up_collection_title(optimize_for_search(collection)) if collection != None else None
 			
 			songs = []
+			# Prepare for API call
 			api_url = f'{api}/search/track'
 			api_params = {
 				'q': f'artist:"{artists[0]}" track:"{title}"',
@@ -23,14 +28,19 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 			api_headers = {
 				'Content-Type': 'application/json'
 			}
-			timeout = aiohttp.ClientTimeout(total = 30)
+			timeout = aiohttp.ClientTimeout(total = 30)	# Set a timeout for the HTTP request
 
+			# Make the GET request to the Deezer search API
 			async with session.get(url = api_url, headers = api_headers, timeout = timeout, params = api_params) as response:
 				if response.status == 200:
+					# Parse the JSON response
 					json_response = await response.json()
 
+					# Iterate over each track in the response data
 					for data in json_response['data']:
+						# Fetch detailed information for each track by ID because the base results don't have much artist info needed for accurate filtering
 						async with session.get(url = f'{api}/track/{data['id']}', headers = api_headers) as result:
+							# Parse the detailed track info
 							song = await result.json()
 
 							song_type = 'track'
@@ -40,6 +50,7 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 							song_is_explicit = song['explicit_lyrics']
 							song_artists = get_artists_of_media(request, song['contributors'])
 
+							# Create a Cover object for the song
 							song_cover = Cover(
 								service = service,
 								media_type = song_type,
@@ -56,6 +67,7 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 								)
 							)
 
+							# Create a Collection object for the song's album/EP
 							song_collection = Collection(
 								service = service,
 								type = 'album' if song['album']['type'] != 'ep' else 'ep',
@@ -74,6 +86,7 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 								)
 							)
 
+							# Append the Song object to the songs list
 							songs.append(Song(
 								service = service,
 								type = song_type,
@@ -91,6 +104,7 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 									http_code = response.status
 								)
 							))
+					# Filter and return the best matching song
 					return await filter_song(service = service, query_request = request, songs = songs, query_artists = artists, query_title = title, query_song_type = song_type, query_collection = collection, query_is_explicit = is_explicit, query_country_code = country_code)
 				
 				else:
@@ -108,6 +122,7 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 					await log(error)
 					return error
 
+	# If sinister things happen
 	except Exception as error:
 		error = Error(
 			service = service,

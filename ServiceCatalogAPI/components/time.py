@@ -19,5 +19,10 @@ def current_unix_time_ms():
 	return int(time() * 1000)
 
 def save_json(json_data: dict):
+	"""
+		USE FOR DEBUGGING ONLY
+	"""
 	with open('save_json_data.json', 'w', encoding = 'utf-8') as f:
 		json.dump(json_data, f, ensure_ascii = False, indent = 4)
+
+print('[ServiceCatalogAPI] Unix time module initialized')

@@ -2,7 +2,12 @@ from .about import service
 from ServiceCatalogAPI.components import *
 
 def get_artists_of_media(request: dict, artists_json: dict):
+	"""
+		If you need to compile a list of artists, use this
+	"""
+	# Initialize an empty list to store Artist objects
 	song_artists = []
+	# Iterate over each artist in the provided artists JSON
 	for artist in artists_json:
 		song_artists.append(
 			Artist(
@@ -20,7 +25,7 @@ def get_artists_of_media(request: dict, artists_json: dict):
 						request = request,
 						processing_time = 0,
 						filter_confidence_percentage = 100.0,
-						http_code = 200
+						http_code = 200 
 					)
 				),
 				meta = Meta(
@@ -28,7 +33,7 @@ def get_artists_of_media(request: dict, artists_json: dict):
 					request = request,
 					processing_time = 0,
 					filter_confidence_percentage = 100.0,
-					http_code = 200
+					http_code = 200 
 				)
 			)
 		)

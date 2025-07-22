@@ -6,22 +6,30 @@ import aiohttp
 
 
 async def lookup_collection(id: str, country_code: str = 'us') -> object:
+	# Prepare the request metadata
 	request = {'request': 'lookup_collection', 'id': id, 'country_code': country_code}
+	# Record the start time for processing time calculation
 	start_time = current_unix_time_ms()
 
 	try:
+		# Create an aiohttp session
 		async with aiohttp.ClientSession() as session:
+			# Prepare for API call
 			api_url = f'{api}/albums/{id}'
 			api_params = {
 				'market': country_code.upper(),
 			}
 			api_headers = {'Authorization': f'Bearer {await spotify_token.get_token()}'}
-			timeout = aiohttp.ClientTimeout(total = 30)
+			timeout = aiohttp.ClientTimeout(total = 30) # Set a timeout for the HTTP request
 
+			# Make the GET request to the Spotify API
 			async with session.get(url = api_url, headers = api_headers, timeout = timeout, params = api_params) as response:
+				# If the response is successful
 				if response.status == 200:
+					# Parse the JSON response
 					collection = await response.json()
 
+					# Determine the collection type (album or ep)
 					collection_type = ('album' if collection['album_type'] != 'single' else 'ep')
 					collection_url = collection['external_urls']['spotify']
 					collection_id = collection['id']
@@ -29,6 +37,7 @@ async def lookup_collection(id: str, country_code: str = 'us') -> object:
 					collection_artists = get_artists_of_media(request, collection['artists'])
 					collection_year = collection['release_date'][:4]
 					
+					# Build the cover object with high and low quality image URLs
 					media_cover = Cover(
 						service = service,
 						media_type = collection_type,
@@ -45,6 +54,7 @@ async def lookup_collection(id: str, country_code: str = 'us') -> object:
 						)
 					)
 
+					# Return the Collection object with all relevant data
 					return Collection(
 						service = service,
 						type = collection_type,
@@ -78,6 +88,7 @@ async def lookup_collection(id: str, country_code: str = 'us') -> object:
 					await log(error)
 					return error
 
+	# If sinister things happen
 	except Exception as error:
 		error = Error(
 			service = service,

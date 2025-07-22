@@ -10,3 +10,5 @@ keys.read('ServiceCatalogAPI/keys.ini')
 
 text = configparser.ConfigParser()
 text.read('ServiceCatalogAPI/text.ini')
+
+print('[ServiceCatalogAPI] .ini files initialized')

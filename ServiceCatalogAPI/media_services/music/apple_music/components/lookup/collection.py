@@ -7,33 +7,43 @@ import aiohttp
 
 
 async def lookup_collection(id: str, country_code: str = 'us') -> object:
+	# Prepare the request metadata
 	request = {'request': 'lookup_collection', 'id': id, 'country_code': country_code}
+	# Record the start time for processing time calculation
 	start_time = current_unix_time_ms()
 
 	try:
+		# Create an aiohttp session
 		async with aiohttp.ClientSession() as session:
+			# Prepare for API call
 			api_url = f'{api}/lookup'
 			api_params = {
 				'id': id,
 				'country': country_code.lower()
 			}
-			timeout = aiohttp.ClientTimeout(total = 30)
+			timeout = aiohttp.ClientTimeout(total = 30)  # Set a timeout for the request
 
+			# Make the GET request to the API
 			async with session.get(url = api_url, params = api_params, timeout = timeout) as response:
 				if response.status == 200:
+					# Parse the JSON response
 					collection = await response.json(content_type = 'text/javascript')
 					collection = collection['results'][0]
 
+					# Check if the collection is a single or not
 					if ' - Single' not in collection['collectionName']:
+						# Determine if it's an album or EP
 						collection_type = ('album' if ' - EP' not in collection['collectionName'] else 'ep')
 						collection_url = collection['collectionViewUrl']
 						collection_id = collection['collectionId']
 						collection_title = clean_up_collection_title(collection['collectionName'])
+						# Lookup artist information
 						collection_artists = await lookup_artist(id = collection['artistId'], country_code = country_code)
 						collection_artists = [collection_artists]
-						collection_year = collection['releaseDate'][:4]
+						collection_year = collection['releaseDate'][:4]  # Extract release year
 						collection_genre = collection['primaryGenreName'] if 'primaryGenreName' in collection else None
 
+						# Create the cover object
 						collection_cover = Cover(
 							service = service,
 							media_type = collection_type,
@@ -50,6 +60,7 @@ async def lookup_collection(id: str, country_code: str = 'us') -> object:
 							)
 						)
 
+						# Return the Collection object
 						return Collection(
 							service = service,
 							type = collection_type,
@@ -70,14 +81,18 @@ async def lookup_collection(id: str, country_code: str = 'us') -> object:
 						)
 
 					else:
+						# Handle the case where the collection is a single
 						song_type = 'single'
 						song_url = collection['collectionViewUrl']
 						song_id = collection['collectionId']
 						song_title = clean_up_collection_title(collection['collectionName'])
+						# Lookup artist information
 						song_artists = await lookup_artist(id = collection['artistId'], country_code = country_code)
 						song_artists = [song_artists]
+						# Determine if the song is explicit
 						song_is_explicit = not 'not' in collection['collectionExplicitness']
 						song_genre = collection['primaryGenreName'] if 'primaryGenreName' in collection else None
+						# Create the cover object for the song
 						song_cover = Cover(
 							service = service,
 							media_type = song_type,
@@ -95,6 +110,7 @@ async def lookup_collection(id: str, country_code: str = 'us') -> object:
 							)
 						)
 
+						# Create a Collection object for the single
 						song_collection = Collection(
 							service = service,
 							type = song_type,
@@ -114,6 +130,7 @@ async def lookup_collection(id: str, country_code: str = 'us') -> object:
 							)
 						)
 
+						# Return the Song object
 						return Song(
 							service = service,
 							type = song_type,
@@ -149,6 +166,7 @@ async def lookup_collection(id: str, country_code: str = 'us') -> object:
 					await log(error)
 					return error
 
+	# If sinister things happen
 	except Exception as error:
 		error = Error(
 			service = service,

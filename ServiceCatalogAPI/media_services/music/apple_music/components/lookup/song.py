@@ -8,35 +8,43 @@ import aiohttp
 
 
 async def lookup_song(id: str, country_code: str = 'us') -> object:
+	# Prepare the request dictionary with song lookup parameters
 	request = {'request': 'lookup_song', 'id': id, 'country_code': country_code}
+	# Record the start time for processing time calculation
 	start_time = current_unix_time_ms()
 
 	try:
+		# Create an aiohttp session
 		async with aiohttp.ClientSession() as session:
-			request = {'request': 'lookup_song', 'id': id, 'country_code': country_code}
+			# Prepare for API call
 			api_url = f'{api}/lookup'
 			api_params = {
 				'id': id,
 				'country': country_code.lower()
 			}
-			timeout = aiohttp.ClientTimeout(total = 30)
-			start_time = current_unix_time_ms()
+			timeout = aiohttp.ClientTimeout(total = 30) # Set a timeout for the HTTP request
 
+			# Make the GET request to the API endpoint
 			async with session.get(url = api_url, params = api_params, timeout = timeout) as response:
 				if response.status == 200:
+					# Parse the JSON response
 					song = await response.json(content_type = 'text/javascript')
 					song = song['results'][0]
 
+					# Determine the song type based on the collection name
 					song_type = 'track' if ' - Single' not in song['collectionName'] else 'single'
 					song_url = song['trackViewUrl']
 					song_id = song['trackId']
 					song_title = song['trackName']
+					# Lookup the artist information asynchronously
 					song_artists = await lookup_artist(id = song['artistId'], country_code = country_code)
 					song_artists = [song_artists]
+					# Lookup the collection information asynchronously
 					song_collection = await lookup_collection(id = song['collectionId'], country_code = country_code)
 					song_is_explicit = not 'not' in song['trackExplicitness']
 					song_genre = song['primaryGenreName'] if 'primaryGenreName' in song else None
 
+					# Create a Cover object for the song
 					song_cover = Cover(
 						service = service,
 						media_type = song_type,
@@ -53,6 +61,7 @@ async def lookup_song(id: str, country_code: str = 'us') -> object:
 						)
 					)
 
+					# Return a Song object with all the gathered information
 					return Song(
 						service = service,
 						type = song_type,
@@ -88,6 +97,7 @@ async def lookup_song(id: str, country_code: str = 'us') -> object:
 					await log(error)
 					return error
 
+	# If sinister things happen
 	except Exception as error:
 		error = Error(
 			service = service,

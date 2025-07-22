@@ -6,7 +6,9 @@ import aiohttp
 
 
 async def lookup_song(id: str, country_code: str = 'us') -> object:
+	# Prepare the request dictionary with search parameters
 	request = {'request': 'lookup_song', 'id': id, 'country_code': country_code}
+	# Record the start time for processing time calculation
 	start_time = current_unix_time_ms()
 
 	# Try to perform the song lookup operation

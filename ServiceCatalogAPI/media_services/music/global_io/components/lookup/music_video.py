@@ -6,7 +6,9 @@ from ServiceCatalogAPI.media_services.music.global_io.components.search.music_vi
 
 
 async def lookup_music_video(service: object, id: str, mv_country_code: str = None, lookup_country_code: str = 'us') -> object:
+	# Prepare the request metadata
 	request = {'request': 'lookup_song', 'service': service.service, 'id': id, 'mv_country_code': mv_country_code, 'lookup_country_code': lookup_country_code}
+	# Record the start time for processing time calculation
 	start_time = current_unix_time_ms()
 	
 	try:

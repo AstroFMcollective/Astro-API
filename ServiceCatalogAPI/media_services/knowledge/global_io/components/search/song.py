@@ -11,26 +11,32 @@ from asyncio import create_task, gather
 
 
 async def search_song(artists: list, title: str, song_type: str = None, collection: str = None, is_explicit: bool = None, country_code: str = 'us', include_premade_media: list = [], exclude_services: list = []) -> object:
+	# Build the request dictionary with all parameters
 	request = {'request': 'search_song', 'artists': artists, 'title': title, 'song_type': song_type, 'collection': collection, 'is_explicit': is_explicit, 'country_code': country_code, 'exclude_services': exclude_services}
+	# Record the start time for processing time calculation
 	start_time = current_unix_time_ms()
 
-	# Try to perform the song search operation
 	try:
-		# Define service objects
+		# Define the service objects to use for searching
 		service_objs = [spotify, genius]
+		# Extract the service names from the service objects
 		services = [obj.service for obj in service_objs]
 
+		# Define which result types are considered valid
 		legal_results = ['knowledge']
 
 		# Exclude services if they already have a premade media object
 		# This is to prevent duplicate searches and increase performance
 		ignore_in_excluded_services = []
 		for premade in include_premade_media:
+			# If the premade media's service is not already excluded, add it to the exclusion list
+			# Do this so we don't query the premade's service
 			if premade.service not in exclude_services:
 				exclude_services.append(premade.service)
+			# Track which services are being ignored in the exclusion process
 			ignore_in_excluded_services.append(premade.service)
 
-		# Search services for songs
+		# Prepare asynchronous search tasks for each service not excluded
 		tasks = []
 		for obj in service_objs:
 			if obj.service not in exclude_services:
@@ -43,19 +49,23 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 					)
 				)
 
+		# Run all search tasks concurrently and collect their results
+		# This will be our list of unlabeled results
 		unlabeled_results = await gather(*tasks)
 
-		# Redefine exluded services to only include those that are not in the ignore list
+		# Redefine excluded services to only include those not in the ignore list
 		exclude_services = [service for service in exclude_services if service not in ignore_in_excluded_services]
+		# Add premade media objects to the results
 		for premade in include_premade_media:
-			unlabeled_results.append(premade) # Add premade media objects to the results
-		for service in exclude_services: # If a service is excluded, we add an Empty result for it so it can still be processed later
+			unlabeled_results.append(premade)
+		# For each excluded service not in the ignore list, add an Empty result for later processing
+		for service in exclude_services:
 			if service not in ignore_in_excluded_services:
 				unlabeled_results.append(
 					Empty(
 						service = service,
 						meta = Meta(
-							service = gservice, # We use the Global IO service for the metadata so we know it generated the Empty result
+							service = gservice, # Use Global IO service for metadata to indicate Empty result
 							request = request,
 							processing_time = current_unix_time_ms() - start_time,
 							filter_confidence_percentage = {service: 0.0},
@@ -64,8 +74,10 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 					)
 				)
 
+		# Create a dictionary mapping service names to their results
 		labeled_results = {result.service: result for result in unlabeled_results}
 
+		# Define the order of preference for each field from different services
 		general_order = [spotify.service, genius.service]
 		type_order = [spotify.service, genius.service]
 		title_order = [spotify.service, genius.service]
@@ -81,7 +93,7 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 		length_order = [spotify.service, genius.service]
 		time_signature_order = [spotify.service, genius.service]
 
-
+		# Remove results that are not of a legal type from all order lists and results
 		for service in services:
 			if labeled_results[service].type not in legal_results:
 				general_order.remove(service)
@@ -99,6 +111,7 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 				del unlabeled_results[list(labeled_results.keys()).index(service)]
 				del labeled_results[service]
 
+		# Initialize variables for the final compiled result
 		result_type = None
 		result_media_type = None
 		result_urls = {}
@@ -106,17 +119,21 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 		result_processing_time = {}
 		result_confidence = {}
 		result_title = None
+		# Compile artists from all results
 		result_artists = compiled_artists(request, [song.artists for song in unlabeled_results])
+		# Compile collection from all results
 		result_collection = compiled_collection(request, [collection.collection for collection in unlabeled_results])
 		result_description = None
 		result_is_explicit = None
 		result_release_date = None
+		# Compile cover from all results
 		result_cover = compiled_cover(request, unlabeled_results)
 		result_bpm = None
 		result_key = None
 		result_length = None
 		result_time_signature = None
 
+		# For each service in the preferred order, fill in the result fields if not already set
 		for service_index in range(len(general_order)):
 			if result_type == None:
 				result_type = labeled_results[type_order[service_index]].type
@@ -151,7 +168,7 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 			if result_time_signature == None:
 				result_time_signature = labeled_results[time_signature_order[service_index]].time_signature
 
-
+		# If a valid result type was found, return a compiled Knowledge object
 		if result_type is not None:
 			return Knowledge(
 				service = gservice,
@@ -178,7 +195,7 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 				)
 			)
 		else:
-			error = Empty(
+			empty_response = Empty(
 				service = gservice,
 				meta = Meta(
 					service = gservice,
@@ -188,9 +205,10 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 					http_code = 204
 				)
 			)
-			await log(error)
-			return error
+			await log(empty_response)
+			return empty_response
 
+	# If sinister things happen
 	except Exception as error:
 		error = Error(
 			service = gservice,

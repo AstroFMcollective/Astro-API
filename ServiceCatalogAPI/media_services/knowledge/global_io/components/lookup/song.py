@@ -7,21 +7,24 @@ from ServiceCatalogAPI.media_services.knowledge.global_io.components.search.song
 
 
 async def lookup_song(service: object, id: str, song_country_code: str = None, lookup_country_code: str = 'us') -> object:
+	# Build the request dictionary with all relevant parameters
 	request = {'request': 'lookup_song', 'service': service.service, 'id': id, 'song_country_code': song_country_code, 'lookup_country_code': lookup_country_code}
+	# Record the start time for processing time calculation
 	start_time = current_unix_time_ms()
 	
 	try:
-		# Look up the song knowledge on its respectative service for its metadata
+		# Look up the song knowledge on its respective service for its metadata
 		knowledge_reference = await service.lookup_song(id = id, country_code = song_country_code)
 
-		legal_results = ['knowledge', 'track', 'single']
-		compatible_results = ['knowledge']
+		# Define which result types are considered legal and compatible
+		legal_results = ['knowledge', 'track', 'single'] # Result types that are legal to use for metadata
+		compatible_results = ['knowledge'] # Result types that are compatible to use as premade media
 
-		# This would usually trigger had an error happened inside the lookup knowledge function, so we can just return that empty or error object 
+		# If the lookup result type is not legal, return the reference as is (could be error or empty)
 		if knowledge_reference.type not in legal_results:
 			return knowledge_reference
 
-		# Make the call to the Global Interface's song-searching function
+		# Call the global song search function with extracted metadata and include the knowledge reference if compatible
 		song = await search_song_knowledge(
 			artists = [artist.name for artist in knowledge_reference.artists],
 			title = knowledge_reference.title,

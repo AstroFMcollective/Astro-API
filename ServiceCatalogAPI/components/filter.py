@@ -22,7 +22,7 @@ from ServiceCatalogAPI.components.time import current_unix_time_ms
 
 	Both of these are equally important, because API output data provides the necessary media to sort and filter through,
 	and search query data provides the guidelines from which the filtering algorithms know what media object is the most
-	accurate out of the ones listed.
+	accurate out of the ones listed. Don't skimp out on supplying search query data!
 """
 
 
@@ -31,7 +31,7 @@ async def filter_song(service: str, query_request: dict, songs: list, query_arti
 	"""
 		# Song filtering function
 
-		This is a built-in internal Astro API function which iterates through a list of song media objects and
+		This is a built-in internal Service Catalog API function which iterates through a list of song media objects and
 		determines the single most accurate song with the most overlapping data out of the ones listed.
 
 		It can return two object types: `Song` (filtered song) and `Empty` (empty response).
@@ -69,6 +69,7 @@ async def filter_song(service: str, query_request: dict, songs: list, query_arti
 		artists_with_similarity = []
 
 		# This accounts all the artists in a song: checks their similarity with the query data, sorts that data from the highest to lowest, and then applies the highest score to the song similarity overall score
+		# In the distant future this will be able to use Artist objects but we're not there yet
 		for artist_name in artists_reference:
 			artists_with_similarity.append([calculate_similarity(bare_bones(artist_name), artist_input), artist_name]) 
 		artists_with_similarity = sort_similarity_lists(artists_with_similarity)
@@ -159,7 +160,7 @@ async def filter_mv(service: str, query_request: dict, videos: list, query_artis
 	"""
 		# Music video filtering function
 
-		This is a built-in internal Astro API function which iterates through a list of music video media objects and
+		This is a built-in internal Service Catalog API function which iterates through a list of music video media objects and
 		determines the single most accurate music video with the most overlapping data out of the ones listed.
 
 		It can return two object types: `MusicVideo` (filtered music video) and `Empty` (empty response).
@@ -191,6 +192,7 @@ async def filter_mv(service: str, query_request: dict, videos: list, query_artis
 		artists_with_similarity = []
 
 		# This accounts all the artists in a music video: checks their similarity with the query data, sorts that data from the highest to lowest, and then applies the highest score to the music video similarity overall score
+		# In the distant future this will be able to use Artist objects but we're not there yet
 		for artist_name in artists_reference:
 			artists_with_similarity.append([calculate_similarity(bare_bones(artist_name), artist_input), artist_name])
 		artists_with_similarity = sort_similarity_lists(artists_with_similarity)
@@ -270,7 +272,7 @@ async def filter_collection(service: str, query_request: dict, collections: list
 	"""
 		# Collection filtering function
 
-		This is a built-in internal Astro API function which iterates through a list of collection media objects and
+		This is a built-in internal Service Catalog API function which iterates through a list of collection media objects and
 		determines the single most accurate collection with the most overlapping data out of the ones listed.
 
 		It can return two object types: `Collection` (filtered collection) and `Empty` (empty response).
@@ -303,6 +305,7 @@ async def filter_collection(service: str, query_request: dict, collections: list
 		artists_with_similarity = []
 
 		# This accounts all the artists in a collection: checks their similarity with the query data, sorts that data from the highest to lowest, and then applies the highest score to the music video similarity overall score
+		# In the distant future this will be able to use Artist objects but we're not there yet
 		for artist_name in artists_reference:
 			artists_with_similarity.append([calculate_similarity(bare_bones(artist_name), artist_input), artist_name])
 		artists_with_similarity = sort_similarity_lists(artists_with_similarity)
@@ -376,3 +379,5 @@ async def filter_collection(service: str, query_request: dict, collections: list
 		)
 		await log(empty_response)
 		return empty_response
+
+print('[ServiceCatalogAPI] Filtering module initialized')

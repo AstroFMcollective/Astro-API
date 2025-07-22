@@ -11,7 +11,9 @@ from asyncio import create_task, gather
 
 
 async def search_song(artists: list, title: str, song_type: str = None, collection: str = None, is_explicit: bool = None, country_code: str = 'us', include_premade_media: list = [], exclude_services: list = []) -> object:
+	# Prepare the request metadata
 	request = {'request': 'search_song', 'artists': artists, 'title': title, 'song_type': song_type, 'collection': collection, 'is_explicit': is_explicit, 'country_code': country_code, 'exclude_services': exclude_services}
+	# Record the start time for processing time calculation
 	start_time = current_unix_time_ms()
 
 	# Try to perform the song search operation
@@ -144,7 +146,7 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 			)
 			return song
 		else:
-			error = Empty(
+			empty_response = Empty(
 				service = gservice,
 				meta = Meta(
 					service = gservice,
@@ -154,8 +156,8 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 					http_code = 204
 				)
 			)
-			await log(error)
-			return error
+			await log(empty_response)
+			return empty_response
 
 	# If sinister things happen
 	except Exception as error:

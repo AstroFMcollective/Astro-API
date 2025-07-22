@@ -6,16 +6,21 @@ import aiohttp
 
 
 async def search_song(artists: list, title: str, song_type: str = None, collection: str = None, is_explicit: bool = None, country_code: str = 'us') -> object:
+	# Build the request dictionary with all input parameters
 	request = {'request': 'search_song', 'artists': artists, 'title': title, 'song_type': song_type, 'collection': collection, 'is_explicit': is_explicit, 'country_code': country_code}
+	# Record the start time for processing time calculation
 	start_time = current_unix_time_ms()
 
 	try:
+		# Create an aiohttp session
 		async with aiohttp.ClientSession() as session:
+			# Optimize strings for query search
 			artists = [optimize_for_search(artist) for artist in artists]
 			title = optimize_for_search(replace_with_ascii(title).lower())
 			collection = clean_up_collection_title(optimize_for_search(collection)) if collection != None else None
 
 			songs = []
+			# Prepare for API call
 			api_url = f'{api}/search'
 			api_params = {
 				'term': (f'{artists[0]} "{title}"' if collection == None or song_type == 'single' else f'{artists[0]} "{title}" {collection}'),
@@ -23,20 +28,26 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 				'limit': 200,
 				'country': country_code.lower()
 			}
-			timeout = aiohttp.ClientTimeout(total = 30)
+			timeout = aiohttp.ClientTimeout(total = 30) # Set a timeout for the HTTP request
 
+			# Send a GET request to the API endpoint
 			async with session.get(url = api_url, timeout = timeout, params = api_params) as response:
 				if response.status == 200:
+					# Parse the JSON response
 					json_response = await response.json(content_type = 'text/javascript')
 
+					# Iterate through each song in the results
 					for song in json_response['results']:
+						# Determine the song type based on collection name
 						song_type = 'track' if ' - Single' not in song['collectionName'] else 'single'
 						song_url = song['trackViewUrl']
 						song_id = song['trackId']
 						song_title = song['trackName']
+						# Determine if the song is explicit
 						song_is_explicit = not 'not' in song['trackExplicitness']
 						song_genre = song['primaryGenreName'] if 'primaryGenreName' in song else None
 
+						# Build a list of Artist objects for the song
 						song_artists = [
 							Artist(
 								service = service,
@@ -53,6 +64,7 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 							) for artist in split_artists(song['artistName'])
 						]
 
+						# Create a Cover object for the song
 						song_cover = Cover(
 							service = service,
 							media_type = song_type,
@@ -69,6 +81,7 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 							)
 						)
 
+						# Create a Collection object for the song's collection
 						song_collection = Collection(
 							service = service,
 							type = 'album' if ' - EP' not in song['collectionName'] else 'ep' if song_type != 'single' else song_type,
@@ -86,6 +99,7 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 							)
 						)
 
+						# Append the constructed Song object to the songs list
 						songs.append(Song(
 							service = service,
 							type = song_type,
@@ -104,6 +118,7 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 								http_code = response.status
 							)
 						))
+					# Filter and return the best matching song
 					return await filter_song(service = service, query_request = request, songs = songs, query_artists = artists, query_title = title, query_song_type = song_type, query_collection = collection, query_is_explicit = is_explicit, query_country_code = country_code)
 
 				else:
@@ -122,6 +137,7 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 					await log(error)
 					return error
 
+	# If sinister things happen
 	except Exception as error:
 		error = Error(
 			service = service,

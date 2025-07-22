@@ -6,15 +6,20 @@ import aiohttp
 
 
 async def search_collection(artists: list, title: str, year: int = None, country_code: str = 'us') -> object:
+	# Prepare the request dictionary with search parameters
 	request = {'request': 'search_collection', 'artists': artists, 'title': title, 'year': year, 'country_code': country_code}
+	# Record the start time for processing time calculation
 	start_time = current_unix_time_ms()
 
 	try:
+		# Create an aiohttp session
 		async with aiohttp.ClientSession() as session:
+			# Optimize strings for query search
 			artists = [optimize_for_search(artist) for artist in artists]
 			title = clean_up_collection_title(optimize_for_search(title))
-				
+			
 			collections = []
+			# Prepare for API call
 			api_url = f'{api}/search'
 			api_params = {
 				'q': f'artist:{artists[0]} album:{title}',
@@ -24,13 +29,17 @@ async def search_collection(artists: list, title: str, year: int = None, country
 				'offset': 0
 			}
 			api_headers = {'Authorization': f'Bearer {await spotify_token.get_token()}'}
-			timeout = aiohttp.ClientTimeout(total = 30)
+			timeout = aiohttp.ClientTimeout(total = 30) # Set a timeout for the HTTP request
 
+			# Make an asynchronous GET request to the Spotify API
 			async with session.get(url = api_url, headers = api_headers, timeout = timeout, params = api_params) as response:
 				if response.status == 200:
+					# Parse the JSON response
 					json_response = await response.json()
 
+					# Iterate over each collection (album) in the response
 					for collection in json_response['albums']['items']:
+						# Determine the collection type (album or ep)
 						collection_type = ('album' if collection['album_type'] != 'single' else 'ep')
 						collection_url = collection['external_urls']['spotify']
 						collection_id = collection['id']
@@ -38,6 +47,7 @@ async def search_collection(artists: list, title: str, year: int = None, country
 						collection_artists = get_artists_of_media(request, collection['artists'])
 						collection_year = collection['release_date'][:4]
 			
+						# Create a Cover object for the collection's artwork
 						media_cover = Cover(
 							service = service,
 							media_type = collection_type,
@@ -54,6 +64,7 @@ async def search_collection(artists: list, title: str, year: int = None, country
 							)
 						)    
 
+						# Create a Collection object and add it to the list
 						collections.append(Collection(
 							service = service,
 							type = collection_type,
@@ -70,6 +81,7 @@ async def search_collection(artists: list, title: str, year: int = None, country
 								http_code = response.status
 							)
 						))
+					# Filter and return the collection based on the query
 					return await filter_collection(service = service, query_request = request, collections = collections, query_artists = artists, query_title = title, query_year = year, query_country_code = country_code)
 
 				else:
@@ -87,6 +99,7 @@ async def search_collection(artists: list, title: str, year: int = None, country
 					await log(error)
 					return error
 
+	# If sinister things happen
 	except Exception as error:
 		error = Error(
 			service = service,

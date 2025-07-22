@@ -5,14 +5,19 @@ from ServiceCatalogAPI.media_services.knowledge.global_io.components.generic imp
 from ServiceCatalogAPI.media_services.knowledge.global_io.components.search.song import search_song as search_song_knowledge
 
 async def search_query(query: str, country_code: str = 'us', exclude_services: list = []) -> object:
+	# Prepare the request dictionary with query details
 	request = {'request': 'search_query', 'query': query, 'country_code': country_code}
+	# Record the start time for processing time calculation
 	start_time = current_unix_time_ms()
 
 	try:
+		# Define the types considered as 'knowledge'
 		knowledge_types = ['knowledge']
 		
+		# Perform the search query using the genius module
 		query_result = await genius.search_query(query, country_code)
 		
+		# If the result type is in knowledge_types, process as a song knowledge search
 		if query_result.type in knowledge_types:
 			return await search_song_knowledge(
 				[artist.name for artist in query_result.artists],
@@ -39,6 +44,7 @@ async def search_query(query: str, country_code: str = 'us', exclude_services: l
 			await log(empty_response)
 			return empty_response
 
+	# If sinister things happen
 	except Exception as msg:
 		error = Error(
 			service = gservice,
