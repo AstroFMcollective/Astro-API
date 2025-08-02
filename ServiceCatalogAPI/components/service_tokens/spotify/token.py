@@ -14,12 +14,13 @@ class Token:
 		self.client_secret = client_secret
 		self.token = None
 		self.token_expiration_date = None
-		run(self.get_token())
+		
+		self.token = self.get_token()
 
 	async def get_token(self) -> str:
 		if self.token == None or (self.token_expiration_date == None or current_unix_time() > self.token_expiration_date):
 			async with aiohttp.ClientSession() as session:
-				request = 'get_token'
+				request = {'request': 'get_token'}
 				api_url = api
 				api_data = f'grant_type=client_credentials&client_id={self.client_id}&client_secret={self.client_secret}'
 				api_headers = {'Content-Type': 'application/x-www-form-urlencoded'}
