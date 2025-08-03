@@ -14,8 +14,6 @@ class Token:
 		self.client_secret = client_secret
 		self.token = None
 		self.token_expiration_date = None
-		
-		self.token = self.get_token()
 
 	async def get_token(self) -> str:
 		if self.token == None or (self.token_expiration_date == None or current_unix_time() > self.token_expiration_date):
