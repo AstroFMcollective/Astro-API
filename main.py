@@ -59,7 +59,7 @@ async def search_song(media: str, service: str, artist: str, title: str, song_ty
 	if song_object.type not in illegal_results:
 		return song_object.json
 	else:
-		raise HTTPException(status_code = song_object.meta.http_code, detail = song_object.error_msg if song_object.type is 'error' else None)
+		raise HTTPException(status_code = song_object.meta.http_code, detail = song_object.error_msg if song_object.type == 'error' else None)
 
 
 
@@ -91,7 +91,7 @@ async def search_music_video(media: str, service: str, artist: str, title: str, 
 	if music_video_object.type not in illegal_results:
 		return music_video_object.json
 	else:
-		raise HTTPException(status_code = music_video_object.meta.http_code, detail = music_video_object.error_msg if music_video_object.type is 'error' else None)
+		raise HTTPException(status_code = music_video_object.meta.http_code, detail = music_video_object.error_msg if music_video_object.type == 'error' else None)
 
 
 
@@ -123,7 +123,7 @@ async def search_collection(media: str, service: str, artist: str, title: str, y
 	if collection_object.type not in illegal_results:
 		return collection_object.json
 	else:
-		raise HTTPException(status_code = collection_object.meta.http_code, detail = collection_object.error_msg if collection_object.type is 'error' else None)
+		raise HTTPException(status_code = collection_object.meta.http_code, detail = collection_object.error_msg if collection_object.type == 'error' else None)
 
 
 
@@ -150,7 +150,7 @@ async def search_music_video(media: str, service: str, query: str, country_code:
 	if query_object.type not in illegal_results:
 		return query_object.json
 	else:
-		raise HTTPException(status_code = query_object.meta.http_code, detail = query_object.error_msg if query_object.type is 'error' else None)
+		raise HTTPException(status_code = query_object.meta.http_code, detail = query_object.error_msg if query_object.type == 'error' else None)
 
 
 
@@ -204,7 +204,7 @@ async def lookup_song(media: str, service: str, id: str, id_service: str = None,
 	if song_object.type not in illegal_results:
 		return song_object.json
 	else:
-		raise HTTPException(status_code = song_object.meta.http_code, detail = song_object.error_msg if song_object.type is 'error' else None)
+		raise HTTPException(status_code = song_object.meta.http_code, detail = song_object.error_msg if song_object.type == 'error' else None)
 
 
 
@@ -248,7 +248,7 @@ async def lookup_music_video(media: str, service: str, id: str, id_service: str 
 	if music_video_object.type not in illegal_results:
 		return music_video_object.json
 	else:
-		raise HTTPException(status_code = music_video_object.meta.http_code, detail = music_video_object.error_msg if music_video_object.type is 'error' else None)
+		raise HTTPException(status_code = music_video_object.meta.http_code, detail = music_video_object.error_msg if music_video_object.type == 'error' else None)
 
 
 
@@ -292,4 +292,4 @@ async def lookup_collection(media: str, service: str, id: str, id_service: str =
 	if collection_object.type not in illegal_results:
 		return collection_object.json
 	else:
-		raise HTTPException(status_code = collection_object.meta.http_code, detail = collection_object.error_msg if collection_object.type is 'error' else None)
+		raise HTTPException(status_code = collection_object.meta.http_code, detail = collection_object.error_msg if collection_object.type == 'error' else None)
