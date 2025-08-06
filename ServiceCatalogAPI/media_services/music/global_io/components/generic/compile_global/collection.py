@@ -16,6 +16,7 @@ def compiled_collection(request: dict, unlabeled_collections: list) -> Collectio
 	# Some services have lesser quality or straight-up do not carry certain information, so we prioritize the ones who do
 	all_services = [spotify.service, apple_music.service, youtube_music.service, deezer.service]
 	general_order = [spotify.service, apple_music.service, youtube_music.service, deezer.service]
+	type_order = [apple_music.service, spotify.service, deezer.service, youtube_music.service]
 	urls_order = [spotify.service, apple_music.service, youtube_music.service, deezer.service]
 	ids_order = [spotify.service, apple_music.service, youtube_music.service, deezer.service]
 	title_order = [spotify.service, apple_music.service, deezer.service, youtube_music.service]
@@ -26,6 +27,7 @@ def compiled_collection(request: dict, unlabeled_collections: list) -> Collectio
 	for service in all_services:
 		if service not in labeled_collections:
 			general_order.remove(service)
+			type_order.remove(service)
 			urls_order.remove(service)
 			ids_order.remove(service)
 			title_order.remove(service)
@@ -47,7 +49,7 @@ def compiled_collection(request: dict, unlabeled_collections: list) -> Collectio
 	# Iterating through the ordered list to find the first non-None result for each field
 	for service_index in range(len(general_order)):
 		if result_type is None:
-			result_type = labeled_collections[general_order[service_index]].type
+			result_type = labeled_collections[type_order[service_index]].type
 		if result_title is None:
 			result_title = labeled_collections[title_order[service_index]].title
 		if result_genre is None:
