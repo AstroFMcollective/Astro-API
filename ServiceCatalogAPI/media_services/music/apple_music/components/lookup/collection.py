@@ -6,7 +6,7 @@ import aiohttp
 
 
 
-async def lookup_collection(id: str, country_code: str = 'us') -> object:
+async def lookup_collection(id: str, country_code: str = 'us', ignore_single_suffix: bool = False) -> object:
 	# Prepare the request metadata
 	request = {'request': 'lookup_collection', 'id': id, 'country_code': country_code}
 	# Record the start time for processing time calculation
@@ -31,9 +31,10 @@ async def lookup_collection(id: str, country_code: str = 'us') -> object:
 					collection = collection['results'][0]
 
 					# Check if the collection is a single or not
-					if ' - Single' not in collection['collectionName']:
+					# If an internal toggle for single suffix ignoring is set, treat the collection as a collection regardless if it's a single or not
+					if ' - Single' not in collection['collectionName'] or ignore_single_suffix:
 						# Determine if it's an album or EP
-						collection_type = ('album' if ' - EP' not in collection['collectionName'] else 'ep')
+						collection_type = ('single' if ' - Single' in collection['collectionName'] else 'ep' if ' - EP' in collection['collectionName'] else 'album')
 						collection_url = collection['collectionViewUrl']
 						collection_id = collection['collectionId']
 						collection_title = clean_up_collection_title(collection['collectionName'])
@@ -100,7 +101,6 @@ async def lookup_collection(id: str, country_code: str = 'us') -> object:
 							artists = song_artists,
 							hq_urls = collection['artworkUrl100'],
 							lq_urls = collection['artworkUrl60'],
-							color_hex = None,
 							meta = Meta(
 								service = service,
 								request = request,
@@ -116,8 +116,8 @@ async def lookup_collection(id: str, country_code: str = 'us') -> object:
 							type = song_type,
 							urls = song_url,
 							ids = song_id,
-							title = collection_title,
-							artists = collection_artists,
+							title = song_title,
+							artists = song_artists,
 							cover = song_cover,
 							release_year = collection['releaseDate'][:4],
 							genre = song_genre,

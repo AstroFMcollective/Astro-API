@@ -40,7 +40,7 @@ async def lookup_song(id: str, country_code: str = 'us') -> object:
 					song_artists = await lookup_artist(id = song['artistId'], country_code = country_code)
 					song_artists = [song_artists]
 					# Lookup the collection information asynchronously
-					song_collection = await lookup_collection(id = song['collectionId'], country_code = country_code)
+					song_collection = await lookup_collection(id = song['collectionId'], country_code = country_code, ignore_single_suffix = True)
 					song_is_explicit = not 'not' in song['trackExplicitness']
 					song_genre = song['primaryGenreName'] if 'primaryGenreName' in song else None
 
