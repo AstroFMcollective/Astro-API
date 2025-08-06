@@ -1,4 +1,5 @@
 from ServiceCatalogAPI.components.ini import text
+from ServiceCatalogAPI.components.text_manipulation import censor_text
 
 missing_image = text['images']['missing_image']
 
@@ -170,7 +171,7 @@ class Song:
 	def __init__(self, service: str, type: str, urls: str | dict, ids: str | dict, title: str, artists: list[object], cover: object, meta: object, collection: object = None, genre: str = None, is_explicit: bool = None) -> object:
 		urls = {service: urls} if not isinstance(urls, dict) else urls
 		ids = {service: str(ids)} if not isinstance(ids, dict) else ids
-		censored_title = title
+		censored_title = censor_text(title)
 		
 		self.service = service
 		self.type = type
@@ -240,7 +241,7 @@ class MusicVideo:
 		type = 'music_video'
 		urls = {service: urls} if not isinstance(urls, dict) else urls
 		ids = {service: str(ids)} if not isinstance(ids, dict) else ids
-		censored_title = title
+		censored_title = censor_text(title)
 		
 		self.service = service
 		self.type = type
@@ -307,7 +308,7 @@ class Collection:
 	def __init__(self, service: str, type: str, urls: str | dict, ids: str | dict, title: str, artists: list[object], cover: object, meta = object, release_year: int = None, genre: str = None) -> object:
 		urls = {service: urls} if not isinstance(urls, dict) else urls
 		ids = {service: str(ids)} if not isinstance(ids, dict) else ids
-		censored_title = title
+		censored_title = censor_text(title)
 		
 		self.service = service
 		self.type = type
@@ -373,7 +374,7 @@ class Podcast:
 		type = 'podcast'
 		urls = {service: urls} if not isinstance(urls, dict) else urls
 		ids = {service: str(ids)} if not isinstance(ids, dict) else ids
-		censored_title = title
+		censored_title = censor_text(title)
 		
 		self.service = service
 		self.type = type
@@ -436,7 +437,7 @@ class PodcastEpisode:
 		type = 'podcast_episode'
 		urls = {service: urls} if not isinstance(urls, dict) else urls
 		ids = {service: str(ids)} if not isinstance(ids, dict) else ids
-		censored_title = title
+		censored_title = censor_text(title)
 
 		self.service = service
 		self.type = type
@@ -498,7 +499,7 @@ class Playlist:
 		type = 'playlist'
 		urls = {service: urls} if not isinstance(urls, dict) else urls
 		ids = {service: str(ids)} if not isinstance(ids, dict) else ids
-		censored_title = title
+		censored_title = censor_text(title)
 
 		self.service = service
 		self.type = type
@@ -564,7 +565,7 @@ class Audiobook:
 		type = 'audiobook'
 		urls = {service: urls} if not isinstance(urls, dict) else urls
 		ids = {service: str(ids)} if not isinstance(ids, dict) else ids
-		censored_title = title
+		censored_title = censor_text(title)
 
 		self.service = service
 		self.type = 'audiobook'
@@ -688,7 +689,7 @@ class Cover:
 		type = 'cover'
 		hq_urls = {service: hq_urls} if isinstance(hq_urls, str) else hq_urls if hq_urls != None else {service: missing_image}
 		lq_urls = {service: lq_urls} if isinstance(lq_urls, str) else lq_urls if lq_urls != None else {service: missing_image}
-		censored_title = title
+		censored_title = censor_text(title)
 		
 		self.service = service
 		self.type = type
@@ -802,7 +803,8 @@ class Knowledge:
 		urls = {service: urls} if not isinstance(urls, dict) else urls
 		ids = {service: str(ids)} if not isinstance(ids, dict) else ids
 		description = description if description != '?' and description != '' else None
-		censored_description = description
+		censored_title = censor_text(title)
+		censored_description = censor_text(description)
 		time_signature = f'1/{time_signature}' if time_signature is not None else None
 		pitch_class = {
 			0: 'C',
@@ -828,7 +830,7 @@ class Knowledge:
 		self.urls = urls
 		self.ids = ids
 		self.title = title
-		self.censored_title = title
+		self.censored_title = censored_title
 		self.artists = artists
 		self.collection = collection
 		self.description = description
