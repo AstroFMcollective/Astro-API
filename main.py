@@ -21,7 +21,6 @@ def get_service_catalog_api(media_type: str, service: str):
 
 api = FastAPI()
 print("[AstroAPI] Ready!")
-uvicorn.run(api)
 
 
 
