@@ -1,0 +1,11 @@
+discord.py
+unidecode
+audioop-lts
+ytmusicapi
+requests
+pillow
+numpy
+lyricsgenius
+fastapi
+uvicorn
+better-profanity
