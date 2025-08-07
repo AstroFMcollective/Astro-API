@@ -233,13 +233,14 @@ def convert_genius_desc_into_discord_str(description: dict):
 
 # A simple wrapper for the better_profanity module to handle slur censoring
 def censor_text(text: str) -> str:
-    path_to_file = "ServiceCatalogAPI/profanity_wordlist.txt"
-    profanity.load_censor_words_from_file(path_to_file)
-    words = text.split()
-    for word in words:
-        if profanity.contains_profanity(word):
-            new_word = word[0] + '*' * (len(word) - 2) + word[-1]
-            text = text.replace(word, new_word)
-    return text
+	if text != '' and text is not None:
+		path_to_file = "ServiceCatalogAPI/profanity_wordlist.txt"
+		profanity.load_censor_words_from_file(path_to_file)
+		words = text.split()
+		for word in words:
+			if profanity.contains_profanity(word):
+				new_word = word[0] + '*' * (len(word) - 2) + word[-1]
+				text = text.replace(word, new_word)
+	return text
 
 print('[ServiceCatalogAPI] Text manipulation module initialized')
