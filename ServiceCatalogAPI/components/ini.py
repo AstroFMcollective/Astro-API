@@ -5,6 +5,9 @@ import configparser
 config = configparser.ConfigParser()
 config.read('ServiceCatalogAPI/config.ini')
 
+deployment_channel = config['system']['deployment_channel']
+version = config['system']['version']
+
 keys = configparser.ConfigParser()
 keys.read('ServiceCatalogAPI/keys.ini')
 

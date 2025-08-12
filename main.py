@@ -21,6 +21,8 @@ def get_service_catalog_api(media_type: str, service: str):
 
 api = FastAPI()
 print("[AstroAPI] Ready!")
+print(f"[AstroAPI] Version: {ServiceCatalog.version}")
+print(f"[AstroAPI] Deployment channel: {ServiceCatalog.deployment_channel}")
 
 
 
@@ -198,7 +200,7 @@ async def lookup_song(media: str, service: str, id: str, id_service: str = None,
 				artists = [artist.name for artist in id_service_song_object.artists],
 				title = id_service_song_object.title,
 				song_type = id_service_song_object.type,
-				collection = id_service_song_object.collection.title if id_service_song_object.collection else None,
+				collection = id_service_song_object.collection.title if 'collection' in id_service_song_object.json else None,
 				is_explicit = id_service_song_object.is_explicit,
 				country_code = country_code,
 			)
