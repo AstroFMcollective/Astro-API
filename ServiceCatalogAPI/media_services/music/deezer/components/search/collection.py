@@ -48,7 +48,7 @@ async def search_collection(artists: list, title: str, year: int = None, country
 							collection_id = collection['id']
 							collection_title = remove_feat(collection['title'])
 							collection_year = collection['release_date'][:4]
-							collection_genre = collection['genres']['data'][0]['name']
+							collection_genre = collection['genres']['data'][0]['name'] if collection['genres']['data'] != [] else None
 							collection_artists = get_artists_of_media(request, collection['contributors'])
 
 							# Create a Cover object for the collection
