@@ -24,12 +24,23 @@ async def lookup_song(service: object, id: str, song_country_code: str = None, l
 		if knowledge_reference.type not in legal_results:
 			return knowledge_reference
 
+
+		# Rudimentary check to see if the knowledge object reference has a collection
+		# Certain service API-s do not provide a collection for objects, and music videos (which have compatible metadata) do not have a collection in any case
+		if 'collection' in knowledge_reference.json:
+			if knowledge_reference.collection is not None:
+				knowledge_reference_collection_title = knowledge_reference.collection.title
+			else: 
+				knowledge_reference_collection_title = None
+		else:
+			knowledge_reference_collection_title = None
+
 		# Call the global song search function with extracted metadata and include the knowledge reference if compatible
 		song = await search_song_knowledge(
 			artists = [artist.name for artist in knowledge_reference.artists],
 			title = knowledge_reference.title,
 			song_type = knowledge_reference.type if knowledge_reference.type != 'knowledge' else knowledge_reference.media_type,
-			collection = knowledge_reference.collection.title,
+			collection = knowledge_reference_collection_title,
 			is_explicit = knowledge_reference.is_explicit,
 			country_code = lookup_country_code,
 			include_premade_media = [knowledge_reference] if knowledge_reference.type in compatible_results else [],

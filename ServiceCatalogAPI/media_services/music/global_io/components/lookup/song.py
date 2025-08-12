@@ -22,13 +22,23 @@ async def lookup_song(service: object, id: str, song_country_code: str = None, l
 		# This would usually trigger had an error happened inside the lookup song function, so we can just return that empty or error object 
 		if song_reference.type not in legal_results:
 			return song_reference
+		
+		# Rudimentary check to see if the song object reference has a collection
+		# Certain service API-s do not provide a collection for objects, and music videos (which have compatible metadata) do not have a collection in any case
+		if 'collection' in song_reference.json:
+			if song_reference.collection is not None:
+				song_reference_collection_title = song_reference.collection.title
+			else: 
+				song_reference_collection_title = None
+		else:
+			song_reference_collection_title = None
 
 		# Make the call to the Global Interface's song-searching function
 		song = await search_song_music(
 			artists = [artist.name for artist in song_reference.artists],
 			title = song_reference.title,
 			song_type = song_reference.type if song_reference.type != 'knowledge' else song_reference.media_type,
-			collection = song_reference.collection.title if song_reference.type != 'music_video' else None, # Music videos do not have a collection
+			collection = song_reference_collection_title,
 			is_explicit = song_reference.is_explicit,
 			country_code = lookup_country_code,
 			include_premade_media = [song_reference] if song_reference.type in compatible_results else []  # Include the media from the original call unless it's a knowledge result
