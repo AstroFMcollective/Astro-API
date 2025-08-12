@@ -107,7 +107,6 @@ async def search_collection(artists: list, title: str, year: int = None, country
 					error = Error(
 						service = service,
 						component = component,
-						http_code = response.status,
 						error_msg = "HTTP error when searching for collection",
 						meta = Meta(
 							service = service,
