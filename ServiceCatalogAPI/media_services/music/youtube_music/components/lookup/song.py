@@ -133,5 +133,5 @@ async def lookup_song(id: str, country_code: str = 'us') -> object:
 			)
 		)
 		song_data = ytm.get_song(id)
-		await log(error, files = [discord.File(fp = StringIO(json.dumps(song_data, indent = 4)), filename = f'{id}.json')])
+		await log(error)
 		return error
