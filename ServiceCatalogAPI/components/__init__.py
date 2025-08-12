@@ -10,3 +10,4 @@ from ServiceCatalogAPI.components.media import *
 from ServiceCatalogAPI.components.text_manipulation import *
 from ServiceCatalogAPI.components.time import *
 from ServiceCatalogAPI.components.log import *
+from ServiceCatalogAPI.components.sort_dicts import *

@@ -59,16 +59,20 @@ def compiled_collection(request: dict, unlabeled_collections: list) -> Collectio
 		if result_urls == {}:
 			for result in unlabeled_collections:
 				result_urls[result.service] = result.urls[result.service]
+			result_urls = sort_dicts(result_urls, general_order)
 		if result_ids == {}:
 			for result in unlabeled_collections:
 				result_ids[result.service] = result.ids[result.service]
+			result_ids = sort_dicts(result_ids, general_order)
 		if result_processing_time == {}:
 			for result in unlabeled_collections:
 				result_processing_time[result.service] = result.meta.processing_time
 				result_confidence[result.service] = result.meta.filter_confidence_percentage
+			result_ids = sort_dicts(result_ids, general_order)
 		if result_confidence == {}:
 			for result in unlabeled_collections:
 				result_confidence[result.service] = result.meta.filter_confidence_percentage
+			result_confidence = sort_dicts(result_confidence, general_order)
 
 	# Building the Collection object with the compiled results
 	collection = Collection(

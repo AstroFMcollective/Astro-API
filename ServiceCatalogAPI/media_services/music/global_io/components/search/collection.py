@@ -113,15 +113,19 @@ async def search_collection(artists: list, title: str, year: int = None, country
 			if result_urls == {}:
 				for result in unlabeled_results:
 					result_urls[result.service] = result.urls[result.service]
+				result_urls = sort_dicts(result_urls, general_order)
 			if result_ids == {}:
 				for result in unlabeled_results:
 					result_ids[result.service] = result.ids[result.service]
+				result_ids = sort_dicts(result_ids, general_order)
 			if result_processing_time == {}:
 				for result in unlabeled_results:
 					result_processing_time[result.service] = result.meta.processing_time[result.service]
+				result_processing_time = sort_dicts(result_processing_time, general_order)
 			if result_confidence == {}:
 				for result in unlabeled_results:
 					result_confidence[result.service] = result.meta.filter_confidence_percentage[result.service]
+				result_confidence = sort_dicts(result_confidence, general_order)
 
 		# If everything went right, we create a Song object with the results and return it
 		if result_type is not None:

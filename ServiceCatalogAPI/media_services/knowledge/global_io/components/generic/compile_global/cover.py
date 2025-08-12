@@ -42,13 +42,16 @@ def compiled_cover(request: dict, unlabeled_results: list) -> Cover:
         if result_cover_hq_urls == {}:
             for result in unlabeled_results:
                 result_cover_hq_urls[result.service] = result.cover.hq_urls[result.service]
+            result_cover_hq_urls = sort_dicts(result_cover_hq_urls, general_order)
         if result_cover_lq_urls == {}:
             for result in unlabeled_results:
                 result_cover_lq_urls[result.service] = result.cover.lq_urls[result.service]
+            result_cover_lq_urls = sort_dicts(result_cover_lq_urls, general_order)
         if result_processing_time == {}:
             for result in unlabeled_results:
                 result_processing_time[result.service] = result.meta.processing_time[result.service]
                 result_confidence[result.service] = result.meta.filter_confidence_percentage[result.service]
+            result_processing_time = sort_dicts(result_processing_time, general_order)
 
     # Creating the Cover object
     cover = Cover(

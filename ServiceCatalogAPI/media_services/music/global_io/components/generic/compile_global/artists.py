@@ -61,24 +61,27 @@ def compiled_artists(request: dict, unlabeled_artists: dict) -> list[Artist]:
 				for result in unlabeled_artists:
 					for obj in result:
 						result_urls[obj.service] = obj.urls[obj.service]
+				result_urls = sort_dicts(result_urls, general_order)
 			if result_ids == {}:
 				for result in unlabeled_artists:
 					for obj in result:
 						result_ids[obj.service] = obj.ids[obj.service]
+				result_ids = sort_dicts(result_ids, general_order)
 			if result_processing_time == {}:
 				for result in unlabeled_artists:
 					for obj in result:
 						result_processing_time[obj.service] = obj.meta.processing_time[obj.service]
+				result_processing_time = sort_dicts(result_processing_time, general_order)
 			if result_confidence == {}:
 				for result in unlabeled_artists:
 					for obj in result:
 						result_confidence[obj.service] = obj.meta.filter_confidence_percentage[obj.service]
+				result_confidence = sort_dicts(result_confidence, general_order)
 			if profile_picture is None:
 				if artist_index < len(labeled_artists[profile_picture_lift_from_template[service_index]]):
-					profile_picture = labeled_artists[profile_picture_lift_from_template[service_index]][artist_index].profile_picture
-					
 					# This catastrophe attempts to fill in HQ and LQ URLs from all prioritized services if a profile picture was found
 					# ts pmo 🥀
+					profile_picture = labeled_artists[profile_picture_lift_from_template[service_index]][artist_index].profile_picture
 					if profile_picture is not None:
 						# Populate HQ URLs if not already set
 						if not result_profile_picture_hq_urls:
@@ -89,6 +92,7 @@ def compiled_artists(request: dict, unlabeled_artists: dict) -> list[Artist]:
 									# Add HQ URL for this service if available
 									if obj.profile_picture and obj.profile_picture.hq_urls.get(service):
 										result_profile_picture_hq_urls[service] = obj.profile_picture.hq_urls[service]
+						result_profile_picture_hq_urls = sort_dicts(result_profile_picture_hq_urls, general_order)
 						# Populate LQ URLs if not already set
 						if not result_profile_picture_lq_urls:
 							for service in profile_picture_lift_from_template:
@@ -98,6 +102,7 @@ def compiled_artists(request: dict, unlabeled_artists: dict) -> list[Artist]:
 									# Add LQ URL for this service if available
 									if obj.profile_picture and obj.profile_picture.lq_urls.get(service):
 										result_profile_picture_lq_urls[service] = obj.profile_picture.lq_urls[service]
+							result_profile_picture_lq_urls = sort_dicts(result_profile_picture_lq_urls, general_order)
 		
 		# Building the new Artist object with the results
 		artist = Artist(

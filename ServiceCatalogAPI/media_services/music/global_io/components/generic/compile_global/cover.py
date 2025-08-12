@@ -2,6 +2,9 @@ from ServiceCatalogAPI.components import *
 from ServiceCatalogAPI.media_services.music.global_io.components.generic.about import service as gservice, component as gcomponent
 from ServiceCatalogAPI.media_services.music.global_io.components.generic import *
 from ServiceCatalogAPI.media_services.music.global_io.components.generic.compile_global.artists import compiled_artists
+from ServiceCatalogAPI.components.sort_dicts import sort_dicts
+
+
 
 def compiled_cover(request: dict, unlabeled_results: list) -> Cover:
     labeled_results = {result.service: result for result in unlabeled_results}
@@ -42,13 +45,16 @@ def compiled_cover(request: dict, unlabeled_results: list) -> Cover:
         if result_cover_hq_urls == {}:
             for result in unlabeled_results:
                 result_cover_hq_urls[result.service] = result.cover.hq_urls[result.service]
+            result_cover_hq_urls = sort_dicts(result_cover_hq_urls, general_order)
         if result_cover_lq_urls == {}:
             for result in unlabeled_results:
                 result_cover_lq_urls[result.service] = result.cover.lq_urls[result.service]
+            result_cover_lq_urls = sort_dicts(result_cover_hq_urls, general_order)
         if result_processing_time == {}:
             for result in unlabeled_results:
                 result_processing_time[result.service] = result.meta.processing_time[result.service]
                 result_confidence[result.service] = result.meta.filter_confidence_percentage[result.service]
+            result_processing_time = sort_dicts(result_cover_hq_urls, general_order)
 
     # Creating the Cover object
     cover = Cover(
