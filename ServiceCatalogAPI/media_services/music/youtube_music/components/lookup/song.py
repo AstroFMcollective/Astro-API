@@ -22,8 +22,6 @@ async def lookup_song(id: str, country_code: str = 'us') -> object:
 		# Fetch song data from YouTube Music API
 		song_data = ytm.get_song(id)
 		# Extract video details from the response
-		if 'videoDetails' not in song_data:
-			save_json(song_data)
 		song = song_data['videoDetails']
 
 		# Check if the song has a music video type
