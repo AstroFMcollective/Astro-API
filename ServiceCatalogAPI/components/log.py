@@ -26,6 +26,7 @@ import aiohttp
 async def log(media: object, files: list = None):
 	async with aiohttp.ClientSession() as session:
 		deployment_channel = config['system']['deployment_channel']
+		api_dev_ping = '<@&1330182314831122492>'
 		embed = discord.Embed(
 			title = f'Astro Service Catalog API - `{media.type}`', # TODO: rn this is hard coded to only work with the service catalog api
 			colour = 0x0097f5,
@@ -56,9 +57,9 @@ async def log(media: object, files: list = None):
 			
 			webhook = Webhook.from_url(url = keys['webhooks'][f'{deployment_channel}'], session = session)
 			if files is not None:
-				await webhook.send(embed = embed, username = 'Astro API', avatar_url = text['images']['astro_trans'], files = files)
+				await webhook.send(api_dev_ping, embed = embed, username = 'Astro API', avatar_url = text['images']['astro_trans'], files = files)
 			else:
-				await webhook.send(embed = embed, username = 'Astro API', avatar_url = text['images']['astro_trans'])
+				await webhook.send(api_dev_ping, embed = embed, username = 'Astro API', avatar_url = text['images']['astro_trans'])
 			return
 
 		elif media.type == 'empty_response':
@@ -71,9 +72,9 @@ async def log(media: object, files: list = None):
 
 			webhook = Webhook.from_url(url = keys['webhooks'][f'{deployment_channel}'], session = session)
 			if files is not None:
-				await webhook.send(embed = embed, username = 'Astro API', avatar_url = text['images']['astro_trans'], files = files)
+				await webhook.send(api_dev_ping, embed = embed, username = 'Astro API', avatar_url = text['images']['astro_trans'], files = files)
 			else:
-				await webhook.send(embed = embed, username = 'Astro API', avatar_url = text['images']['astro_trans'])
+				await webhook.send(api_dev_ping, embed = embed, username = 'Astro API', avatar_url = text['images']['astro_trans'])
 			return
 		
 print('[ServiceCatalogAPI] Logging to Discord initialized')
