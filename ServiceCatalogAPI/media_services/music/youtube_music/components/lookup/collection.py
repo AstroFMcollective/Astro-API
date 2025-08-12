@@ -7,7 +7,7 @@ from ServiceCatalogAPI.media_services.music.youtube_music.components.generic imp
 
 async def lookup_collection(id: str = None, browse_id: str = None, country_code: str = 'us') -> object:
 	# Prepare the request dictionary with lookup details
-	request = {'request': 'lookup_collection', 'id': id, 'country_code': country_code, 'url': f'https://music.youtube.com/playlist?list={id}'}
+	request = {'request': 'lookup_collection', 'id': id, 'country_code': country_code}
 	# Record the start time for processing time calculation
 	start_time = current_unix_time_ms()
 	
