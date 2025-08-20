@@ -1,4 +1,3 @@
-from io import StringIO
 from ServiceCatalogAPI.components import *
 from ServiceCatalogAPI.media_services.music.youtube_music.components.generic import *
 from ServiceCatalogAPI.media_services.music.youtube_music.components.lookup.artist import lookup_artist

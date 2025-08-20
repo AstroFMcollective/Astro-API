@@ -1,4 +1,3 @@
-from io import StringIO
 from ServiceCatalogAPI.components import *
 from ServiceCatalogAPI.media_services.music.global_io.components.generic import *
 from ServiceCatalogAPI.media_services.music.global_io.components.generic import service as gservice, component as gcomponent
@@ -15,19 +14,14 @@ async def search_query(query: str, country_code: str = 'us', exclude_services: l
 	# Prepare the request metadata
 	request = {'request': 'search_query', 'query': query, 'country_code': country_code}
 	# Record the start time for processing time calculation
-	start_time = current_unix_time_ms()
-	
-	song_types = ['track', 'single']
-	video_types = ['music_video']
-	collection_types = ['album', 'ep']
-	query_result = await ytm_search_query(query, country_code)		
+	start_time = current_unix_time_ms()	
 
 	try:
-		# song_types = ['track', 'single']
-		# video_types = ['music_video']
-		# collection_types = ['album', 'ep']
+		song_types = ['track', 'single']
+		video_types = ['music_video']
+		collection_types = ['album', 'ep']
 
-		# query_result = await ytm_search_query(query, country_code)
+		query_result = await ytm_search_query(query, country_code)
 
 		if query_result.type in song_types:
 			return await search_song_music(
@@ -89,5 +83,5 @@ async def search_query(query: str, country_code: str = 'us', exclude_services: l
 				http_code = 500
 			)
 		)
-		await log(error, files = [discord.File(fp = StringIO(json.dumps(query_result, indent = 4)), filename = f'{id}.json')])
+		await log(error)
 		return error

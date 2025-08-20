@@ -1,6 +1,5 @@
 import ServiceCatalogAPI as ServiceCatalog
 from fastapi import FastAPI, HTTPException
-import uvicorn
 
 
 
