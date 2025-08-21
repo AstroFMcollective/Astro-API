@@ -10,7 +10,12 @@ from asyncio import create_task, gather
 
 
 
-async def search_song(artists: list, title: str, song_type: str = None, collection: str = None, is_explicit: bool = None, country_code: str = 'us', include_premade_media: list = [], exclude_services: list = []) -> object:
+async def search_song(artists: list, title: str, song_type: str = None, collection: str = None, is_explicit: bool = None, country_code: str = 'us', include_premade_media: list = None, exclude_services: list = None) -> object:
+	# SINCE WHEN ARE PARAMETER VARIABLES PERSISTENT??????
+	if include_premade_media is None:
+		include_premade_media = []
+	if exclude_services is None:
+		exclude_services = []
 	# Build the request dictionary with all parameters
 	request = {'request': 'search_song', 'artists': artists, 'title': title, 'song_type': song_type, 'collection': collection, 'is_explicit': is_explicit, 'country_code': country_code, 'exclude_services': exclude_services}
 	# Record the start time for processing time calculation

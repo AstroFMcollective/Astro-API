@@ -9,7 +9,12 @@ from asyncio import create_task, gather
 
 
 
-async def search_collection(artists: list, title: str, year: int = None, country_code: str = 'us', include_premade_media: list = [], exclude_services: list = []) -> object:
+async def search_collection(artists: list, title: str, year: int = None, country_code: str = 'us', include_premade_media: list = None, exclude_services: list = None) -> object:
+	# SINCE WHEN ARE PARAMETER VARIABLES PERSISTENT??????
+	if include_premade_media is None:
+		include_premade_media = []
+	if exclude_services is None:
+		exclude_services = []
 	# Prepare the request metadata
 	request = {'request': 'search_collection', 'artists': artists, 'title': title, 'year': year, 'country_code': country_code}
 	# Record the start time for processing time calculation
