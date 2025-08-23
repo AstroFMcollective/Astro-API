@@ -3,6 +3,7 @@ import difflib
 import re
 from ServiceCatalogAPI.components.time import save_json
 from better_profanity import profanity
+from discord.utils import escape_markdown
 
 
 
@@ -210,10 +211,7 @@ def remove_duplicates(items: list):
 def convert_genius_desc_into_discord_str(description: dict):
 	# TODO: this blows and I'm rewritting it as soon as we start working on the phone app
 	converted_description = ''
-
 	description = description['dom']['children'][0]['children']
-	#save_json(description)
-	
 	for element in description:
 		if isinstance(element, str):
 			converted_description += element
@@ -226,9 +224,6 @@ def convert_genius_desc_into_discord_str(description: dict):
 					converted_description += f'[{element['children'][0]}]({element['attributes']['href']})'
 			if element['tag'] == 'em':
 				converted_description += f'*{element['children'][0]}*'
-
-
-
 	return converted_description
 
 # A simple wrapper for the better_profanity module to handle slur censoring
@@ -240,7 +235,7 @@ def censor_text(text: str) -> str:
 		for word in words:
 			if profanity.contains_profanity(word):
 				new_word = word[0] + '*' * (len(word) - 2) + word[-1]
-				text = text.replace(word, new_word)
+				text = text.replace(word, escape_markdown(new_word))
 	return text
 
 print('[ServiceCatalogAPI] Text manipulation module initialized')
