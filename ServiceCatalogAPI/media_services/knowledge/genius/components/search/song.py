@@ -110,14 +110,15 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 				))
 			# Filter the found songs based on the query
 			filtered_song = await filter_song(service = service, query_request = request, songs = songs, query_artists = artists, query_title = title, query_song_type = song_type, query_collection = collection, query_is_explicit = is_explicit, query_country_code = country_code)
-			# Lookup the filtered song for more details cuz the query search is VERY limited in knowledge
-			song = await lookup_song(id = filtered_song.ids['genius'], country_code = country_code)
-			# Update processing time in the song's metadata
-			song.meta.processing_time[service] = current_unix_time_ms() - start_time
-			# Regenerate the song's JSON representation
-			# P.S. If you haven't read the media.py file; ALWAYS DO THIS WHEN YOU'RE MODDING MEDIA OBJECT VALUES
-			song.regenerate_json()
-			return song
+			if filtered_song.type == 'track' or filtered_song.type == 'single': # Check if the media type is valid before parsing data for a detailed lookup
+				# Lookup the filtered song for more details cuz the query search is VERY limited in knowledge
+				filtered_song = await lookup_song(id = filtered_song.ids['genius'], country_code = country_code)
+				# Update processing time in the song's metadata
+				filtered_song.meta.processing_time[service] = current_unix_time_ms() - start_time
+				# Regenerate the song's JSON representation
+				# P.S. If you haven't read the media.py file; ALWAYS DO THIS WHEN YOU'RE MODDING MEDIA OBJECT VALUES
+				filtered_song.regenerate_json()
+			return filtered_song
 			
 		else:
 			error = Error(
