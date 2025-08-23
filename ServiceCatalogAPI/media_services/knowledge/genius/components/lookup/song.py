@@ -81,24 +81,52 @@ async def lookup_song(id: str, country_code: str = 'us') -> object:
 			)
 
 			# Build the Collection object for the song's album
-			collection_data = song['album'] # Extract album (collection) data from the song
-			song_collection = Collection(
-				service = service,
-				type = 'album',
-				urls = collection_data['url'],
-				ids = collection_data['id'],
-				title = collection_data['name'],
-				artists = [
-					Artist(
+			if 'album' in song: # Checks if the collection data even exists
+				if song['album'] != None:
+					collection_data = song['album'] # Extract collection data from the song
+					song_collection = Collection(
 						service = service,
-						name = artist['name'],
-						urls = artist['url'],
-						ids = artist['id'],
-						profile_picture = ProfilePicture(
+						type = 'album',
+						urls = collection_data['url'],
+						ids = collection_data['id'],
+						title = collection_data['name'],
+						artists = [
+							Artist(
+								service = service,
+								name = artist['name'],
+								urls = artist['url'],
+								ids = artist['id'],
+								profile_picture = ProfilePicture(
+									service = service,
+									user_type = 'artist',
+									hq_urls = artist['image_url'],
+									lq_urls = artist['header_image_url'],
+									meta = Meta(
+										service = service,
+										request = request,
+										processing_time = {service: current_unix_time_ms() - start_time},
+										http_code = result.status_code,
+										filter_confidence_percentage = 100.0
+									)
+								),
+								meta = Meta(
+									service = service,
+									request = request,
+									processing_time = {service: current_unix_time_ms() - start_time},
+									http_code = result.status_code,
+									filter_confidence_percentage = 100.0
+								)
+							) for artist in collection_data['primary_artists']
+						],
+						release_year = collection_data['release_date_for_display'][-4:], # Extract the release year from the album's release date string
+						# Build the Cover object for the album
+						cover = Cover(
 							service = service,
-							user_type = 'artist',
-							hq_urls = artist['image_url'],
-							lq_urls = artist['header_image_url'],
+							media_type = 'album',
+							title = collection_data['name'],
+							artists = song_artists,
+							hq_urls = song['song_art_image_url'],
+							lq_urls = song['song_art_image_thumbnail_url'],
 							meta = Meta(
 								service = service,
 								request = request,
@@ -114,33 +142,13 @@ async def lookup_song(id: str, country_code: str = 'us') -> object:
 							http_code = result.status_code,
 							filter_confidence_percentage = 100.0
 						)
-					) for artist in collection_data['primary_artists']
-				],
-				release_year = collection_data['release_date_for_display'][-4:], # Extract the release year from the album's release date string
-				# Build the Cover object for the album
-				cover = Cover(
-					service = service,
-					media_type = 'album',
-					title = collection_data['name'],
-					artists = song_artists,
-					hq_urls = song['song_art_image_url'],
-					lq_urls = song['song_art_image_thumbnail_url'],
-					meta = Meta(
-						service = service,
-						request = request,
-						processing_time = {service: current_unix_time_ms() - start_time},
-						http_code = result.status_code,
-						filter_confidence_percentage = 100.0
 					)
-				),
-				meta = Meta(
-					service = service,
-					request = request,
-					processing_time = {service: current_unix_time_ms() - start_time},
-					http_code = result.status_code,
-					filter_confidence_percentage = 100.0
-				)
-			)
+				else:
+					song_collection = None
+			else:
+				song_collection = None
+
+
 
 			# Return a Knowledge object with all the song's knowledge metadata
 			return Knowledge(
