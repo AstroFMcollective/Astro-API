@@ -26,7 +26,7 @@ async def lookup_song(id: str, country_code: str = 'us') -> object:
 			song_id = song['id']
 			song_title = song['title']
 			# Convert the song's very HTML-like description to a Discord-friendly string while retaining formatting
-			song_description = convert_genius_desc_into_discord_str(song['description'])
+			song_description = json_to_markdown(song['description'])
 			song_release_date = song['release_date_for_display']
 			song_is_explicit = None # Explicit flag is not available, set to None
 
