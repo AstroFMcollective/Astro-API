@@ -8,6 +8,8 @@ from ServiceCatalogAPI.media_services.music.youtube_music.components.generic imp
 async def search_query(query: str, country_code: str = 'us') -> object: # TODO: Dovrši
 	# Prepare the request dictionary with query details
 	request = {'request': 'search_query', 'query': query, 'country_code': country_code}
+	# Lookup JSON variable for later debugging
+	lookup_json = None
 	# Record the start time for processing time calculation
 	start_time = current_unix_time_ms()
 
@@ -16,6 +18,8 @@ async def search_query(query: str, country_code: str = 'us') -> object: # TODO: 
 		results = ytm.search(
 			query = query
 		)
+		# Save the JSON for future debugging if necessary
+		lookup_json = results
 		# Take the first result from the search results
 		result = results[0]
 		# Get the type of the result (song, album, video, etc.)
@@ -208,5 +212,5 @@ async def search_query(query: str, country_code: str = 'us') -> object: # TODO: 
 				http_code = 500
 			)
 		)
-		await log(error)
+		await log(error, [discord.File(fp = StringIO(json.dumps(lookup_json, indent = 4)), filename = f'{id}.json')])
 		return error

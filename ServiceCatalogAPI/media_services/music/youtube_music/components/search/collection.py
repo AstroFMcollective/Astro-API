@@ -8,6 +8,8 @@ from ServiceCatalogAPI.media_services.music.youtube_music.components.generic imp
 async def search_collection(artists: list, title: str, year: int = None, country_code: str = 'us') -> object:
 	# Prepare the request dictionary with input parameters
 	request = {'request': 'search_collection', 'artists': artists, 'title': title, 'year': year, 'country_code': country_code}
+	# Lookup JSON variable for later debugging
+	lookup_json = None
 	# Record the start time for processing time calculation
 	start_time = current_unix_time_ms()
 	
@@ -22,6 +24,8 @@ async def search_collection(artists: list, title: str, year: int = None, country
 			query = f'{artists[0]} {title}',
 			filter = 'albums'
 		)
+		# Save the JSON for future debugging if necessary
+		lookup_json = results
 
 		# Iterate over each collection result
 		for collection in results:
@@ -96,5 +100,5 @@ async def search_collection(artists: list, title: str, year: int = None, country
 				processing_time = current_unix_time_ms() - start_time,
 			)
 		)
-		await log(error)
+		await log(error, [discord.File(fp = StringIO(json.dumps(lookup_json, indent = 4)), filename = f'{id}.json')])
 		return error

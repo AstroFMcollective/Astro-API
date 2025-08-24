@@ -8,6 +8,8 @@ from ServiceCatalogAPI.media_services.music.youtube_music.components.generic imp
 async def lookup_collection(id: str = None, browse_id: str = None, country_code: str = 'us') -> object:
 	# Prepare the request dictionary with lookup details
 	request = {'request': 'lookup_collection', 'id': id, 'country_code': country_code}
+	# Lookup JSON variable for later debugging
+	lookup_json = None
 	# Record the start time for processing time calculation
 	start_time = current_unix_time_ms()
 	
@@ -33,6 +35,8 @@ async def lookup_collection(id: str = None, browse_id: str = None, country_code:
 				)
 			)
 
+		# Save the JSON for future debugging if necessary
+		lookup_json = collection
 		# Determine collection type (album or ep)
 		collection_type = ('album' if collection['type'] == 'Album' else 'ep')
 		collection_url = f'https://music.youtube.com/playlist?list={collection["audioPlaylistId"]}'
@@ -105,5 +109,5 @@ async def lookup_collection(id: str = None, browse_id: str = None, country_code:
 				http_code = 500
 			)
 		)
-		await log(error)
+		await log(error, [discord.File(fp = StringIO(json.dumps(lookup_json, indent = 4)), filename = f'{id}.json')])
 		return error

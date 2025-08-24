@@ -7,6 +7,8 @@ from ServiceCatalogAPI.media_services.music.youtube_music.components.generic imp
 async def lookup_artist(id: str = None, video_id: str = None, country_code: str = 'us') -> object:
 	# Build the request dictionary with provided parameters
 	request = {'request': 'lookup_artist', 'id': id, 'video_id': video_id, 'country_code': country_code}
+	# Lookup JSON variable for later debugging
+	lookup_json = None
 	# Record the start time for processing time calculation
 	start_time = current_unix_time_ms()
 	
@@ -20,9 +22,13 @@ async def lookup_artist(id: str = None, video_id: str = None, country_code: str 
 				)
 			# If video_id is provided but id is not, extract artist id from the song's video details
 			elif video_id != None and id == None:
-				id = ytm.get_song(video_id)['videoDetails']['channelId']
+				id = ytm.get_song(video_id)
+				lookup_json = id # Save the JSON for future debugging if necessary
+				id = id['videoDetails']['channelId']
 			# Lookup artist information using the artist id
 			artist = ytm.get_artist(id)
+			lookup_json = id # Save the JSON for future debugging if necessary
+
 
 			artist_url = f'https://music.youtube.com/channel/{artist["channelId"]}'
 			artist_id = artist['channelId']
@@ -44,7 +50,9 @@ async def lookup_artist(id: str = None, video_id: str = None, country_code: str 
 			)
 		except:
 			# If the above fails, fallback to extracting artist info from the song's video details
-			artist = ytm.get_song(video_id)['videoDetails']
+			artist = ytm.get_song(video_id)
+			lookup_json = artist # Save the JSON for future debugging if necessary
+			artist = artist['videoDetails']
 
 			artist_url = f'https://music.youtube.com/channel/{artist["channelId"]}'
 			artist_id = artist['channelId']
@@ -78,5 +86,5 @@ async def lookup_artist(id: str = None, video_id: str = None, country_code: str 
 				http_code = 500
 			)
 		)
-		await log(error)
+		await log(error, [discord.File(fp = StringIO(json.dumps(lookup_json, indent = 4)), filename = f'{id}.json')])
 		return error

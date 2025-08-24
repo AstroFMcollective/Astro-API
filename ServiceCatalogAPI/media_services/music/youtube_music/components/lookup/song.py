@@ -14,12 +14,16 @@ async def lookup_song(id: str, country_code: str = 'us') -> object:
 	]
 	# Prepare request metadata
 	request = {'request': 'lookup_song', 'id': id, 'country_code': country_code}
+	# Lookup JSON variable for later debugging
+	lookup_json = None
 	# Record the start time for processing time calculation
 	start_time = current_unix_time_ms()
 
 	try:
 		# Fetch song data from YouTube Music API
 		song_data = ytm.get_song(id)
+		# Save the JSON for future debugging if necessary
+		lookup_json = song_data
 		# Extract video details from the response
 		song = song_data['videoDetails']
 
@@ -129,6 +133,5 @@ async def lookup_song(id: str, country_code: str = 'us') -> object:
 				http_code = 500
 			)
 		)
-		song_data = ytm.get_song(id)
-		await log(error)
+		await log(error, [discord.File(fp = StringIO(json.dumps(lookup_json, indent = 4)), filename = f'{id}.json')])
 		return error
