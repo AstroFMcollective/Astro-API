@@ -10,7 +10,7 @@ from asyncio import create_task, gather
 
 
 async def search_music_video(artists: list, title: str, is_explicit: bool = None, country_code: str = 'us', include_premade_media: list = None, exclude_services: list = None) -> object:
-	# SINCE WHEN ARE PARAMETER VARIABLES PERSISTENT??????
+	# SINCE WHEN ARE FUNCTION VARIABLES PERSISTENT??????
 	if include_premade_media is None:
 		include_premade_media = []
 	if exclude_services is None:
