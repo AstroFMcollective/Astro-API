@@ -132,6 +132,10 @@ async def search_collection(artists: list, title: str, year: int = None, country
 					result_confidence[result.service] = result.meta.filter_confidence_percentage[result.service]
 				result_confidence = sort_dicts(result_confidence, general_order)
 
+		# Add Global IO values to metadata
+		result_processing_time[gservice] = current_unix_time_ms() - start_time
+		result_confidence[gservice] = sum(result_confidence.values()) / len(result_confidence) if result_confidence else 0.0
+
 		# If everything went right, we create a Song object with the results and return it
 		if result_type is not None:
 			collection = Collection(
@@ -147,8 +151,8 @@ async def search_collection(artists: list, title: str, year: int = None, country
 				meta = Meta(
 					service = gservice,
 					request = request,
-					processing_time = current_unix_time_ms() - start_time,
-					filter_confidence_percentage = {gservice: 100.0},
+					processing_time = result_processing_time,
+					filter_confidence_percentage = result_confidence,
 					http_code = 200
 				)
 			)

@@ -177,6 +177,10 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 			if result_time_signature == None:
 				result_time_signature = labeled_results[time_signature_order[service_index]].time_signature
 
+		# Add Global IO values to metadata
+		result_processing_time[gservice] = current_unix_time_ms() - start_time
+		result_confidence[gservice] = sum(result_confidence.values()) / len(result_confidence) if result_confidence else 0.0
+
 		# If a valid result type was found, return a compiled Knowledge object
 		if result_type is not None:
 			return Knowledge(
@@ -199,7 +203,7 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 					service = gservice,
 					request = request,
 					processing_time = result_processing_time,
-					filter_confidence_percentage = {gservice: 100.0},
+					filter_confidence_percentage = result_confidence,
 					http_code = 200
 				)
 			)
