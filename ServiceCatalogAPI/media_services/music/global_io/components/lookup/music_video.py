@@ -31,6 +31,11 @@ async def lookup_music_video(service: object, id: str, mv_country_code: str = No
 			include_premade_media = [video_reference] # Include the media from the original call
 		)
 
+		# Replace the request dict of the search one with the lookup one
+		music_video.meta.request = request
+		music_video.meta.regenerate_json()
+		music_video.regenerate_json()
+
 		return music_video
 
 	# If sinister things happen
