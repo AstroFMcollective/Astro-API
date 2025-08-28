@@ -46,6 +46,11 @@ async def lookup_song(service: object, id: str, song_country_code: str = None, l
 			include_premade_media = [knowledge_reference] if knowledge_reference.type in compatible_results else [],
 		)
 
+		# Replace the request dict of the search one with the lookup one
+		song.meta.request = request
+		song.meta.regenerate_json()
+		song.regenerate_json()
+
 		return song
 
 	# If sinister things happen

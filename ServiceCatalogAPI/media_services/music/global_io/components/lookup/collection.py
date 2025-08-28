@@ -42,6 +42,11 @@ async def lookup_collection(service: object, id: str, collection_country_code: s
 			[collection_reference]
 		)
 
+		# Replace the request dict of the search one with the lookup one
+		collection.meta.request = request
+		collection.meta.regenerate_json()
+		collection.regenerate_json()
+
 		return collection
 
 	# If sinister things happen
