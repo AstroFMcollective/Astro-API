@@ -1,0 +1,2 @@
+from AstroAPI.ServiceCatalogAPI.media_services import music
+from AstroAPI.ServiceCatalogAPI.media_services import knowledge

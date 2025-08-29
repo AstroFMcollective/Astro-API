@@ -1,6 +1,5 @@
 discord.py
 unidecode
-audioop-lts
 ytmusicapi
 requests
 pillow

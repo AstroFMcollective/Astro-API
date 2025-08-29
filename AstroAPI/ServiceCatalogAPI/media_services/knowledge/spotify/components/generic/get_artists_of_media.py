@@ -1,0 +1,1 @@
+from AstroAPI.ServiceCatalogAPI.media_services.music.spotify.components.generic.get_artists_of_media import get_artists_of_media
