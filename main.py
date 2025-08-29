@@ -1,4 +1,4 @@
-import ServiceCatalogAPI as ServiceCatalog
+import AstroAPI.ServiceCatalogAPI as ServiceCatalog
 from fastapi import FastAPI, HTTPException
 
 
