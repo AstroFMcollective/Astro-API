@@ -1,5 +1,5 @@
 from AstroAPI.ServiceCatalogAPI.components import *
-from AstroAPI.ServiceCatalogAPI.components.service_tokens.spotify.token import spotify_token
+from AstroAPI.ServiceCatalogAPI.service_tokens.spotify.token import spotify_token
 from AstroAPI.ServiceCatalogAPI.media_services.knowledge.spotify.components.generic import *
 from AstroAPI.ServiceCatalogAPI.media_services.music.spotify.components.lookup.song import lookup_song as lookup_song_music_metadata
 import aiohttp
