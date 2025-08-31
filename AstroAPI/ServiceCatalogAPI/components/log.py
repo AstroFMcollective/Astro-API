@@ -69,6 +69,7 @@ async def log(media: object, files: list = None):
 				value = f'{request}',
 				inline = False
 			)
+			api_dev_ping = ''
 
 			webhook = Webhook.from_url(url = keys['webhooks'][f'{deployment_channel}'], session = session)
 			if files is not None:
