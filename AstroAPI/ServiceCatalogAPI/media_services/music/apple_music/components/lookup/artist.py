@@ -61,7 +61,7 @@ async def lookup_artist(id: str, country_code: str = 'us') -> object:
 								service = service,
 								request = request,
 								processing_time = current_unix_time_ms() - start_time,
-								http_code = response.status
+								http_code = 204
 							)
 						)
 						await log(empty)

@@ -159,7 +159,7 @@ async def lookup_collection(id: str, country_code: str = 'us', ignore_single_suf
 								service = service,
 								request = request,
 								processing_time = current_unix_time_ms() - start_time,
-								http_code = response.status
+								http_code = 204
 							)
 						)
 						await log(empty)
