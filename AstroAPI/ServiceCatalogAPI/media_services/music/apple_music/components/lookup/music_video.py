@@ -30,50 +30,65 @@ async def lookup_music_video(id: str, country_code: str = 'us') -> object:
 					video = await response.json(content_type = 'text/javascript')
 					video = video['results'][0]
 
-					mv_url = video['trackViewUrl']
-					mv_id = video['trackId']
-					mv_title = video['trackName']
-					# Lookup the artist details using the artist ID
-					mv_artist = await lookup_artist(id = video['artistId'], country_code = country_code)
-					mv_artist = [mv_artist]
-					mv_is_explicit = not 'not' in video['trackExplicitness']
-					mv_genre = video['primaryGenreName'] if 'primaryGenreName' in video else None
+					if video['results'] != []: # Check if there was any music video data returned
+						video = video['results'][0]
+						mv_url = video['trackViewUrl']
+						mv_id = video['trackId']
+						mv_title = video['trackName']
+						# Lookup the artist details using the artist ID
+						mv_artist = await lookup_artist(id = video['artistId'], country_code = country_code)
+						mv_artist = [mv_artist]
+						mv_is_explicit = not 'not' in video['trackExplicitness']
+						mv_genre = video['primaryGenreName'] if 'primaryGenreName' in video else None
 
-					# Create a Cover object for the music video thumbnail
-					mv_thumbnail = Cover(
-						service = service,
-						media_type = 'music_video',
-						title = mv_title,
-						artists = mv_artist,
-						hq_urls = video['artworkUrl100'],
-						lq_urls = video['artworkUrl60'],
-						meta = Meta(
+						# Create a Cover object for the music video thumbnail
+						mv_thumbnail = Cover(
 							service = service,
-							request = request,
-							processing_time = current_unix_time_ms() - start_time,
-							filter_confidence_percentage = {service: 100.0},
-							http_code = response.status
+							media_type = 'music_video',
+							title = mv_title,
+							artists = mv_artist,
+							hq_urls = video['artworkUrl100'],
+							lq_urls = video['artworkUrl60'],
+							meta = Meta(
+								service = service,
+								request = request,
+								processing_time = current_unix_time_ms() - start_time,
+								filter_confidence_percentage = {service: 100.0},
+								http_code = response.status
+							)
 						)
-					)
 
-					# Return a MusicVideo object with all the extracted information
-					return MusicVideo(
-						service = service,
-						urls = mv_url,
-						ids = mv_id,
-						title = mv_title,
-						artists = mv_artist,
-						is_explicit = mv_is_explicit,
-						cover = mv_thumbnail,
-						genre = mv_genre,
-						meta = Meta(
+						# Return a MusicVideo object with all the extracted information
+						return MusicVideo(
 							service = service,
-							request = request,
-							processing_time = current_unix_time_ms() - start_time,
-							filter_confidence_percentage = {service: 100.0},
-							http_code = response.status
+							urls = mv_url,
+							ids = mv_id,
+							title = mv_title,
+							artists = mv_artist,
+							is_explicit = mv_is_explicit,
+							cover = mv_thumbnail,
+							genre = mv_genre,
+							meta = Meta(
+								service = service,
+								request = request,
+								processing_time = current_unix_time_ms() - start_time,
+								filter_confidence_percentage = {service: 100.0},
+								http_code = response.status
+							)
 						)
-					)
+					
+					else: # If not, return an empty object and log it
+						empty = Empty(
+							service = service,
+							meta = Meta(
+								service = service,
+								request = request,
+								processing_time = current_unix_time_ms() - start_time,
+								http_code = response.status
+							)
+						)
+						await log(empty)
+						return empty
 
 				else:
 					error = Error(
