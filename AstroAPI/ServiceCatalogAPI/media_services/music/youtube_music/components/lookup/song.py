@@ -1,17 +1,13 @@
 from AstroAPI.ServiceCatalogAPI.components import *
 from AstroAPI.ServiceCatalogAPI.media_services.music.youtube_music.components.generic import *
 from AstroAPI.ServiceCatalogAPI.media_services.music.youtube_music.components.lookup.artist import lookup_artist
-from AstroAPI.ServiceCatalogAPI.media_services.music.youtube_music.components.generic import ytm
+from AstroAPI.InternalComponents.CredentialsManager.media_services.youtube.credentials import youtube_credentials
 
 
 
 async def lookup_song(id: str, country_code: str = 'us') -> object:
-	# List of allowed music video types
-	allowed_video_types = [
-		'MUSIC_VIDEO_TYPE_ATV',
-		'MUSIC_VIDEO_TYPE_OMV',
-		'MUSIC_VIDEO_TYPE_OFFICIAL_SOURCE_MUSIC'
-	]
+	# Initialize ytmusicapi
+	# ytm = await youtube_credentials.initialize_ytmusicapi()
 	# Prepare request metadata
 	request = {'request': 'lookup_song', 'id': id, 'country_code': country_code}
 	# Lookup JSON variable for later debugging
@@ -19,106 +15,89 @@ async def lookup_song(id: str, country_code: str = 'us') -> object:
 	# Record the start time for processing time calculation
 	start_time = current_unix_time_ms()
 
-	try:
-		# Fetch song data from YouTube Music API
-		song_data = ytm.get_song(id)
-		# Save the JSON for future debugging if necessary
-		lookup_json = song_data
-		# Extract video details from the response
-		song = song_data['videoDetails']
 
-		# Check if the song has a music video type
-		if 'musicVideoType' in song:
-			# Check if the music video type is allowed (filter user-generated content)
-			if song['musicVideoType'] in allowed_video_types:
-				song_url = f'https://music.youtube.com/watch?v={song['videoId']}'
-				song_id = song['videoId']
-				song_title = song['title']
-				song_artists = [await lookup_artist(video_id = song['videoId'])]
-				thumbnails = song_data['microformat']['microformatDataRenderer']['thumbnail']['thumbnails']
-				song_cover = Cover(
-					service = service,
-					media_type = 'track' if song['musicVideoType'] == 'MUSIC_VIDEO_TYPE_ATV' else 'music_video',
-					title = song_title,
-					artists = song_artists,
-					hq_urls = thumbnails[0]['url'],
-					lq_urls = thumbnails[len(thumbnails)-1]['url'],
-					meta = Meta(
-						service = service,
-						request = request,
-						processing_time = current_unix_time_ms() - start_time,
-						filter_confidence_percentage = {service: 100.0},
-						http_code = 200
-					)
-				)
-				# If the video type is an audio track video
-				if song['musicVideoType'] == 'MUSIC_VIDEO_TYPE_ATV':
-					# Return a Song object with all relevant metadata
+
+    # Try to perform the song lookup operation
+	try:
+		# Create an aiohttp session for making HTTP requests
+		async with aiohttp.ClientSession() as session:
+			# Prepare request data and YouTube Data API endpoint
+			api_url = f'{api}/videos'
+			api_params = {
+				'id': id,
+				'key': youtube_credentials.api_key,
+				'part': 'snippet,contentDetails,statistics,topicDetails,snippet,status'
+			}
+			timeout = aiohttp.ClientTimeout(total = 30)
+
+			# Make the GET request to the YouTube Data API
+			async with session.get(url = api_url, params = api_params, timeout = timeout) as response:
+				if response.status == 200:
+					# Parse the JSON response if the request was successful
+					song = await response.json()
+					# Extract song details
+					song_type = 'track'
+					song_url = f'https://music.youtube.com/watch?v={song['items'][0]['id']}'
+					song_id = song['items'][0]['id']
+					song_title = song['items'][0]['snippet']['title']
+					song_artists = [await lookup_artist(video_id = song_id, id = song['items'][0]['snippet']['channelId'])]
+
+					# Build the cover object for the song
+					thumbnails = song['items'][0]['snippet']['thumbnails']
+					if thumbnails != {}:
+						media_cover = Cover(
+							service = service,
+							media_type = 'track',
+							title = song_title,
+							artists = song_artists,
+							hq_urls = thumbnails['maxres']['url'],
+							lq_urls = thumbnails['high']['url'],
+							meta = Meta(
+								service = service,
+								request = request,
+								processing_time = 0,
+								filter_confidence_percentage = 100.0,
+								http_code = 200
+							)
+						)
+					else:
+						media_cover = None
+
+					# Return the Song object with all extracted details
 					return Song(
 						service = service,
-						type = 'track',
+						type = song_type,
 						urls = song_url,
 						ids = song_id,
 						title = song_title,
 						artists = song_artists,
 						collection = None,
 						is_explicit = None,
-						cover = song_cover,
+						cover = media_cover,
 						meta = Meta(
 							service = service,
 							request = request,
 							processing_time = current_unix_time_ms() - start_time,
-							filter_confidence_percentage = {service: 100.0},
-							http_code = 200
+							filter_confidence_percentage = 100.0,
+							http_code = response.status
 						)
 					)
 
 				else:
-					song_title = remove_music_video_declaration(song_title)
-					# Return a MusicVideo object with all relevant metadata
-					return MusicVideo(
+					# Handle non-OK HTTP responses by returning an Error object
+					error = Error(
 						service = service,
-						urls = song_url,
-						ids = song_id,
-						title = song_title,
-						artists = song_artists,
-						is_explicit = None,
-						cover = song_cover,
+						component = component,
+						error_msg = "HTTP error when looking up song ID",
 						meta = Meta(
 							service = service,
 							request = request,
 							processing_time = current_unix_time_ms() - start_time,
-							filter_confidence_percentage = {service: 100.0},
-							http_code = 200
+							http_code = response.status 
 						)
 					)
-				
-			else:
-				# If the music video type is not allowed, return an Empty object
-				# DO NOT LOG THIS EVER UNLESS IT'S IN TESTING
-				# THAT WILL LOG USER GENERATED CONTENT, COMPROMISING USER PRIVACY
-				return Empty(
-					service = service,
-					meta = Meta(
-						service = service,
-						request = request,
-						processing_time = current_unix_time_ms() - start_time,
-						http_code = 204
-					)
-				)
-		else:
-			# If there is no music video type, return an Empty object
-			# DO NOT LOG THIS EVER UNLESS IT'S IN TESTING
-			# THAT WILL LOG USER GENERATED CONTENT, COMPROMISING USER PRIVACY
-			return Empty(
-				service = service,
-				meta = Meta(
-					service = service,
-					request = request,
-					processing_time = current_unix_time_ms() - start_time,
-					http_code = 204
-				)
-			)
+					await log(error)
+					return error
 
 	# If sinister things happen
 	except Exception as error:
