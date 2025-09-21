@@ -1,10 +1,13 @@
 from AstroAPI.ServiceCatalogAPI.components import *
 from AstroAPI.ServiceCatalogAPI.media_services.music.youtube_music.components.generic import *
-from AstroAPI.ServiceCatalogAPI.media_services.music.youtube_music.components.generic import ytm
+from AstroAPI.InternalComponents.CredentialsManager.media_services.youtube.credentials import youtube_credentials
+
 
 
 
 async def lookup_artist(id: str = None, video_id: str = None, country_code: str = 'us') -> object:
+	# Initialize ytmusicapi
+	ytm = await youtube_credentials.initialize_ytmusicapi()
 	# Build the request dictionary with provided parameters
 	request = {'request': 'lookup_artist', 'id': id, 'video_id': video_id, 'country_code': country_code}
 	# Lookup JSON variable for later debugging
@@ -22,9 +25,22 @@ async def lookup_artist(id: str = None, video_id: str = None, country_code: str 
 				)
 			# If video_id is provided but id is not, extract artist id from the song's video details
 			elif video_id != None and id == None:
-				id = ytm.get_song(video_id)
-				lookup_json = id # Save the JSON for future debugging if necessary
-				id = id['videoDetails']['channelId']
+				async with aiohttp.ClientSession() as session:
+				# Prepare request data and YouTube Data API endpoint
+					api_url = f'{api}/videos'
+					api_params = {
+						'id': id,
+						'key': youtube_credentials.api_key,
+						'part': 'snippet,contentDetails,statistics,topicDetails,snippet,status'
+					}
+					timeout = aiohttp.ClientTimeout(total = 30)
+
+					# Make the GET request to the YouTube Data API
+					async with session.get(url = api_url, params = api_params, timeout = timeout) as response:
+						if response.status == 200:
+							# Parse the JSON response if the request was successful
+							lookup_json = await response.json()
+							id = lookup_json['items'][0]['snippet']['channelId']
 			# Lookup artist information using the artist id
 			artist = ytm.get_artist(id)
 			lookup_json = id # Save the JSON for future debugging if necessary
@@ -50,13 +66,25 @@ async def lookup_artist(id: str = None, video_id: str = None, country_code: str 
 			)
 		except:
 			# If the above fails, fallback to extracting artist info from the song's video details
-			artist = ytm.get_song(video_id)
-			lookup_json = artist # Save the JSON for future debugging if necessary
-			artist = artist['videoDetails']
+			async with aiohttp.ClientSession() as session:
+				# Prepare request data and YouTube Data API endpoint
+					api_url = f'{api}/videos'
+					api_params = {
+						'id': video_id,
+						'key': youtube_credentials.api_key,
+						'part': 'snippet,contentDetails,statistics,topicDetails,snippet,status'
+					}
+					timeout = aiohttp.ClientTimeout(total = 30)
 
-			artist_url = f'https://music.youtube.com/channel/{artist["channelId"]}'
-			artist_id = artist['channelId']
-			artist_name = artist['author']
+					# Make the GET request to the YouTube Data API
+					async with session.get(url = api_url, params = api_params, timeout = timeout) as response:
+						if response.status == 200:
+							# Parse the JSON response if the request was successful
+							lookup_json = await response.json()
+
+			artist_url = f'https://music.youtube.com/channel/{lookup_json['items'][0]['snippet']['channelId']}'
+			artist_id = lookup_json['items'][0]['snippet']['channelId']
+			artist_name = lookup_json['items'][0]['snippet']['channelTitle'].replace(' - Topic', '')
 
 			# Return an Artist object with the gathered information and metadata
 			return Artist(
