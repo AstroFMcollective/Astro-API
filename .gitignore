@@ -6,3 +6,5 @@ save_json_data.json
 .DS_Store
 venv
 .venv
+credentials.json
+oauth.json
