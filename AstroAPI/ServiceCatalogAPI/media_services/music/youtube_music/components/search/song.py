@@ -2,11 +2,13 @@ from AstroAPI.ServiceCatalogAPI.components import *
 from AstroAPI.ServiceCatalogAPI.media_services.music.youtube_music.components.generic import *
 from AstroAPI.ServiceCatalogAPI.media_services.music.youtube_music.components.lookup.artist import lookup_artist
 from AstroAPI.ServiceCatalogAPI.media_services.music.youtube_music.components.lookup.collection import lookup_collection
-from AstroAPI.ServiceCatalogAPI.media_services.music.youtube_music.components.generic import ytm
+from AstroAPI.InternalComponents.CredentialsManager.media_services.youtube.credentials import youtube_credentials
 
 
 
 async def search_song(artists: list, title: str, song_type: str = None, collection: str = None, is_explicit: bool = None, country_code: str = 'us') -> object:
+	# Initialize ytmusicapi
+	ytm = await youtube_credentials.initialize_ytmusicapi()
 	# Build the request dictionary with all input parameters
 	request = {'request': 'search_song', 'artists': artists, 'title': title, 'song_type': song_type, 'collection': collection, 'is_explicit': is_explicit, 'country_code': country_code}
 	# Lookup JSON variable for later debugging

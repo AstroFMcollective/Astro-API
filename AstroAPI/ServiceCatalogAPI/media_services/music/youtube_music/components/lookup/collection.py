@@ -1,11 +1,13 @@
 from AstroAPI.ServiceCatalogAPI.components import *
 from AstroAPI.ServiceCatalogAPI.media_services.music.youtube_music.components.generic import *
 from AstroAPI.ServiceCatalogAPI.media_services.music.youtube_music.components.lookup.artist import lookup_artist
-from AstroAPI.ServiceCatalogAPI.media_services.music.youtube_music.components.generic import ytm
+from AstroAPI.InternalComponents.CredentialsManager.media_services.youtube.credentials import youtube_credentials
 
 
 
 async def lookup_collection(id: str = None, browse_id: str = None, country_code: str = 'us') -> object:
+	# Initialize ytmusicapi
+	ytm = await youtube_credentials.initialize_ytmusicapi()
 	# Prepare the request dictionary with lookup details
 	request = {'request': 'lookup_collection', 'id': id, 'country_code': country_code}
 	# Lookup JSON variable for later debugging
