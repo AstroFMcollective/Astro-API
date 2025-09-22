@@ -180,7 +180,7 @@ async def search_collection(artists: list, title: str, year: int = None, country
 			meta = Meta(
 				service = gservice,
 				request = request,
-				processing_time = {service: current_unix_time_ms() - start_time},
+				processing_time = {gservice: current_unix_time_ms() - start_time},
 				filter_confidence_percentage = {gservice: 0.0},
 				http_code = 500
 			)
