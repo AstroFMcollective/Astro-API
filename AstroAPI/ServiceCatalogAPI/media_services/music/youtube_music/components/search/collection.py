@@ -100,6 +100,7 @@ async def search_collection(artists: list, title: str, year: int = None, country
 				service = service,
 				request = request,
 				processing_time = current_unix_time_ms() - start_time,
+				http_code = 500
 			)
 		)
 		await log(error, [discord.File(fp = StringIO(json.dumps(lookup_json, indent = 4)), filename = f'{id}.json')])
