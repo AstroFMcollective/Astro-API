@@ -1,5 +1,5 @@
-from AstroAPI.ServiceCatalogAPI.components import *
-from AstroAPI.ServiceCatalogAPI.components.ini import keys
+from AstroAPI.InternalComponents.Legacy import *
+from AstroAPI.InternalComponents.Legacy.ini import keys
 from .components.about import *
 import aiohttp
 

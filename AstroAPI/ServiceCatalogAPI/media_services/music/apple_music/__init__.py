@@ -1,4 +1,4 @@
-from AstroAPI.ServiceCatalogAPI.components import *
+from AstroAPI.InternalComponents.Legacy import *
 from .components.generic import *
 
 from .components.search.song import search_song

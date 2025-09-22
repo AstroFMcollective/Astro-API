@@ -1,5 +1,5 @@
 from .about import service
-from AstroAPI.ServiceCatalogAPI.components import *
+from AstroAPI.InternalComponents.Legacy import *
 
 def get_artists_of_media(request: dict, artists_json: dict):
 	"""

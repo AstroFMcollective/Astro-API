@@ -1,8 +1,8 @@
-from AstroAPI.ServiceCatalogAPI.components import *
+from AstroAPI.InternalComponents.Legacy import *
 from AstroAPI.ServiceCatalogAPI.media_services.music.global_io.components.generic.about import service as gservice, component as gcomponent
 from AstroAPI.ServiceCatalogAPI.media_services.music.global_io.components.generic import *
 from AstroAPI.ServiceCatalogAPI.media_services.music.global_io.components.generic.compile_global.artists import compiled_artists
-from AstroAPI.ServiceCatalogAPI.components.sort_dicts import sort_dicts
+from AstroAPI.InternalComponents.Legacy.sort_dicts import sort_dicts
 
 
 

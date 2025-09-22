@@ -1,5 +1,5 @@
-from AstroAPI.ServiceCatalogAPI.components.ini import text
-from AstroAPI.ServiceCatalogAPI.components.text_manipulation import censor_text
+from AstroAPI.InternalComponents.Legacy.ini import text
+from AstroAPI.InternalComponents.Legacy.text_manipulation import censor_text
 
 missing_image = text['images']['missing_image']
 

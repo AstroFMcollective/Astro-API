@@ -1,4 +1,4 @@
-from AstroAPI.ServiceCatalogAPI.components import *
+from AstroAPI.InternalComponents.Legacy import *
 from AstroAPI.ServiceCatalogAPI.media_services.music.youtube_music.components.generic import *
 from AstroAPI.InternalComponents.CredentialsManager.media_services.youtube.credentials import youtube_credentials
 

@@ -1,4 +1,4 @@
-from AstroAPI.ServiceCatalogAPI.components import *
+from AstroAPI.InternalComponents.Legacy import *
 from AstroAPI.ServiceCatalogAPI.media_services.music.apple_music.components.generic import *
 
 import aiohttp

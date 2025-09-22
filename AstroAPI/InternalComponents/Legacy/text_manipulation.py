@@ -1,7 +1,7 @@
 from unidecode import *
 import difflib
 import re
-from AstroAPI.ServiceCatalogAPI.components.time import save_json
+from AstroAPI.InternalComponents.Legacy.time import save_json
 from better_profanity import profanity
 from discord.utils import escape_markdown
 
@@ -211,7 +211,7 @@ def remove_duplicates(items: list):
 # A simple wrapper for the better_profanity module to handle slur censoring
 def censor_text(text: str) -> str:
 	if text != '' and text is not None:
-		path_to_file = "AstroAPI/ServiceCatalogAPI/profanity_wordlist.txt"
+		path_to_file = "AstroAPI/InternalComponents/Legacy/profanity_wordlist.txt"
 		profanity.load_censor_words_from_file(path_to_file)
 		words = text.split()
 		for word in words:

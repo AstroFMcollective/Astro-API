@@ -1,6 +1,6 @@
-from AstroAPI.ServiceCatalogAPI.components import *
-from AstroAPI.ServiceCatalogAPI.components.ini import keys
-from AstroAPI.ServiceCatalogAPI.components.time import current_unix_time
+from AstroAPI.InternalComponents.Legacy import *
+from AstroAPI.InternalComponents.Legacy.ini import keys
+from AstroAPI.InternalComponents.Legacy.time import current_unix_time
 from .components.about import *
 from ytmusicapi import YTMusic, OAuthCredentials
 from googleapiclient import *

@@ -1,4 +1,4 @@
-from AstroAPI.ServiceCatalogAPI.components import *
+from AstroAPI.InternalComponents.Legacy import *
 from AstroAPI.ServiceCatalogAPI.media_services.knowledge.spotify.components.generic import *
 from AstroAPI.ServiceCatalogAPI.media_services.music.spotify.components.search.song import search_song as search_song_music
 from AstroAPI.ServiceCatalogAPI.media_services.knowledge.spotify.components.lookup.song import lookup_song as lookup_song_knowledge

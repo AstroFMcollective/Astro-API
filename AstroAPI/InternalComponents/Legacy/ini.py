@@ -9,9 +9,9 @@ deployment_channel = config['system']['deployment_channel']
 version = config['system']['version']
 
 keys = configparser.ConfigParser()
-keys.read('AstroAPI/ServiceCatalogAPI/keys.ini')
+keys.read('AstroAPI/InternalComponents/Legacy/keys.ini')
 
 text = configparser.ConfigParser()
-text.read('AstroAPI/ServiceCatalogAPI/text.ini')
+text.read('AstroAPI/InternalComponents/Legacy/text.ini')
 
 print('[ServiceCatalogAPI] .ini files initialized')

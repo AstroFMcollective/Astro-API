@@ -1,4 +1,4 @@
-from AstroAPI.ServiceCatalogAPI.components import *
+from AstroAPI.InternalComponents.Legacy import *
 from AstroAPI.ServiceCatalogAPI.media_services.music.youtube_music.components.generic import *
 from AstroAPI.ServiceCatalogAPI.media_services.music.youtube_music.components.lookup.artist import lookup_artist
 from AstroAPI.ServiceCatalogAPI.media_services.music.youtube_music.components.lookup.collection import lookup_collection
@@ -33,7 +33,7 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 
 		# Iterate through each song result
 		for song in results:
-			song_type = 'track'  # Set song type to 'track' because AFAIK there is nothing differentiating singles from tracks inside the metadata
+			song_type = 'track' # Set song type to 'track' because AFAIK there is nothing differentiating singles from tracks inside the metadata
 			song_url = f'https://music.youtube.com/watch?v={song['videoId']}'
 			song_id = song['videoId']
 			song_title = song['title']
