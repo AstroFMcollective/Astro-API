@@ -44,7 +44,7 @@ async def lookup_collection(id: str = None, browse_id: str = None, country_code:
 		collection_url = f'https://music.youtube.com/playlist?list={collection["audioPlaylistId"]}'
 		collection_id = collection['audioPlaylistId']
 		collection_title = collection['title']
-		collection_year = collection['year']
+		collection_year = collection['year'] if 'year' in collection else None   # I hate Google so goddamn much.
 
 		# Build a list of Artist objects for the collection's artists
 		collection_artists = [
