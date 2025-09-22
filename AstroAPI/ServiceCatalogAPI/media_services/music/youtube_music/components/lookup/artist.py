@@ -1,6 +1,8 @@
-from AstroAPI.ServiceCatalogAPI.components import *
+from AstroAPI.InternalComponents.Legacy import *
 from AstroAPI.ServiceCatalogAPI.media_services.music.youtube_music.components.generic import *
 from AstroAPI.InternalComponents.CredentialsManager.media_services.youtube.credentials import youtube_credentials
+from AstroAPI.ServiceCatalogAPI.media_services.music.youtube_music.components.generic.is_kpop import is_kpop
+from AstroAPI.ServiceCatalogAPI.media_services.music.youtube_music.components.generic.cleanup_mv_title import get_kpop_artist_name, devevoify
 
 
 
@@ -82,9 +84,14 @@ async def lookup_artist(id: str = None, video_id: str = None, country_code: str 
 							# Parse the JSON response if the request was successful
 							lookup_json = await response.json()
 
-			artist_url = f'https://music.youtube.com/channel/{lookup_json['items'][0]['snippet']['channelId']}'
-			artist_id = lookup_json['items'][0]['snippet']['channelId']
-			artist_name = lookup_json['items'][0]['snippet']['channelTitle'].replace(' - Topic', '')
+			song = lookup_json['items'][0]
+
+			artist_url = f'https://music.youtube.com/channel/{song['snippet']['channelId']}'
+			artist_id = song['snippet']['channelId']
+			if is_kpop(song):
+				artist_name = get_kpop_artist_name(song)
+			else:
+				artist_name = devevoify(song)
 
 			# Return an Artist object with the gathered information and metadata
 			return Artist(

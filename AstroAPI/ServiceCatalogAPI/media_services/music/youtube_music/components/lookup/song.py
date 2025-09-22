@@ -91,7 +91,7 @@ async def lookup_song(id: str, country_code: str = 'us') -> object:
 						# Extract music video details
 						mv_url = f'https://music.youtube.com/watch?v={song['id']}'
 						mv_id = song['id']
-						mv_title = cleanup_mv_title(song)
+						mv_title = remove_feat(cleanup_mv_title(song))
 						mv_artists = [await lookup_artist(video_id = mv_id, id = song['snippet']['channelId'])]
 
 						# Build the cover object for the music video
