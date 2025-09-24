@@ -8,6 +8,8 @@ import aiohttp
 async def search_song(artists: list, title: str, song_type: str = None, collection: str = None, is_explicit: bool = None, country_code: str = 'us') -> object:
 	# Prepare the request dictionary with search parameters
 	request = {'request': 'search_song', 'artists': artists, 'title': title, 'song_type': song_type, 'collection': collection, 'is_explicit': is_explicit, 'country_code': country_code}
+	# Lookup JSON variable for later debugging
+	lookup_json = None
 	# Record the start time for processing time calculation
 	start_time = current_unix_time_ms()
 
@@ -39,9 +41,10 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 
 			# Make the GET request to Spotify API
 			async with session.get(url = api_url, headers = api_headers, timeout = timeout, params = api_params) as response:
+				json_response = await response.json()
 				if response.status == 200:
 					# Parse JSON response if request was successful
-					json_response = await response.json()
+					song = json_response
 
 					# Iterate through each song in the response
 					for song in json_response['tracks']['items']:
@@ -131,7 +134,7 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 							http_code = response.status
 						)
 					)
-					await log(error)
+					await log(error, [discord.File(fp = StringIO(json.dumps(lookup_json, indent = 4)), filename = f'{title}.json')])
 					return error
 
 	# Handle any exceptions that occur during the process
@@ -147,5 +150,5 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 				processing_time = {service: current_unix_time_ms() - start_time}
 			)
 		)
-		await log(error)
+		await log(error, [discord.File(fp = StringIO(json.dumps(lookup_json, indent = 4)), filename = f'{title}.json')])
 		return error

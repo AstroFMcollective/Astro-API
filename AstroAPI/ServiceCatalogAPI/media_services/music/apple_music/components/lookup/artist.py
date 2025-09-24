@@ -8,6 +8,8 @@ import aiohttp
 async def lookup_artist(id: str, country_code: str = 'us') -> object:
 	# Prepare the request metadata
 	request = {'request': 'lookup_artist', 'id': id, 'country_code': country_code}
+	# Lookup JSON variable for later debugging
+	lookup_json = None
 	# Record the start time for processing time calculation
 	start_time = current_unix_time_ms()
 
@@ -24,10 +26,11 @@ async def lookup_artist(id: str, country_code: str = 'us') -> object:
 
 			# Make the GET request to the API endpoint
 			async with session.get(url = api_url, params = api_params, timeout = timeout) as response:
+				lookup_json = await response.json(content_type = 'text/javascript')
 				# Check if the response status is OK
 				if response.status == 200:
 					# Parse the JSON response
-					artist = await response.json(content_type = 'text/javascript')
+					artist = lookup_json
 					
 					if artist['results'] != []: # Check if there was any song data returned
 						artist = artist['results'][0]
@@ -80,7 +83,7 @@ async def lookup_artist(id: str, country_code: str = 'us') -> object:
 							http_code = response.status
 						)
 					)
-					await log(error)
+					await log(error, [discord.File(fp = StringIO(json.dumps(lookup_json, indent = 4)), filename = f'{id}.json')])
 					return error
 
 	# If sinister things happen
@@ -96,5 +99,5 @@ async def lookup_artist(id: str, country_code: str = 'us') -> object:
 				processing_time = {service: current_unix_time_ms() - start_time}
 			)
 		)
-		await log(error)
+		await log(error, [discord.File(fp = StringIO(json.dumps(lookup_json, indent = 4)), filename = f'{id}.json')])
 		return error

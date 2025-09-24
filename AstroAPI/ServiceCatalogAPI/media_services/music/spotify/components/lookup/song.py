@@ -8,6 +8,8 @@ import aiohttp
 async def lookup_song(id: str, country_code: str = 'us') -> object:
 	# Prepare the request dictionary with search parameters
 	request = {'request': 'lookup_song', 'id': id, 'country_code': country_code}
+	# Lookup JSON variable for later debugging
+	lookup_json = None
 	# Record the start time for processing time calculation
 	start_time = current_unix_time_ms()
 
@@ -25,9 +27,10 @@ async def lookup_song(id: str, country_code: str = 'us') -> object:
 
 			# Make the GET request to the Spotify API
 			async with session.get(url = api_url, headers = api_headers, timeout = timeout, params = api_params) as response:
+				lookup_json = await response.json()
 				if response.status == 200:
 					# Parse the JSON response if the request was successful
-					song = await response.json()
+					song = lookup_json
 
 					# Extract song details
 					song_type = ('track' if song['album']['album_type'] != 'single' else 'single') # Determine the song type (track or single)
@@ -114,7 +117,7 @@ async def lookup_song(id: str, country_code: str = 'us') -> object:
 							http_code = response.status 
 						)
 					)
-					await log(error)
+					await log(error, [discord.File(fp = StringIO(json.dumps(lookup_json, indent = 4)), filename = f'{id}.json')])
 					return error
 
 	# Handle any exceptions that occur during the lookup process
@@ -130,5 +133,5 @@ async def lookup_song(id: str, country_code: str = 'us') -> object:
 				processing_time = {service: current_unix_time_ms() - start_time}
 			)
 		)
-		await log(error)
+		await log(error, [discord.File(fp = StringIO(json.dumps(lookup_json, indent = 4)), filename = f'{id}.json')])
 		return error

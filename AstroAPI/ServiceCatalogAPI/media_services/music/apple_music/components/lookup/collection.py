@@ -9,6 +9,8 @@ import aiohttp
 async def lookup_collection(id: str, country_code: str = 'us', ignore_single_suffix: bool = False) -> object:
 	# Prepare the request metadata
 	request = {'request': 'lookup_collection', 'id': id, 'country_code': country_code}
+	# Lookup JSON variable for later debugging
+	lookup_json = None
 	# Record the start time for processing time calculation
 	start_time = current_unix_time_ms()
 
@@ -25,9 +27,10 @@ async def lookup_collection(id: str, country_code: str = 'us', ignore_single_suf
 
 			# Make the GET request to the API
 			async with session.get(url = api_url, params = api_params, timeout = timeout) as response:
+				lookup_json = await response.json(content_type = 'text/javascript')
 				if response.status == 200:
 					# Parse the JSON response
-					collection = await response.json(content_type = 'text/javascript')
+					collection = lookup_json
 
 					if collection['results'] != []: # Check if there was any collection data returned
 						collection = collection['results'][0]
@@ -177,7 +180,7 @@ async def lookup_collection(id: str, country_code: str = 'us', ignore_single_suf
 							http_code = response.status
 						)
 					)
-					await log(error)
+					await log(error, [discord.File(fp = StringIO(json.dumps(lookup_json, indent = 4)), filename = f'{id}.json')])
 					return error
 
 	# If sinister things happen
@@ -193,5 +196,5 @@ async def lookup_collection(id: str, country_code: str = 'us', ignore_single_suf
 				processing_time = {service: current_unix_time_ms() - start_time}
 			)
 		)
-		await log(error)
+		await log(error, [discord.File(fp = StringIO(json.dumps(lookup_json, indent = 4)), filename = f'{id}.json')])
 		return error

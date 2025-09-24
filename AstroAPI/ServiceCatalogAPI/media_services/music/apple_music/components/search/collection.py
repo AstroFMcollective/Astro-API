@@ -8,6 +8,8 @@ import aiohttp
 async def search_collection(artists: list, title: str, year: int = None, country_code: str = 'us') -> object:
 	# Prepare the request dictionary with search parameters
 	request = {'request': 'search_collection', 'artists': artists, 'title': title, 'year': year, 'country_code': country_code}
+	# Lookup JSON variable for later debugging
+	lookup_json = None
 	# Record the start time for processing time calculation
 	start_time = current_unix_time_ms()
 	
@@ -32,9 +34,10 @@ async def search_collection(artists: list, title: str, year: int = None, country
 
 			# Make the GET request to the API endpoint
 			async with session.get(url = api_url, timeout = timeout, params = api_params) as response:
+				lookup_json = await response.json(content_type = 'text/javascript')
 				if response.status == 200:
 					# Parse the JSON response
-					json_response = await response.json(content_type = 'text/javascript')
+					json_response = lookup_json
 
 					# Iterate over each collection in the results
 					for collection in json_response['results']:
@@ -116,7 +119,7 @@ async def search_collection(artists: list, title: str, year: int = None, country
 							http_code = response.status
 						)
 					)
-					await log(error)
+					await log(error, [discord.File(fp = StringIO(json.dumps(lookup_json, indent = 4)), filename = f'{title}.json')])
 					return error
 				
 	# If sinister things happen
@@ -133,5 +136,5 @@ async def search_collection(artists: list, title: str, year: int = None, country
 				processing_time = {service: current_unix_time_ms() - start_time}
 			)
 		)
-		await log(error)
+		await log(error, [discord.File(fp = StringIO(json.dumps(lookup_json, indent = 4)), filename = f'{title}.json')])
 		return error

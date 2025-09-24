@@ -8,6 +8,8 @@ import aiohttp
 async def lookup_collection(id: str, country_code: str = 'us') -> object:
 	# Prepare the request metadata
 	request = {'request': 'lookup_collection', 'id': id, 'country_code': country_code}
+	# Lookup JSON variable for later debugging
+	lookup_json = None
 	# Record the start time for processing time calculation
 	start_time = current_unix_time_ms()
 
@@ -24,10 +26,11 @@ async def lookup_collection(id: str, country_code: str = 'us') -> object:
 
 			# Make the GET request to the Spotify API
 			async with session.get(url = api_url, headers = api_headers, timeout = timeout, params = api_params) as response:
+				lookup_json = await response.json()
 				# If the response is successful
 				if response.status == 200:
 					# Parse the JSON response
-					collection = await response.json()
+					collection = lookup_json
 
 					# Determine the collection type (album or ep)
 					collection_type = ('album' if collection['album_type'] != 'single' else 'ep')
@@ -85,7 +88,7 @@ async def lookup_collection(id: str, country_code: str = 'us') -> object:
 							http_code = response.status
 						)
 					)
-					await log(error)
+					await log(error, [discord.File(fp = StringIO(json.dumps(lookup_json, indent = 4)), filename = f'{id}.json')])
 					return error
 
 	# If sinister things happen
@@ -101,5 +104,5 @@ async def lookup_collection(id: str, country_code: str = 'us') -> object:
 				processing_time = {service: current_unix_time_ms() - start_time}
 			)
 		)
-		await log(error)
+		await log(error, [discord.File(fp = StringIO(json.dumps(lookup_json, indent = 4)), filename = f'{id}.json')])
 		return error
