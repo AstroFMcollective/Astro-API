@@ -47,8 +47,9 @@ class Token:
 		return self.token
 
 
-
+with open(f'{path}/components/credentials.json', 'r') as file:
+	creds = json.load(file)
 spotify_token = Token(
-	client_id = keys['spotify']['id'],
-	client_secret = keys['spotify']['secret']
+	client_id = creds['id'],
+	client_secret = creds['secret']
 )

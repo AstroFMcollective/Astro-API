@@ -17,7 +17,7 @@ class Token:
 
 	async def get_token(self) -> str:
 		if self.token == None or (self.token_expiration_date == None or current_unix_time() > self.token_expiration_date):
-			creds = f'{self.client_id}:{self.client_secret}='
+			creds = f'{self.client_id}:{self.client_secret}'
 			b64_creds = base64.b64encode(creds.encode()).decode()
 			async with aiohttp.ClientSession() as session:
 				request = {'request': 'get_token'}
@@ -50,8 +50,9 @@ class Token:
 		return self.token
 
 
-
+with open(f'{path}/components/credentials.json', 'r') as file:
+	creds = json.load(file)
 tidal_token = Token(
-	client_id = keys['tidal']['id'],
-	client_secret = keys['tidal']['secret']
+	client_id = creds['id'],
+	client_secret = creds['secret']
 )

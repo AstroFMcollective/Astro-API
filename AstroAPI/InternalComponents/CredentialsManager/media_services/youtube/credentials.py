@@ -78,4 +78,9 @@ class Credentials:
 
 with open(f'{path}/components/credentials.json', 'r') as file:
 	creds = json.load(file)
-youtube_credentials = Credentials(creds['id'], creds['secret'], creds['api_key'], f'{path}/components/oauth.json')
+youtube_credentials = Credentials(
+	client_id = creds['id'],
+	client_secret = creds['secret'],
+	api_key = creds['api_key'],
+	oauth_path = f'{path}/components/oauth.json'
+)
