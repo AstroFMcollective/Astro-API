@@ -3,7 +3,6 @@ from AstroAPI.InternalComponents.Legacy.ini import keys
 from AstroAPI.InternalComponents.Legacy.time import current_unix_time
 from .components.about import *
 from ytmusicapi import YTMusic, OAuthCredentials
-from googleapiclient import *
 import aiohttp
 import json
 
