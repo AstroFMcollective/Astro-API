@@ -213,5 +213,5 @@ async def search_query(query: str, country_code: str = 'us') -> object:
 				http_code = 500
 			)
 		)
-		await log(error, [discord.File(fp = StringIO(json.dumps(lookup_json, indent = 4)), filename = f'{id}.json')])
+		await log(error, [discord.File(fp = StringIO(json.dumps(lookup_json, indent = 4)), filename = f'{query}.json')])
 		return error

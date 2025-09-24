@@ -137,5 +137,5 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 				processing_time = current_unix_time_ms() - start_time,
 			)
 		)
-		await log(error, [discord.File(fp = StringIO(json.dumps(lookup_json, indent = 4)), filename = f'{id}.json')])
+		await log(error, [discord.File(fp = StringIO(json.dumps(lookup_json, indent = 4)), filename = f'{title}.json')])
 		return error
