@@ -24,7 +24,7 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 			
 		songs = []
 		# Search for songs using the first artist and the title
-		results = ytm.search(
+		results = youtube_credentials.ytmusicapi.search(
 			query = f'{artists[0]} {title}',
 			filter = 'songs'
 		)
@@ -79,23 +79,26 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 			)
 
 			# Build Collection object for the song's album
-			song_collection = Collection(
-				service = service,
-				type = 'album',
-				urls = f'https://music.youtube.com/playlist?list={song['album']['id']}',
-				ids = song['album']['id'],
-				title = song['album']['name'],
-				artists = [song_artists[0]],
-				release_year = song['album']['year'] if 'year' in song['album'] else None,
-				cover = song_cover,
-				meta = Meta(
+			if song['album'] != None:
+				song_collection = Collection(
 					service = service,
-					request = request,
-					processing_time = current_unix_time_ms() - start_time,
-					http_code = 200,
-					filter_confidence_percentage = 100.0
+					type = 'album',
+					urls = f'https://music.youtube.com/playlist?list={song['album']['id']}',
+					ids = song['album']['id'],
+					title = song['album']['name'],
+					artists = [song_artists[0]],
+					release_year = song['album']['year'] if 'year' in song['album'] else None,
+					cover = song_cover,
+					meta = Meta(
+						service = service,
+						request = request,
+						processing_time = current_unix_time_ms() - start_time,
+						http_code = 200,
+						filter_confidence_percentage = 100.0
+					)
 				)
-			)
+			else:
+				song_collection = None
 
 			# Append the constructed Song object to the songs list
 			songs.append(Song(
