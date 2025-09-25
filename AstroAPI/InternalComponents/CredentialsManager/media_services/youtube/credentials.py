@@ -21,19 +21,23 @@ class Credentials:
 		self.refresh_token = None
 		with open(oauth_path, 'r') as file:
 			self.oauth = json.load(file)
+		self.ytmusicapi = self.initialize_ytmusicapi()
 
-	async def initialize_ytmusicapi(self):
-		# await self.refresh_access_token()
-		return YTMusic(
-			auth = self.oauth,
-			oauth_credentials = 
-				OAuthCredentials(
-					client_id = self.client_id,
-					client_secret = self.client_secret
-				)
-			)
+	def initialize_ytmusicapi(self):
+		# A YouTube API update broke the way ytmusicapi does authentication, so for the time being we're
+		# emulating a browser session by reusing sushi's Firefox request headers. If these break, check
+		# if the OAuth issues have been solved. If not, make some new headers.
+		# return YTMusic(
+		# 	auth = self.oauth,
+		# 	oauth_credentials = 
+		# 		OAuthCredentials(
+		# 			client_id = self.client_id,
+		# 			client_secret = self.client_secret
+		# 		)
+		# 	)
+		return YTMusic(auth = self.oauth)
 	
-	async def refresh_access_token(self):
+	async def refresh_access_token(self): # Unused and doesn't work right now
 		async with aiohttp.ClientSession() as session:
 			request = {'request': 'refresh_access_token'}
 			api_url = api
@@ -82,5 +86,5 @@ youtube_credentials = Credentials(
 	client_id = creds['id'],
 	client_secret = creds['secret'],
 	api_key = creds['api_key'],
-	oauth_path = f'{path}/components/oauth.json'
+	oauth_path = f'{path}/components/browser.json' # Check comments in initialize_ytmusicapi()
 )
