@@ -6,10 +6,7 @@ from AstroAPI.ServiceCatalogAPI.media_services.music.youtube_music.components.ge
 
 
 
-
 async def lookup_artist(id: str = None, video_id: str = None, country_code: str = 'us') -> object:
-	# Initialize ytmusicapi
-	ytm = await youtube_credentials.initialize_ytmusicapi()
 	# Build the request dictionary with provided parameters
 	request = {'request': 'lookup_artist', 'id': id, 'video_id': video_id, 'country_code': country_code}
 	# Lookup JSON variable for later debugging
@@ -44,7 +41,7 @@ async def lookup_artist(id: str = None, video_id: str = None, country_code: str 
 							lookup_json = await response.json()
 							id = lookup_json['items'][0]['snippet']['channelId']
 			# Lookup artist information using the artist id
-			artist = ytm.get_artist(id)
+			artist = youtube_credentials.ytmusicapi.get_artist(id)
 			lookup_json = id # Save the JSON for future debugging if necessary
 
 
