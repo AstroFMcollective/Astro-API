@@ -5,8 +5,6 @@ from AstroAPI.InternalComponents.CredentialsManager.media_services.youtube.crede
 
 
 async def search_query(query: str, country_code: str = 'us') -> object:
-	# Initialize ytmusicapi
-	ytm = await youtube_credentials.initialize_ytmusicapi()
 	# Prepare the request dictionary with query details
 	request = {'request': 'search_query', 'query': query, 'country_code': country_code}
 	# Lookup JSON variable for later debugging
@@ -16,7 +14,7 @@ async def search_query(query: str, country_code: str = 'us') -> object:
 
 	try:
 		# Perform the search using ytm (YouTube Music API wrapper)
-		results = ytm.search(
+		results = youtube_credentials.ytmusicapi.search(
 			query = query
 		)
 		# Save the JSON for future debugging if necessary

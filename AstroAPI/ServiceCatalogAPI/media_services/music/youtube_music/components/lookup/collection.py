@@ -6,8 +6,6 @@ from AstroAPI.InternalComponents.CredentialsManager.media_services.youtube.crede
 
 
 async def lookup_collection(id: str = None, browse_id: str = None, country_code: str = 'us') -> object:
-	# Initialize ytmusicapi
-	ytm = await youtube_credentials.initialize_ytmusicapi()
 	# Prepare the request dictionary with lookup details
 	request = {'request': 'lookup_collection', 'id': id, 'country_code': country_code}
 	# Lookup JSON variable for later debugging
@@ -18,11 +16,11 @@ async def lookup_collection(id: str = None, browse_id: str = None, country_code:
 	try:
 		# If id is provided but browse_id is not, fetch browse_id and collection info
 		if id is not None and browse_id is None:
-			browse_id = ytm.get_album_browse_id(id)
-			collection = ytm.get_album(browse_id)
+			browse_id = youtube_credentials.ytmusicapi.get_album_browse_id(id)
+			collection = youtube_credentials.ytmusicapi.get_album(browse_id)
 		# If browse_id is provided, fetch collection info directly
 		elif browse_id is not None:
-			collection = ytm.get_album(browse_id)
+			collection = youtube_credentials.ytmusicapi.get_album(browse_id)
 		# If neither id nor browse_id is provided, return an error
 		elif id is None and browse_id is None:
 			return Error(

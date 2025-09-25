@@ -6,8 +6,6 @@ from AstroAPI.InternalComponents.CredentialsManager.media_services.youtube.crede
 
 
 async def search_music_video(artists: list, title: str, is_explicit: bool = None, country_code: str = 'us') -> object:
-	# Initialize ytmusicapi
-	ytm = await youtube_credentials.initialize_ytmusicapi()
 	# Prepare the request dictionary with search parameters
 	request = {'request': 'search_music_video', 'artists': artists, 'title': title, 'is_explicit': is_explicit, 'country_code': country_code}
 	# Lookup JSON variable for later debugging
@@ -22,7 +20,7 @@ async def search_music_video(artists: list, title: str, is_explicit: bool = None
 		
 		videos = []
 		# Perform a search on YouTube Music for videos matching the first artist and the title
-		results = ytm.search(
+		results = youtube_credentials.ytmusicapi.search(
 			query = f'{artists[0]} {title}',
 			filter = 'videos'
 		)
