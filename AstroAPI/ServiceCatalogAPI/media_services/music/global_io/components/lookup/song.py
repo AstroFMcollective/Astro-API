@@ -41,7 +41,7 @@ async def lookup_song(service: object, id: str, song_country_code: str = None, l
 			collection = song_reference_collection_title,
 			is_explicit = song_reference.is_explicit,
 			country_code = lookup_country_code,
-			include_premade_media = [song_reference] if song_reference.type in compatible_results else []  # Include the media from the original call unless it's a knowledge result
+			include_premade_media = [song_reference] if song_reference.type in compatible_results and song_reference.service != 'youtube_music' else []  # Include the media from the original call unless it's a knowledge result or anything from YouTube, because YT's data can be unreliable
 		)
 
 		# Replace the request dict of the search one with the lookup one
