@@ -33,110 +33,122 @@ async def lookup_song(id: str, country_code: str = 'us') -> object:
 				lookup_json = await response.json()
 				if response.status == 200:
 					# Parse the JSON response if the request was successful
-					song = lookup_json['items'][0]
+					if lookup_json['items'] != []: # Check if the items list is empty, effectively an empty response
+						song = lookup_json['items'][0]
 
-					# Approximate whether the given data was of a song, music video or regular YouTube video
-					# If the approximaton concludes as a song:
-					if classify(song) == 'song':
-						# Extract song details
-						song_type = 'track'
-						song_url = f'https://music.youtube.com/watch?v={song['id']}'
-						song_id = song['id']
-						song_title = song['snippet']['title']
-						song_artists = [await lookup_artist(video_id = song_id, id = song['snippet']['channelId'])]
+						# Approximate whether the given data was of a song, music video or regular YouTube video
+						# If the approximaton concludes as a song:
+						if classify(song) == 'song':
+							# Extract song details
+							song_type = 'track'
+							song_url = f'https://music.youtube.com/watch?v={song['id']}'
+							song_id = song['id']
+							song_title = song['snippet']['title']
+							song_artists = [await lookup_artist(video_id = song_id, id = song['snippet']['channelId'])]
 
-						# Build the cover object for the song
-						thumbnails = song['snippet']['thumbnails']
-						if thumbnails != {}:
-							media_cover = Cover(
+							# Build the cover object for the song
+							thumbnails = song['snippet']['thumbnails']
+							if thumbnails != {}:
+								media_cover = Cover(
+									service = service,
+									media_type = 'track',
+									title = song_title,
+									artists = song_artists,
+									hq_urls = thumbnails['maxres']['url'],
+									lq_urls = thumbnails['high']['url'],
+									meta = Meta(
+										service = service,
+										request = request,
+										processing_time = 0,
+										filter_confidence_percentage = 100.0,
+										http_code = 200
+									)
+								)
+							else:
+								media_cover = None
+
+							# Return the Song object with all extracted details
+							return Song(
 								service = service,
-								media_type = 'track',
+								type = song_type,
+								urls = song_url,
+								ids = song_id,
 								title = song_title,
 								artists = song_artists,
-								hq_urls = thumbnails['maxres']['url'],
-								lq_urls = thumbnails['high']['url'],
+								collection = None,
+								is_explicit = None,
+								cover = media_cover,
 								meta = Meta(
 									service = service,
 									request = request,
-									processing_time = 0,
+									processing_time = current_unix_time_ms() - start_time,
 									filter_confidence_percentage = 100.0,
-									http_code = 200
+									http_code = response.status
 								)
 							)
-						else:
-							media_cover = None
 
-						# Return the Song object with all extracted details
-						return Song(
-							service = service,
-							type = song_type,
-							urls = song_url,
-							ids = song_id,
-							title = song_title,
-							artists = song_artists,
-							collection = None,
-							is_explicit = None,
-							cover = media_cover,
-							meta = Meta(
+						# If the approximaton concludes as a music video:
+						elif classify(song) == 'music_video':
+							# Extract music video details
+							mv_url = f'https://music.youtube.com/watch?v={song['id']}'
+							mv_id = song['id']
+							mv_title = remove_feat(cleanup_mv_title(song))
+							mv_artists = [await lookup_artist(video_id = mv_id, id = song['snippet']['channelId'])]
+
+							# Build the cover object for the music video
+							thumbnails = song['snippet']['thumbnails']
+							if thumbnails != {}:
+								media_cover = Cover(
+									service = service,
+									media_type = 'music_video',
+									title = mv_title,
+									artists = mv_artists,
+									hq_urls = thumbnails['maxres']['url'],
+									lq_urls = thumbnails['high']['url'],
+									meta = Meta(
+										service = service,
+										request = request,
+										processing_time = 0,
+										filter_confidence_percentage = 100.0,
+										http_code = 200
+									)
+								)
+							else:
+								media_cover = None
+
+							# Return the music video object with all extracted details
+							return MusicVideo(
 								service = service,
-								request = request,
-								processing_time = current_unix_time_ms() - start_time,
-								filter_confidence_percentage = 100.0,
-								http_code = response.status
-							)
-						)
-
-					# If the approximaton concludes as a music video:
-					elif classify(song) == 'music_video':
-						# Extract music video details
-						mv_url = f'https://music.youtube.com/watch?v={song['id']}'
-						mv_id = song['id']
-						mv_title = remove_feat(cleanup_mv_title(song))
-						mv_artists = [await lookup_artist(video_id = mv_id, id = song['snippet']['channelId'])]
-
-						# Build the cover object for the music video
-						thumbnails = song['snippet']['thumbnails']
-						if thumbnails != {}:
-							media_cover = Cover(
-								service = service,
-								media_type = 'music_video',
+								urls = mv_url,
+								ids = mv_id,
 								title = mv_title,
 								artists = mv_artists,
-								hq_urls = thumbnails['maxres']['url'],
-								lq_urls = thumbnails['high']['url'],
+								is_explicit = None,
+								cover = media_cover,
 								meta = Meta(
 									service = service,
 									request = request,
-									processing_time = 0,
+									processing_time = current_unix_time_ms() - start_time,
 									filter_confidence_percentage = 100.0,
-									http_code = 200
+									http_code = response.status
 								)
 							)
+						
 						else:
-							media_cover = None
-
-						# Return the music video object with all extracted details
-						return MusicVideo(
-							service = service,
-							urls = mv_url,
-							ids = mv_id,
-							title = mv_title,
-							artists = mv_artists,
-							is_explicit = None,
-							cover = media_cover,
-							meta = Meta(
+							# If the approximaton concludes as a regular video, return an empty object
+							# DO NOT LOG THIS EVER UNLESS IT'S IN TESTING
+							# THAT WILL LOG USER GENERATED CONTENT, COMPROMISING USER PRIVACY
+							return Empty(
 								service = service,
-								request = request,
-								processing_time = current_unix_time_ms() - start_time,
-								filter_confidence_percentage = 100.0,
-								http_code = response.status
+								meta = Meta(
+									service = service,
+									request = request,
+									processing_time = current_unix_time_ms() - start_time,
+									http_code = 204
+								)
 							)
-						)
 					
-					else:
-						# If the approximaton concludes as a regular video, return an empty object
-						# DO NOT LOG THIS EVER UNLESS IT'S IN TESTING
-						# THAT WILL LOG USER GENERATED CONTENT, COMPROMISING USER PRIVACY
+					else: # If the items list is empty, return an empty object
 						return Empty(
 							service = service,
 							meta = Meta(
