@@ -31,10 +31,9 @@ async def search_collection(artists: list, title: str, year: int = None, country
 		# This is to prevent duplicate searches, increasing performance
 		ignore_in_excluded_services = []
 		for premade in include_premade_media:
-			if premade.service in exclude_services:
-				if premade.service not in exclude_services:
-					exclude_services.append(premade.service)
-				ignore_in_excluded_services.append(premade.service)
+			if premade.service not in exclude_services:
+				exclude_services.append(premade.service)
+			ignore_in_excluded_services.append(premade.service)
 		
 		# Search services for songs
 		tasks = []
