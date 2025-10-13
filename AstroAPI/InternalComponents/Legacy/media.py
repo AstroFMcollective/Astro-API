@@ -124,14 +124,16 @@ class Meta:
 		 :param filter_confidence_percentage: Optional. Astro's confidence in how accurately it got the correct media object.
 	"""
 
-	def __init__(self, service: str, request: dict, processing_time: int | dict, http_code: int | dict, filter_confidence_percentage: float | dict = None):
+	def __init__(self, service: str, request: dict, processing_time: int | dict, http_code: int | dict, filter_confidence_percentage: float | dict = None, gen_ai_confidence_percentage: float | dict = None):
 		processing_time = {service: processing_time} if isinstance(processing_time, int) else processing_time
 		filter_confidence_percentage = {service: filter_confidence_percentage} if isinstance(filter_confidence_percentage, float) else filter_confidence_percentage if filter_confidence_percentage != None else {service: 0.0}
-		
+		gen_ai_confidence_percentage = {service: gen_ai_confidence_percentage} if isinstance(gen_ai_confidence_percentage, float) else gen_ai_confidence_percentage if gen_ai_confidence_percentage != None else {service: 0.0}
+
 		self.request = request
 		self.http_code = http_code
 		self.processing_time = processing_time
 		self.filter_confidence_percentage = filter_confidence_percentage
+		self.gen_ai_confidence_percentage = gen_ai_confidence_percentage
 		self.regenerate_json()
 
 	def regenerate_json(self):
@@ -139,7 +141,8 @@ class Meta:
 			'request': self.request,
 			'http_code': self.http_code,
 			'processing_time': self.processing_time,
-			'filter_confidence_percentage': self.filter_confidence_percentage
+			'filter_confidence_percentage': self.filter_confidence_percentage,
+			'gen_ai_confidence_percentage': self.gen_ai_confidence_percentage
 		}
 
 
@@ -212,7 +215,7 @@ class Song:
 			'collection': self.collection.json_lite if self.collection else None,
 			'cover': self.cover.json_lite if self.cover else None,
 			'genre': self.genre,
-			'is_explicit': self.is_explicit,
+			'is_explicit': self.is_explicit
 		}
 
 
@@ -279,7 +282,7 @@ class MusicVideo:
 			'artists': [artist.json_lite for artist in self.artists],
 			'cover': self.cover.json_lite,
 			'genre': self.genre,
-			'is_explicit': self.is_explicit,
+			'is_explicit': self.is_explicit
 		}
 
 
@@ -346,133 +349,7 @@ class Collection:
 			'artists': [artist.json_lite for artist in self.artists],
 			'release_year': self.release_year,
 			'cover': self.cover.json_lite,
-			'genre': self.genre,
-		}
-
-
-
-class Podcast:
-
-	"""
-		# Service Catalog Podcast Object
-
-		This is a built-in Service Catalog API object which identifies podcasts.
-		This is currently unused, and I'm debating on removing this altogether.
-		JSON representation available.
-
-		 :param	service: The API service in which the object was formed.
-		 :param urls: The podcast's URL(s).
-		 :param ids: The podcast's ID(s).
-		 :param title: The podcast's title.
-		 :param publisher: The podcast's publisher.
-		 :param cover: The podcast's cover art.
-		 :param is_explicit: Optional. Whether the podcast is explicit or not.
-		 :param meta: The technical metadata of the podcast.
-	"""
-
-	def __init__(self, service: str, urls: str | dict, ids: str | dict, title: str, publisher: str, cover: object, meta = object, is_explicit: bool = None) -> object:
-		type = 'podcast'
-		urls = {service: urls} if not isinstance(urls, dict) else urls
-		ids = {service: str(ids)} if not isinstance(ids, dict) else ids
-		censored_title = censor_text(title)
-		
-		self.service = service
-		self.type = type
-		self.urls = urls
-		self.ids = ids
-		self.title = title
-		self.censored_title = title
-		self.publisher = publisher
-		self.cover = cover
-		self.is_explicit = is_explicit
-		self.meta = meta
-		self.regenerate_json()
-
-	def regenerate_json(self):
-		self.json = {
-			'service': self.service,
-			'type': self.type,
-			'urls': self.urls,
-			'ids': self.ids,
-			'title': self.title,
-			'censored_title': self.censored_title,
-			'publisher': self.publisher,
-			'cover': self.cover.json_lite,
-			'is_explicit': self.is_explicit,
-			'meta': self.meta.json
-		}
-		self.json_lite = {
-			'type': self.type,
-			'urls': self.urls,
-			'ids': self.ids,
-			'title': self.title,
-			'censored_title': self.censored_title,
-			'publisher': self.publisher,
-			'cover': self.cover.json_lite,
-			'is_explicit': self.is_explicit,
-		}
-
-
-
-class PodcastEpisode:
-
-	"""
-		# Service Catalog Podcast Episode Object
-
-		This is a built-in Service Catalog API object which identifies podcast episodes.
-		This is currently unused, and I'm debating on removing this altogether.
-		JSON representation available.
-
-		 :param	service: The API service in which the object was formed.
-		 :param urls: The podcast episode's URL(s).
-		 :param ids: The podcast episode's ID(s).
-		 :param title: The podcast episode's title.
-		 :param publisher: The podcast episode's publisher.
-		 :param release_year: The podcast episode's release year.
-		 :param is_explicit: Optional. Whether the podcast episode is explicit or not.
-		 :param meta: The technical metadata of the podcast episode.
-	"""
-
-	def __init__(self, service: str, urls: str | dict, ids: str | dict, title: str, release_year: int, cover: object, meta = object, is_explicit: bool = None) -> object:
-		type = 'podcast_episode'
-		urls = {service: urls} if not isinstance(urls, dict) else urls
-		ids = {service: str(ids)} if not isinstance(ids, dict) else ids
-		censored_title = censor_text(title)
-
-		self.service = service
-		self.type = type
-		self.urls = urls
-		self.ids = ids
-		self.title = title
-		self.censored_title = censored_title
-		self.release_year = release_year
-		self.cover = cover
-		self.is_explicit = is_explicit
-		self.meta = meta
-		self.regenerate_json()
-
-	def regenerate_json(self):
-		self.json = {
-			'service': self.service,
-			'type': self.type,
-			'urls': self.urls,
-			'ids': self.ids,
-			'title': self.title,
-			'censored_title': self.censored_title,
-			'release_year': self.release_year,
-			'cover': self.cover.json,
-			'is_explicit': self.is_explicit,
-			'meta': self.meta.json
-		}
-		self.json_lite = {
-			'type': self.type,
-			'urls': self.urls,
-			'ids': self.ids,
-			'title': self.title,
-			'censored_title': self.censored_title,
-			'release_year': self.release_year,
-			'cover': self.cover.json,
-			'is_explicit': self.is_explicit,
+			'genre': self.genre
 		}
 
 
@@ -534,82 +411,7 @@ class Playlist:
 			'censored_title': self.censored_title,
 			'owner': self.owner,
 			'songs': [song.json_lite for song in self.songs],
-			'cover': self.cover.json_lite,
-		}
-
-
-
-class Audiobook:
-
-	"""
-		# Service Catalog Audiobook Object
-
-		This is a built-in Service Catalog API object which identifies audiobooks.
-		This is currently unused, and I'm debating on removing this altogether.
-		JSON representation available.
-
-		 :param	service: The API service in which the object was formed.
-		 :param urls: The audiobook's URL(s).
-		 :param ids: The audiobook's ID(s).
-		 :param title: The audiobook's title.
-		 :param authors: The audiobook's authors.
-		 :param narrators: The audiobook's narrators.
-		 :param publisher: The audiobook's publisher.
-		 :param chapters: The number of chapters the audiobook has.
-		 :param cover: The audiobook's cover.
-		 :param is_explicit: Whether the audiobook is explicit or not.
-		 :param meta: The technical metadata of the audiobook.
-	"""
-
-	def __init__(self, service: str, urls: str | dict, ids: str | dict, title: str, authors: list, narrators: list, publisher: str, chapters: int, cover: object, is_explicit: bool, meta: object) -> object:
-		type = 'audiobook'
-		urls = {service: urls} if not isinstance(urls, dict) else urls
-		ids = {service: str(ids)} if not isinstance(ids, dict) else ids
-		censored_title = censor_text(title)
-
-		self.service = service
-		self.type = 'audiobook'
-		self.urls = urls
-		self.ids = ids
-		self.title = title
-		self.censored_title = censored_title
-		self.authors = authors
-		self.narrators = narrators
-		self.publisher = publisher
-		self.chapters = chapters
-		self.cover = cover
-		self.is_explicit = is_explicit
-		self.meta = meta
-		self.regenerate_json()
-
-	def regenerate_json(self):
-		self.json = {
-			'service': self.service,
-			'type': self.type,
-			'urls': self.urls,
-			'ids': self.ids,
-			'title': self.title,
-			'censored_title': self.censored_title,
-			'authors': self.authors,
-			'narrators': self.narrators,
-			'publisher': self.publisher,
-			'chapters': self.chapters,
-			'cover': self.cover.json,
-			'is_explicit': self.is_explicit,
-			'meta': self.meta.json
-		}
-		self.json_lite = {
-			'type': self.type,
-			'urls': self.urls,
-			'ids': self.ids,
-			'title': self.title,
-			'censored_title': self.censored_title,
-			'authors': self.authors,
-			'narrators': self.narrators,
-			'publisher': self.publisher,
-			'chapters': self.chapters,
-			'cover': self.cover.json,
-			'is_explicit': self.is_explicit,
+			'cover': self.cover.json_lite
 		}
 
 
@@ -663,7 +465,7 @@ class Artist:
 			'ids': self.ids,
 			'name': self.name,
 			'genre': self.genre,
-			'profile_picture': self.profile_picture.json_lite if self.profile_picture else None,
+			'profile_picture': self.profile_picture.json_lite if self.profile_picture else None
 		}
 
 
@@ -717,7 +519,7 @@ class Cover:
 		self.json_lite = {
 			'type': self.type,
 			'hq_urls': self.hq_urls,
-			'lq_urls': self.lq_urls,
+			'lq_urls': self.lq_urls
 		}
 
 
@@ -763,7 +565,7 @@ class ProfilePicture:
 		self.json_lite = {
 			'type': self.type,
 			'hq_urls': self.hq_urls,
-			'lq_urls': self.lq_urls,
+			'lq_urls': self.lq_urls
 		}
 
 
@@ -887,7 +689,7 @@ class Knowledge:
 			'bpm': self.bpm,
 			'key': self.key,
 			'length': self.length,
-			'time_signature': self.time_signature,
+			'time_signature': self.time_signature
 		}
 
 print('[ServiceCatalogAPI] Media objects initialized')
