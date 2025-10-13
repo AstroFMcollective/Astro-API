@@ -51,7 +51,7 @@ async def search_music_video(artists: list, title: str, is_explicit: bool = None
 						mv_artists = [
 							Artist(
 								service = service,
-								urls = video['artistViewUrl'],
+								urls = video['artistViewUrl'] if 'artistViewUrl' in video else f'https://music.apple.com/{country_code}/artist/{video['artistId']}', # Additional edge case if artistViewUrl is missing... this API is so weird
 								ids = video['artistId'],
 								name = artist,
 								meta = Meta(

@@ -55,7 +55,7 @@ async def search_collection(artists: list, title: str, year: int = None, country
 						collection_artists = [
 							Artist(
 								service = service,
-								urls = collection['artistViewUrl'],
+								urls = collection['artistViewUrl'] if 'artistViewUrl' in collection else f'https://music.apple.com/{country_code}/artist/{collection['artistId']}', # Additional edge case if artistViewUrl is missing... this API is so weird
 								ids = collection['artistId'],
 								name = artist,
 								meta = Meta(

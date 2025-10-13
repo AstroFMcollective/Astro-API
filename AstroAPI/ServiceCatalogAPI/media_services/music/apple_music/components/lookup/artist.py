@@ -36,7 +36,7 @@ async def lookup_artist(id: str, country_code: str = 'us') -> object:
 						artist = artist['results'][0]
 
 						# Extract artist details from the response
-						artist_url = artist['artistLinkUrl']
+						artist_url = artist['artistLinkUrl'] if 'artistViewUrl' in artist else f'https://music.apple.com/{country_code}/artist/{artist['artistId']}' # Additional edge case if artistViewUrl is missing... this API is so weird
 						artist_id = artist['artistId']
 						artist_name = artist['artistName']
 						artist_genre = artist['primaryGenreName'] if 'primaryGenreName' in artist else None
