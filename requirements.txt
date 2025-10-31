@@ -5,7 +5,6 @@ requests
 pillow
 numpy
 lyricsgenius
-fastapi
 fastapi[standard]
 uvicorn
 better-profanity
