@@ -18,7 +18,7 @@ def get_service_catalog_api(media_type: str, service: str):
 
 
 
-api = FastAPI()
+app = FastAPI()
 print("[AstroAPI] Ready!")
 print(f"[AstroAPI] Version: {ServiceCatalog.version}")
 print(f"[AstroAPI] Deployment channel: {ServiceCatalog.deployment_channel}")
@@ -30,7 +30,7 @@ print(f"[AstroAPI] Deployment channel: {ServiceCatalog.deployment_channel}")
 # ------------------------------------
 
 # Song Search for media services
-@api.get("/{media}/{service}/search_song")
+@app.get("/{media}/{service}/search_song")
 async def search_song(media: str, service: str, artist: str, title: str, song_type: str = None, collection_title: str = None, is_explicit: str = None, country_code: str = 'us', exclude_services: str = None):
 	# Prepare everything for the API request
 	is_explicit = False if is_explicit is None else is_explicit.lower() == 'true' # Convert the is_explicit string to a boolean
@@ -66,7 +66,7 @@ async def search_song(media: str, service: str, artist: str, title: str, song_ty
 
 
 # Music Video Search for media services
-@api.get("/{media}/{service}/search_music_video")
+@app.get("/{media}/{service}/search_music_video")
 async def search_music_video(media: str, service: str, artist: str, title: str, is_explicit: str = None, country_code: str = 'us', exclude_services: str = None):
 	# Prepare everything for the API request
 	is_explicit = False if is_explicit is None else is_explicit.lower() == 'true' # Convert the is_explicit string to a boolean
@@ -98,7 +98,7 @@ async def search_music_video(media: str, service: str, artist: str, title: str, 
 
 
 # Collection Search for media services
-@api.get("/{media}/{service}/search_collection")
+@app.get("/{media}/{service}/search_collection")
 async def search_collection(media: str, service: str, artist: str, title: str, year: str = None, country_code: str = 'us', exclude_services: str = None):
 	# Prepare everything for the API request
 	year = int(year) if year is not None else None
@@ -130,7 +130,7 @@ async def search_collection(media: str, service: str, artist: str, title: str, y
 
 
 # Query Search for media services
-@api.get("/{media}/{service}/search_query")
+@app.get("/{media}/{service}/search_query")
 async def search_music_video(media: str, service: str, query: str, country_code: str = 'us', exclude_services: str = None):
 	# Prepare everything for the API request
 	country_code = country_code.lower()
@@ -165,7 +165,7 @@ async def search_music_video(media: str, service: str, query: str, country_code:
 # ------------------------------------
 
 # Song Lookup for media services
-@api.get("/{media}/{service}/lookup_song")
+@app.get("/{media}/{service}/lookup_song")
 async def lookup_song(media: str, service: str, id: str, id_service: str = None, country_code: str = 'us'):
 	# Prepare everything for the API request
 	media = media.lower()
@@ -199,7 +199,7 @@ async def lookup_song(media: str, service: str, id: str, id_service: str = None,
 				artists = [artist.name for artist in id_service_song_object.artists],
 				title = id_service_song_object.title,
 				song_type = id_service_song_object.type,
-				collection = id_service_song_object.collection.title if 'collection' in id_service_song_object.json else None,
+				collection = id_service_song_object.collection.title if 'collection' in id_service_song_object.json and id_service_song_object.json['collection'] != None else None,
 				is_explicit = id_service_song_object.is_explicit,
 				country_code = country_code,
 			)
@@ -211,7 +211,7 @@ async def lookup_song(media: str, service: str, id: str, id_service: str = None,
 
 
 # Music Video Lookup for media services
-@api.get("/{media}/{service}/lookup_music_video")
+@app.get("/{media}/{service}/lookup_music_video")
 async def lookup_music_video(media: str, service: str, id: str, id_service: str = None, country_code: str = 'us'):
 	# Prepare everything for the API request
 	media = media.lower()
@@ -255,7 +255,7 @@ async def lookup_music_video(media: str, service: str, id: str, id_service: str 
 
 
 # Collection Lookup for media services
-@api.get("/{media}/{service}/lookup_collection")
+@app.get("/{media}/{service}/lookup_collection")
 async def lookup_collection(media: str, service: str, id: str, id_service: str = None, country_code: str = 'us'):
 	# Prepare everything for the API request
 	media = media.lower()
