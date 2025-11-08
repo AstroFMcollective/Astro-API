@@ -48,29 +48,30 @@ class Token:
 		return self.token
 	
 	async def get_credentials(self) -> None:
-		async with aiohttp.ClientSession() as session:
-			request = {'request': 'get_credentials'}
-			creds_url = keys['cred_endpoints'][self.service]
-			start_time = current_unix_time_ms()
-			async with session.get(url = creds_url) as response:
-				if response.status == 200:
-					json_response = await response.json()
-					self.client_id = json_response['id']
-					self.client_secret = json_response['secret']
-					
-				else:
-					error = Error(
-						service = self.service,
-						component = self.component,
-						error_msg = "HTTP error when getting credentials",
-						meta = Meta(
+		if self.client_id == None:
+			async with aiohttp.ClientSession() as session:
+				request = {'request': 'get_credentials'}
+				creds_url = keys['cred_endpoints'][self.service]
+				start_time = current_unix_time_ms()
+				async with session.get(url = creds_url) as response:
+					if response.status == 200:
+						json_response = await response.json()
+						self.client_id = json_response['id']
+						self.client_secret = json_response['secret']
+						
+					else:
+						error = Error(
 							service = self.service,
-							request = request,
-							processing_time = current_unix_time_ms() - start_time,
-							http_code = response.status
+							component = self.component,
+							error_msg = "HTTP error when getting credentials",
+							meta = Meta(
+								service = self.service,
+								request = request,
+								processing_time = current_unix_time_ms() - start_time,
+								http_code = response.status
+							)
 						)
-					)
-					await log(error)
+						await log(error)
 
 
 
