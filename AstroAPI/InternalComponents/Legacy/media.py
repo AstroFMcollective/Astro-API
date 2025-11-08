@@ -32,9 +32,9 @@ missing_image = text['images']['missing_image']
 class Error:
 
 	"""
-		# Service Catalog Error Object
+		# Astro API Error Object
 
-		This is a built-in Service Catalog API object which identifies errors.
+		This is a built-in general-purpose API object which identifies errors.
 		Use this to return *a thing* when something internally goes wrong.
 		JSON representation available.
 
@@ -69,6 +69,7 @@ class Error:
 			'error_msg': self.error_msg,
 			'meta': self.meta.json
 		}
+
 
 
 class Empty:
@@ -124,16 +125,14 @@ class Meta:
 		 :param filter_confidence_percentage: Optional. Astro's confidence in how accurately it got the correct media object.
 	"""
 
-	def __init__(self, service: str, request: dict, processing_time: int | dict, http_code: int | dict, filter_confidence_percentage: float | dict = None, gen_ai_confidence_percentage: float | dict = None):
+	def __init__(self, service: str, request: dict, processing_time: int | dict, http_code: int | dict, filter_confidence_percentage: float | dict = None):
 		processing_time = {service: processing_time} if isinstance(processing_time, int) else processing_time
 		filter_confidence_percentage = {service: filter_confidence_percentage} if isinstance(filter_confidence_percentage, float) else filter_confidence_percentage if filter_confidence_percentage != None else {service: 0.0}
-		gen_ai_confidence_percentage = {service: gen_ai_confidence_percentage} if isinstance(gen_ai_confidence_percentage, float) else gen_ai_confidence_percentage if gen_ai_confidence_percentage != None else {service: 0.0}
 
 		self.request = request
 		self.http_code = http_code
 		self.processing_time = processing_time
 		self.filter_confidence_percentage = filter_confidence_percentage
-		self.gen_ai_confidence_percentage = gen_ai_confidence_percentage
 		self.regenerate_json()
 
 	def regenerate_json(self):
@@ -142,7 +141,6 @@ class Meta:
 			'http_code': self.http_code,
 			'processing_time': self.processing_time,
 			'filter_confidence_percentage': self.filter_confidence_percentage,
-			'gen_ai_confidence_percentage': self.gen_ai_confidence_percentage
 		}
 
 
