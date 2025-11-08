@@ -5,24 +5,26 @@ from .components.about import *
 from ytmusicapi import YTMusic, OAuthCredentials
 import aiohttp
 import json
+import requests, asyncio
+
 
 
 
 class Credentials:
-	def __init__(self, client_id: str, client_secret: str, api_key: str, oauth_path: str):
+	def __init__(self):
 		self.service = service
 		self.component = component
-		self.client_id = client_id
-		self.client_secret = client_secret
-		self.api_key = api_key
-		self.oauth_path = oauth_path
-		self.access_token = None
-		self.refresh_token = None
-		with open(oauth_path, 'r') as file:
-			self.oauth = json.load(file)
+		self.client_id = None
+		self.client_secret = None
+		self.api_key = None
+		self.oauth = None
+		self.browser = None
 		self.ytmusicapi = self.initialize_ytmusicapi()
 
 	def initialize_ytmusicapi(self):
+		self.get_browser()
+		self.get_oauth()
+		self.get_credentials()
 		# A YouTube API update broke the way ytmusicapi does authentication, so for the time being we're
 		# emulating a browser session by reusing sushi's Firefox request headers. If these break, check
 		# if the OAuth issues have been solved. If not, make some new headers.
@@ -34,7 +36,7 @@ class Credentials:
 		# 			client_secret = self.client_secret
 		# 		)
 		# 	)
-		return YTMusic(auth = self.oauth)
+		return YTMusic(auth = self.browser)
 	
 	async def refresh_access_token(self): # Unused and doesn't work right now
 		async with aiohttp.ClientSession() as session:
@@ -76,14 +78,151 @@ class Credentials:
 					)
 					await log(error)
 					return error
+	
+	def get_browser(self) -> None:
+		if self.browser is None:
+			request = {'request': 'get_credentials'}
+			creds_url = keys['cred_endpoints'][f'{self.service}_browser']
+			start_time = current_unix_time_ms()
+			try:
+				response = requests.get(creds_url, timeout=10)
+				if response.status_code == 200:
+					json_response = response.json()
+					self.browser = json_response
+				else:
+					error = Error(
+						service = self.service,
+						component = self.component,
+						error_msg = "HTTP error when getting browser credentials",
+						meta = Meta(
+							service = self.service,
+							request = request,
+							processing_time = current_unix_time_ms() - start_time,
+							http_code = response.status_code
+						)
+					)
+					# schedule or run logging depending on loop state
+					try:
+						loop = asyncio.get_running_loop()
+					except RuntimeError:
+						asyncio.run(log(error))
+					else:
+						loop.create_task(log(error))
+			except requests.RequestException as e:
+				error = Error(
+					service = self.service,
+					component = self.component,
+					error_msg = f"Request error when getting browser credentials: {e}",
+					meta = Meta(
+						service = self.service,
+						request = request,
+						processing_time = current_unix_time_ms() - start_time,
+						http_code = None
+					)
+				)
+				try:
+					loop = asyncio.get_running_loop()
+				except RuntimeError:
+					asyncio.run(log(error))
+				else:
+					loop.create_task(log(error))
+
+	def get_oauth(self) -> None:
+		if self.oauth is None:
+			request = {'request': 'get_credentials'}
+			creds_url = keys['cred_endpoints'][f'{self.service}_oauth']
+			start_time = current_unix_time_ms()
+			try:
+				response = requests.get(creds_url, timeout=10)
+				if response.status_code == 200:
+					json_response = response.json()
+					self.oauth = json_response
+				else:
+					error = Error(
+						service = self.service,
+						component = self.component,
+						error_msg = "HTTP error when getting OAuth credentials",
+						meta = Meta(
+							service = self.service,
+							request = request,
+							processing_time = current_unix_time_ms() - start_time,
+							http_code = response.status_code
+						)
+					)
+					try:
+						loop = asyncio.get_running_loop()
+					except RuntimeError:
+						asyncio.run(log(error))
+					else:
+						loop.create_task(log(error))
+			except requests.RequestException as e:
+				error = Error(
+					service = self.service,
+					component = self.component,
+					error_msg = f"Request error when getting OAuth credentials: {e}",
+					meta = Meta(
+						service = self.service,
+						request = request,
+						processing_time = current_unix_time_ms() - start_time,
+						http_code = None
+					)
+				)
+				try:
+					loop = asyncio.get_running_loop()
+				except RuntimeError:
+					asyncio.run(log(error))
+				else:
+					loop.create_task(log(error))
+
+	def get_credentials(self) -> None:
+		if self.client_id is None:
+			request = {'request': 'get_credentials'}
+			creds_url = keys['cred_endpoints'][f'{self.service}_credentials']
+			start_time = current_unix_time_ms()
+			try:
+				response = requests.get(creds_url, timeout=10)
+				if response.status_code == 200:
+					json_response = response.json()
+					self.client_id = json_response.get('id')
+					self.client_secret = json_response.get('secret')
+					self.api_key = json_response.get('api_key')
+				else:
+					error = Error(
+						service = self.service,
+						component = self.component,
+						error_msg = "HTTP error when getting OAuth credentials",
+						meta = Meta(
+							service = self.service,
+							request = request,
+							processing_time = current_unix_time_ms() - start_time,
+							http_code = response.status_code
+						)
+					)
+					try:
+						loop = asyncio.get_running_loop()
+					except RuntimeError:
+						asyncio.run(log(error))
+					else:
+						loop.create_task(log(error))
+			except requests.RequestException as e:
+				error = Error(
+					service = self.service,
+					component = self.component,
+					error_msg = f"Request error when getting credentials: {e}",
+					meta = Meta(
+						service = self.service,
+						request = request,
+						processing_time = current_unix_time_ms() - start_time,
+						http_code = None
+					)
+				)
+				try:
+					loop = asyncio.get_running_loop()
+				except RuntimeError:
+					asyncio.run(log(error))
+				else:
+					loop.create_task(log(error))
 
 
 
-with open(f'{path}/components/credentials.json', 'r') as file:
-	creds = json.load(file)
-youtube_credentials = Credentials(
-	client_id = creds['id'],
-	client_secret = creds['secret'],
-	api_key = creds['api_key'],
-	oauth_path = f'{path}/components/browser.json' # Check comments in initialize_ytmusicapi()
-)
+youtube_credentials = Credentials()
