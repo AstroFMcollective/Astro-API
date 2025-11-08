@@ -29,7 +29,7 @@ async def log(media: object, files: list = None):
 		api_dev_ping = '<@&1330182314831122492>'
 		try:
 			embed = discord.Embed(
-				title = f'Astro Service Catalog API - `{media.type}`', # TODO: rn this is hard coded to only work with the service catalog api
+				title = f'Astro API - `{media.type}`',
 				colour = 0x0097f5,
 			)
 			embed.add_field(
@@ -83,7 +83,7 @@ async def log(media: object, files: list = None):
 				# For some reason this function can fail in prod
 				# Something something 1024 character limit being tripped
 				# I cannot recreate it locally, so this is my solution
-				embed_text = f'# Astro Service Catalog API - {media.type}'
+				embed_text = f'# Astro API - {media.type}'
 				embed_text += f'\n**Service**: {text['api_tag'][media.service]}'
 				embed_text += f'\n**Service**'
 				if media.type == 'error':
@@ -121,7 +121,7 @@ async def log(media: object, files: list = None):
 			except:
 				# Okay if this really REALLY doesn't work just give up
 				webhook = Webhook.from_url(url = keys['webhooks'][f'{deployment_channel}'], session = session)
-				await webhook.send(f"{api_dev_ping} Logging keeps failing for some reason, here's the json of the response", username = 'Astro API', avatar_url = text['images']['astro_trans'], files = media.json)
+				await webhook.send(f"{api_dev_ping} Logging keeps failing for some reason, here's the json of the response", username = 'Astro API', avatar_url = text['images']['astro_trans'], files = [media.json])
 				return
 		
 print('[ServiceCatalogAPI] Logging to Discord initialized')
