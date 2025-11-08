@@ -6,16 +6,17 @@ import aiohttp
 
 
 class Token:
-	def __init__(self, client_id: str, client_secret: str):
+	def __init__(self):
 		self.service = service
 		self.component = component
-		self.client_id = client_id
-		self.client_secret = client_secret
+		self.client_id = None
+		self.client_secret = None
 		self.token = None
 		self.token_expiration_date = None
 
 	async def get_token(self) -> str:
 		if self.token == None or (self.token_expiration_date == None or current_unix_time() > self.token_expiration_date):
+			await self.get_credentials()
 			async with aiohttp.ClientSession() as session:
 				request = {'request': 'get_token'}
 				api_url = api
@@ -45,11 +46,32 @@ class Token:
 						return error
 
 		return self.token
+	
+	async def get_credentials(self) -> None:
+		async with aiohttp.ClientSession() as session:
+			request = {'request': 'get_credentials'}
+			creds_url = keys['cred_endpoints'][self.service]
+			start_time = current_unix_time_ms()
+			async with session.get(url = creds_url) as response:
+				if response.status == 200:
+					json_response = await response.json()
+					self.client_id = json_response['id']
+					self.client_secret = json_response['secret']
+					
+				else:
+					error = Error(
+						service = self.service,
+						component = self.component,
+						error_msg = "HTTP error when getting credentials",
+						meta = Meta(
+							service = self.service,
+							request = request,
+							processing_time = current_unix_time_ms() - start_time,
+							http_code = response.status
+						)
+					)
+					await log(error)
 
 
-with open(f'{path}/components/credentials.json', 'r') as file:
-	creds = json.load(file)
-spotify_token = Token(
-	client_id = creds['id'],
-	client_secret = creds['secret']
-)
+
+spotify_token = Token()
