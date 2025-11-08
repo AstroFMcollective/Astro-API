@@ -1,5 +1,5 @@
 from AstroAPI.InternalComponents.Legacy import *
-from AstroAPI.InternalComponents.Legacy.ini import keys
+from AstroAPI.InternalComponents.CredentialsManager.media_services.genius.credentials import genius_credentials
 from AstroAPI.ServiceCatalogAPI.media_services.knowledge.genius.components.generic import *
 from AstroAPI.ServiceCatalogAPI.media_services.knowledge.genius.components.lookup.song import lookup_song
 import requests
@@ -24,7 +24,8 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 		api_params = {
 			'q': f'{artists[0]} {title}'
 		}
-		api_headers = {'Authorization': f'Bearer {keys["genius"]["token"]}'}
+		await genius_credentials.get_credentials()
+		api_headers = {'Authorization': f'Bearer {genius_credentials.client_token}'}
 		# For some reason Genius does not like the way aiohttp forms its headers so we stick to requests for HTTP
 		# I am not a fan of this but you gotta get it working somehow, I'll figure out a workaround someday
 		results = requests.get(api_url, api_params, headers = api_headers)
