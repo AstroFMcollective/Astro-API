@@ -71,3 +71,5 @@ async def check_image_for_generative_ai(image_url: str) -> object:
 		)
 		await log(error, [discord.File(fp = StringIO(json.dumps(lookup_json, indent = 4)), filename = f'{image_url}.json')])
 		return error
+	
+print("[SnitchAPI] SightEngine API initialized")

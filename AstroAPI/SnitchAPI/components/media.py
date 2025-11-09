@@ -162,6 +162,7 @@ class SnitchAnalysis:
 
     def __init__(self, service: str, analysis: list, analysed_media: object, meta: object):
         self._service = service
+        self._type = 'analysis'
         # store a list copy to avoid external mutation
         self._analysis = list(analysis) if analysis is not None else []
         self._analysed_media = analysed_media
@@ -174,6 +175,14 @@ class SnitchAnalysis:
     @service.setter
     def service(self, value: str):
         self._service = value
+
+    @property
+    def type(self):
+        return self._service
+
+    @type.setter
+    def type(self, value: str):
+        self._type = value
 
     @property
     def analysis(self):
@@ -226,3 +235,5 @@ class SnitchAnalysis:
             'analysed_media': serialize_lite(self._analysed_media),
             'meta': serialize(self._meta),
         }
+    
+print("[SnitchAPI] Media objects initialized")

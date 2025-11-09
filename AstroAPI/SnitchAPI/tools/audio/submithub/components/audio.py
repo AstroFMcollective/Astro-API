@@ -75,3 +75,5 @@ async def check_audio_for_generative_ai(audio_url: str) -> object:
 		)
 		await log(error, [discord.File(fp = StringIO(json.dumps(lookup_json, indent = 4)), filename = f'{audio_url}.json')])
 		return error
+	
+print("[SnitchAPI] SubmitHub API initialized")
