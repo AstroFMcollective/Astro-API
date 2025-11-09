@@ -1,10 +1,13 @@
 import AstroAPI.ServiceCatalogAPI as ServiceCatalog
-from fastapi import FastAPI, HTTPException
+from AstroAPI.SnitchAPI.tools import snitch as Snitch
+from fastapi import FastAPI, HTTPException, Request
+
 
 
 
 music_media_services = ['spotify', 'apple_music', 'youtube_music', 'deezer']
 knowledge_media_services = ['spotify', 'genius']
+snitch_media_types = ['image', 'audio']
 illegal_results = ['error', 'empty_response']
 
 
@@ -291,6 +294,61 @@ async def lookup_collection(media: str, service: str, id: str, id_service: str =
 				year = id_service_collection_object.release_year,
 				country_code = country_code
 			)
+	if collection_object.type not in illegal_results:
+		return collection_object.json
+	else:
+		raise HTTPException(status_code = collection_object.meta.http_code, detail = collection_object.error_msg if collection_object.type == 'error' else None)
+	
+
+
+@app.post("/snitch/media")
+async def snitch_media(media: Request, country_code: str = 'us'):
+	media = await media.json()
+	# Prepare everything for the API request
+	country_code = country_code.lower()
+	media_object = await Snitch.lookup_media(media, country_code)
+	if media_object.type not in illegal_results:
+		return media_object.json
+	else:
+		raise HTTPException(status_code = media_object.meta.http_code, detail = media_object.error_msg if media_object.type == 'error' else None)
+
+
+
+@app.get("/snitch/song")
+async def lookup_song(id: str, id_service: str = None, country_code: str = 'us'):
+	# Prepare everything for the API request
+	id_service = id_service.lower() if id_service is not None else None
+	country_code = country_code.lower()
+	service_api = get_service_catalog_api('music', id_service)
+	song_object = await Snitch.lookup_song(service_api, id, country_code)
+	if song_object.type not in illegal_results:
+		return song_object.json
+	else:
+		raise HTTPException(status_code = song_object.meta.http_code, detail = song_object.error_msg if song_object.type == 'error' else None)
+	
+
+
+@app.get("/snitch/music_video")
+async def lookup_song(id: str, id_service: str = None, country_code: str = 'us'):
+	# Prepare everything for the API request
+	id_service = id_service.lower() if id_service is not None else None
+	country_code = country_code.lower()
+	service_api = get_service_catalog_api('music', id_service)
+	music_video_object = await Snitch.lookup_music_video(service_api, id, country_code)
+	if music_video_object.type not in illegal_results:
+		return music_video_object.json
+	else:
+		raise HTTPException(status_code = music_video_object.meta.http_code, detail = music_video_object.error_msg if music_video_object.type == 'error' else None)
+
+
+
+@app.get("/snitch/collection")
+async def lookup_collection(id: str, id_service: str = None, country_code: str = 'us'):
+	# Prepare everything for the API request
+	id_service = id_service.lower() if id_service is not None else None
+	country_code = country_code.lower()
+	service_api = get_service_catalog_api('music', id_service)
+	collection_object = await Snitch.lookup_collection(service_api, id, country_code)
 	if collection_object.type not in illegal_results:
 		return collection_object.json
 	else:
