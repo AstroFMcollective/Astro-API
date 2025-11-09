@@ -17,9 +17,98 @@ class SnitchAPI:
 		self.service = gservice
 		self.component = gcomponent
 
+
+
+	async def lookup_media(self, media: dict, lookup_country_code: str = 'us') -> object:
+		# Prepare the request metadata
+		request = {'request': 'snitch_media', 'lookup_country_code': lookup_country_code}
+		# Record the start time for processing time calculation
+		start_time = current_unix_time_ms()
+		
+		try:
+			cover_order = [spotify.service, deezer.service, youtube_music.service, apple_music.service]
+			tasks = []
+			
+			if media['type'] not in ['empty_response', 'error']:
+				for service in cover_order:
+					if service in media['cover']['hq_urls']:
+						tasks.append(
+							create_task(
+								sightengine_ai(media['cover']['hq_urls'][service])
+							)
+						)
+						break
+				
+				if apple_music.service in media['ids'] and media['type'] not in ['album', 'ep']:
+					tasks.append(
+						create_task(
+							submithub_ai(await get_song_preview(media['ids'][apple_music.service], lookup_country_code))
+						)
+					)
+
+				analysis = await gather(*tasks)
+
+				if analysis != []:
+					analysis = [item for item in analysis if item.media_type in ['image', 'audio']]
+
+				if analysis != []:
+					return SnitchAnalysis(
+						service = gservice,
+						analysis = analysis,
+						analysed_media = media,
+						meta = Meta(
+							service = gservice,
+							request = request,
+							processing_time = current_unix_time_ms() - start_time,
+							http_code = 200
+						)
+					)
+				else:
+					return Empty(
+						service = self.service,
+						meta = Meta(
+							service = self.service,
+							request = request,
+							http_code = 500,
+							processing_time = current_unix_time_ms() - start_time
+						)
+					)
+			else:
+				error = Error(
+					service = gservice,
+					component = gcomponent,
+					error_msg = f'Bad request: invalid media provided',
+					meta = Meta(
+						service = self.service,
+						request = request,
+						http_code = 401,
+						processing_time = current_unix_time_ms() - start_time
+					)
+				)
+				await log(error)
+				return error
+
+		# If sinister things happen
+		except Exception as error:
+			error = Error(
+				service = gservice,
+				component = gcomponent,
+				error_msg = f'Error when searching song: "{error}"',
+				meta = Meta(
+					service = self.service,
+					request = request,
+					http_code = 500,
+					processing_time = current_unix_time_ms() - start_time
+				)
+			)
+			await log(error, [discord.File(fp = StringIO(json.dumps(media, indent = 4)), filename = f'media.json')])
+			return error
+
+
+
 	async def lookup_song(self, service: object, id: str, song_country_code: str = None, lookup_country_code: str = 'us') -> object:
 		# Prepare the request metadata
-		request = {'request': 'lookup_song', 'service': service.service, 'id': id, 'song_country_code': song_country_code, 'lookup_country_code': lookup_country_code}
+		request = {'request': 'snitch_song', 'service': service.service, 'id': id, 'song_country_code': song_country_code, 'lookup_country_code': lookup_country_code}
 		# Record the start time for processing time calculation
 		start_time = current_unix_time_ms()
 		
@@ -93,7 +182,7 @@ class SnitchAPI:
 
 	async def lookup_collection(self, service: object, id: str, song_country_code: str = None, lookup_country_code: str = 'us') -> object:
 		# Prepare the request metadata
-		request = {'request': 'lookup_collection', 'service': service.service, 'id': id, 'song_country_code': song_country_code, 'lookup_country_code': lookup_country_code}
+		request = {'request': 'snitch_collection', 'service': service.service, 'id': id, 'song_country_code': song_country_code, 'lookup_country_code': lookup_country_code}
 		# Record the start time for processing time calculation
 		start_time = current_unix_time_ms()
 		
@@ -160,7 +249,7 @@ class SnitchAPI:
 
 	async def lookup_music_video(self, service: object, id: str, song_country_code: str = None, lookup_country_code: str = 'us') -> object:
 		# Prepare the request metadata
-		request = {'request': 'lookup_music_video', 'service': service.service, 'id': id, 'song_country_code': song_country_code, 'lookup_country_code': lookup_country_code}
+		request = {'request': 'snitch_music_video', 'service': service.service, 'id': id, 'song_country_code': song_country_code, 'lookup_country_code': lookup_country_code}
 		# Record the start time for processing time calculation
 		start_time = current_unix_time_ms()
 		
@@ -233,3 +322,4 @@ class SnitchAPI:
 
 
 snitch = SnitchAPI()
+print("[SnitchAPI] Snitch API initialized")
