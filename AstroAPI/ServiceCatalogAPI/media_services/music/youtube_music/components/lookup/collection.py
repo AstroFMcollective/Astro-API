@@ -7,7 +7,7 @@ from AstroAPI.InternalComponents.CredentialsManager.media_services.youtube.crede
 
 async def lookup_collection(id: str = None, browse_id: str = None, country_code: str = 'us') -> object:
 	# Prepare the request dictionary with lookup details
-	request = {'request': 'lookup_collection', 'id': id, 'country_code': country_code}
+	request = {'request': 'lookup_collection', 'id': id, 'browse_id': browse_id, 'country_code': country_code}
 	# Lookup JSON variable for later debugging
 	lookup_json = None
 	# Record the start time for processing time calculation
@@ -45,21 +45,38 @@ async def lookup_collection(id: str = None, browse_id: str = None, country_code:
 		collection_year = collection['year'] if 'year' in collection else None   # I hate Google so goddamn much.
 
 		# Build a list of Artist objects for the collection's artists
-		collection_artists = [
-			Artist(
-				service = service,
-				ids = artist['id'],
-				name = artist['name'],
-				urls = f'https://music.youtube.com/channel/{artist["id"]}',
-				meta = Meta(
+		if collection['artists'] != None:
+			collection_artists = [
+				Artist(
 					service = service,
-					request = request,
-					processing_time = current_unix_time_ms() - start_time,
-					http_code = 200,
-					filter_confidence_percentage = {service: 100.0}
+					ids = artist['id'],
+					name = artist['name'],
+					urls = f'https://music.youtube.com/channel/{artist["id"]}',
+					meta = Meta(
+						service = service,
+						request = request,
+						processing_time = current_unix_time_ms() - start_time,
+						http_code = 200,
+						filter_confidence_percentage = {service: 100.0}
+					)
+				) for artist in collection['artists']
+			]
+		else:
+			collection_artists = [
+				Artist(
+					service = service,
+					ids = None,
+					name = 'Various Artists',
+					urls = None,
+					meta = Meta(
+						service = service,
+						request = request,
+						processing_time = current_unix_time_ms() - start_time,
+						http_code = 200,
+						filter_confidence_percentage = {service: 0.0}
+					)
 				)
-			) for artist in collection['artists']
-		]
+			]
 
 		# Create a Cover object for the collection
 		collection_cover = Cover(
