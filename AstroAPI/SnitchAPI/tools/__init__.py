@@ -69,7 +69,7 @@ class SnitchAPI:
 						meta = Meta(
 							service = self.service,
 							request = request,
-							http_code = 500,
+							http_code = 204,
 							processing_time = current_unix_time_ms() - start_time
 						)
 					)
@@ -157,7 +157,7 @@ class SnitchAPI:
 					meta = Meta(
 						service = self.service,
 						request = request,
-						http_code = 500,
+						http_code = 204,
 						processing_time = current_unix_time_ms() - start_time
 					)
 				)
