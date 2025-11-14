@@ -231,6 +231,7 @@ class SnitchAnalysis:
 
         return {
             'service': self._service,
+            'type': self._type,
             'analysis': [serialize_lite(a) for a in self._analysis],
             'analysed_media': serialize_lite(self._analysed_media),
             'meta': serialize(self._meta),
