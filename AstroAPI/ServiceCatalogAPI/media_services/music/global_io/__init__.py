@@ -19,19 +19,19 @@ class GlobalIO:
 
 	async def search_song(self, artists: list, title: str, song_type: str = None, collection: str = None, is_explicit: bool = None, country_code: str = 'us', include_premade_media: list = [], exclude_services: list = []) -> Song | Empty | Error:
 		"""
-            # Global Interface Song Music Search
+			# Global Interface Song Music Search
 
-            Search for song metadata on every music service.
+			Search for song metadata on every music service.
 
-            :param artists: A list of artist names on the song that you're attempting to search.
-            :param title: Song title.
-            :param song_type: Whether the song is an album track or a single.
-            :param collection: The name of the collection (album, EP) the song is a part of.
-            :param is_explicit: Whether the song is explicit or not.
-            :param country_code: The country code of the country in which you want to conduct the search.
-            :param include_premade_media: Include premade media object with the search if available. This reduces processing time.
-            :param exclude_services: Discriminators of services that will not be queried.
-        """
+			:param artists: A list of artist names on the song that you're attempting to search.
+			:param title: Song title.
+			:param song_type: Whether the song is an album track or a single.
+			:param collection: The name of the collection (album, EP) the song is a part of.
+			:param is_explicit: Whether the song is explicit or not.
+			:param country_code: The country code of the country in which you want to conduct the search.
+			:param include_premade_media: Include premade media object with the search if available. This reduces processing time.
+			:param exclude_services: Discriminators of services that will not be queried.
+		"""
 		exclude_services.extend(self.exclude_services)
 		exclude_services = remove_duplicates(exclude_services)
 		for premade in include_premade_media:
@@ -41,17 +41,17 @@ class GlobalIO:
 	
 	async def search_music_video(self, artists: list, title: str, is_explicit: bool = None, country_code: str = 'us', include_premade_media: list = [], exclude_services: list = []) -> MusicVideo | Empty | Error:
 		"""
-            # Global Interface Music Video Music Search
+			# Global Interface Music Video Music Search
 
-            Search for music video metadata on every music service.
+			Search for music video metadata on every music service.
 
-            :param artists: A list of artist names on the music video that you're attempting to search.
-            :param title: Music video title.
-            :param is_explicit: Whether the music video is explicit or not.
-            :param country_code: The country code of the country in which you want to conduct the search.
-            :param include_premade_media: Include premade media object with the search if available. This reduces processing time.
-            :param exclude_services: Discriminators of services that will not be queried.
-        """
+			:param artists: A list of artist names on the music video that you're attempting to search.
+			:param title: Music video title.
+			:param is_explicit: Whether the music video is explicit or not.
+			:param country_code: The country code of the country in which you want to conduct the search.
+			:param include_premade_media: Include premade media object with the search if available. This reduces processing time.
+			:param exclude_services: Discriminators of services that will not be queried.
+		"""
 		exclude_services.extend(self.exclude_services)
 		exclude_services = remove_duplicates(exclude_services)
 		for premade in include_premade_media:
@@ -61,17 +61,17 @@ class GlobalIO:
 	
 	async def search_collection(self, artists: list, title: str, year: int = None, country_code: str = 'us', include_premade_media: list = [], exclude_services: list = []) -> Collection | Song | Empty | Error:
 		"""
-            # Global Interface Collection Music Search
+			# Global Interface Collection Music Search
 
-            Search for collection metadata on every music service.
+			Search for collection metadata on every music service.
 
-            :param artists: A list of artist names on the song that you're attempting to search.
-            :param title: Song title.
-            :param year: The name of the collection (album, EP) the song is a part of.
-            :param country_code: The country code of the country in which you want to conduct the search.
-            :param include_premade_media: Include premade media object with the search if available. This reduces processing time.
-            :param exclude_services: Discriminators of services that will not be queried.
-        """
+			:param artists: A list of artist names on the song that you're attempting to search.
+			:param title: Song title.
+			:param year: The name of the collection (album, EP) the song is a part of.
+			:param country_code: The country code of the country in which you want to conduct the search.
+			:param include_premade_media: Include premade media object with the search if available. This reduces processing time.
+			:param exclude_services: Discriminators of services that will not be queried.
+		"""
 		exclude_services.extend(self.exclude_services)
 		exclude_services = remove_duplicates(exclude_services)
 		for premade in include_premade_media:
@@ -81,49 +81,55 @@ class GlobalIO:
 
 	async def search_query(self, query: str, country_code: str = 'us', exclude_services: list = []) -> Song | MusicVideo | Collection | Empty | Error:
 		"""
-            # Global Interface Query Music Search
+			# Global Interface Query Music Search
 
-            Search for song metadata on every music service via query.
+			Search for song metadata on every music service via query.
 
-            :param query: Your search query.
-            :param country_code: The country code of the country in which you want to conduct the search.
-            :param exclude_services: Discriminators of services that will not be queried.
-        """
+			:param query: Your search query.
+			:param country_code: The country code of the country in which you want to conduct the search.
+			:param exclude_services: Discriminators of services that will not be queried.
+		"""
 		exclude_services.extend(self.exclude_services)
 		exclude_services = remove_duplicates(exclude_services)
 		return await search_query_music(query, country_code, exclude_services)
 	
 	async def lookup_song(self, service: object, id: str, song_country_code: str = None, lookup_country_code: str = 'us') -> Song | Empty | Error:
 		"""
-            # Global Interface Song Music Lookup
+			# Global Interface Song Music Lookup
 
-            Lookup for song metadata on every music service via song ID.
+			Lookup for song metadata on every music service via song ID.
 
-            :param id: Song ID.
-            :param country_code: The country code of the country in which you want to conduct the lookup.
-        """
+			:param service: Search Catalog API Music service from which the ID originates from.
+			:param id: Song ID.
+			:param song_country_code: The country code of the country this ID is from.
+			:param lookup_country_code: The country code of the country in which you want to conduct the lookup.
+		"""
 		return await lookup_song_music(service = service, id = id, song_country_code = song_country_code, lookup_country_code = lookup_country_code)
 	
 	async def lookup_music_video(self, service: object, id: str, mv_country_code: str = None, lookup_country_code: str = 'us') -> MusicVideo | Empty | Error:
 		"""
-            # Global Interface Music Video Music Lookup
+			# Global Interface Music Video Music Lookup
 
-            Lookup for music video metadata on every music service via video ID.
+			Lookup for music video metadata on every music service via video ID.
 
-            :param id: Video ID.
-            :param country_code: The country code of the country in which you want to conduct the lookup.
-        """
+			:param service: Search Catalog API Music service from which the ID originates from.
+			:param id: Song ID.
+			:param song_country_code: The country code of the country this ID is from.
+			:param lookup_country_code: The country code of the country in which you want to conduct the lookup.
+		"""
 		return await lookup_music_video_music(service = service, id = id, mv_country_code = mv_country_code, lookup_country_code = lookup_country_code)
 	
 	async def lookup_collection(self, service: object, id: str, collection_country_code: str = None, lookup_country_code: str= 'us') -> Collection | Song | Empty | Error:
 		"""
-            # Global Interface Collection Music Lookup
+			# Global Interface Collection Music Lookup
 
-            Lookup for collection metadata on every music service via collection ID.
+			Lookup for collection metadata on every music service via collection ID.
 
-            :param id: Collection ID.
-            :param country_code: The country code of the country in which you want to conduct the lookup.
-        """
+			:param service: Search Catalog API Music service from which the ID originates from.
+			:param id: Song ID.
+			:param song_country_code: The country code of the country this ID is from.
+			:param lookup_country_code: The country code of the country in which you want to conduct the lookup.
+		"""
 		return await lookup_collection_music(service = service, id = id, collection_country_code = collection_country_code, lookup_country_code = lookup_country_code)
 
 

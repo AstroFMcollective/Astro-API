@@ -15,19 +15,19 @@ class GlobalIO:
 
 	async def search_song(self, artists: list, title: str, song_type: str = None, collection: str = None, is_explicit: bool = None, country_code: str = 'us', include_premade_media: list = [], exclude_services: list = []) -> Knowledge | Empty | Error:
 		"""
-            # Global Interface Song Knowledge Search
+			# Global Interface Song Knowledge Search
 
-            Search for song knowledge on every knowledge service.
+			Search for song knowledge on every knowledge service.
 
-            :param artists: A list of artist names on the song that you're attempting to search.
-            :param title: Song title.
-            :param song_type: Whether the song is an album track or a single.
-            :param collection: The name of the collection (album, EP) the song is a part of.
-            :param is_explicit: Whether the song is explicit or not.
-            :param country_code: The country code of the country in which you want to conduct the search.
-            :param include_premade_media: Include premade media object with the search if available. This reduces processing time.
-            :param exclude_services: Discriminators of services that will not be queried.
-        """
+			:param artists: A list of artist names on the song that you're attempting to search.
+			:param title: Song title.
+			:param song_type: Whether the song is an album track or a single.
+			:param collection: The name of the collection (album, EP) the song is a part of.
+			:param is_explicit: Whether the song is explicit or not.
+			:param country_code: The country code of the country in which you want to conduct the search.
+			:param include_premade_media: Include premade media object with the search if available. This reduces processing time.
+			:param exclude_services: Discriminators of services that will not be queried.
+		"""
 		exclude_services.extend(self.exclude_services)
 		exclude_services = remove_duplicates(exclude_services)
 		for premade in include_premade_media:
@@ -37,29 +37,29 @@ class GlobalIO:
 
 	async def search_query(self, query: str, country_code: str = 'us', exclude_services: list = []) -> Knowledge | Empty | Error:
 		"""
-            # Global Interface Query Knowledge Search
+			# Global Interface Query Knowledge Search
 
-            Search for song knowledge on every knowledge service via query.
+			Search for song knowledge on every knowledge service via query.
 
-            :param query: Your search query.
-            :param country_code: The country code of the country in which you want to conduct the search.
-            :param exclude_services: Discriminators of services that will not be queried.
-        """
+			:param query: Your search query.
+			:param country_code: The country code of the country in which you want to conduct the search.
+			:param exclude_services: Discriminators of services that will not be queried.
+		"""
 		exclude_services.extend(self.exclude_services)
 		exclude_services = remove_duplicates(exclude_services)
 		return await search_query_knowledge(query, country_code, exclude_services)
 
 	async def lookup_song(self, service: object, id: str, song_country_code: str = None, lookup_country_code: str = 'us') -> Knowledge | Empty | Error:
 		"""
-            # Global Interface Song Knowledge Lookup
+			# Global Interface Song Knowledge Lookup
 
-            Lookup for song knowledge on every knowledge service via song ID.
+			Lookup for song knowledge on every knowledge service via song ID.
 
-            :param service: Discriminator of the service with whose credentials you're conducting the lookip.
+			:param service: Search Catalog API Music service from which the ID originates from.
 			:param id: Song ID.
-            :param song_country_code: The country code of the country from which the song credentials are from.
-            :param lookup_country_code: The country code of the country in which you want to conduct the lookup.
-        """
+			:param song_country_code: The country code of the country this ID is from.
+			:param lookup_country_code: The country code of the country in which you want to conduct the lookup.
+		"""
 		return await lookup_song_knowledge(service = service, id = id, song_country_code = song_country_code, lookup_country_code = lookup_country_code)
 
 
