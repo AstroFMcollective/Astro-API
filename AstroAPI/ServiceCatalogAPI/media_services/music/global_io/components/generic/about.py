@@ -1,2 +1,2 @@
 service = 'global_io'
-component = 'Astro Global Music API Interface'
+component = 'Astro Service Catalog Global Music Interface'
