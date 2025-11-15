@@ -1,5 +1,5 @@
 import AstroAPI.ServiceCatalogAPI as ServiceCatalog
-from AstroAPI.SnitchAPI.tools import snitch as Snitch
+import AstroAPI.SnitchAPI as Snitch
 from fastapi import FastAPI, HTTPException, Request
 
 
@@ -306,7 +306,7 @@ async def snitch_media(media: Request, country_code: str = 'us'):
 	media = await media.json()
 	# Prepare everything for the API request
 	country_code = country_code.lower()
-	media_object = await Snitch.lookup_media(media, country_code)
+	media_object = await Snitch.detection_services.global_io.check_media(media, country_code)
 	if media_object.type not in illegal_results:
 		return media_object.json
 	else:
@@ -320,7 +320,7 @@ async def lookup_song(id: str, id_service: str = None, country_code: str = 'us')
 	id_service = id_service.lower() if id_service is not None else None
 	country_code = country_code.lower()
 	service_api = get_service_catalog_api('music', id_service)
-	song_object = await Snitch.lookup_song(service_api, id, country_code)
+	song_object = await Snitch.detection_services.global_io.check_song(service_api, id, country_code, country_code)
 	if song_object.type not in illegal_results:
 		return song_object.json
 	else:
@@ -334,7 +334,7 @@ async def lookup_song(id: str, id_service: str = None, country_code: str = 'us')
 	id_service = id_service.lower() if id_service is not None else None
 	country_code = country_code.lower()
 	service_api = get_service_catalog_api('music', id_service)
-	music_video_object = await Snitch.lookup_music_video(service_api, id, country_code)
+	music_video_object = await Snitch.detection_services.global_io.check_music_video(service_api, id, country_code, country_code)
 	if music_video_object.type not in illegal_results:
 		return music_video_object.json
 	else:
@@ -348,7 +348,7 @@ async def lookup_collection(id: str, id_service: str = None, country_code: str =
 	id_service = id_service.lower() if id_service is not None else None
 	country_code = country_code.lower()
 	service_api = get_service_catalog_api('music', id_service)
-	collection_object = await Snitch.lookup_collection(service_api, id, country_code)
+	collection_object = await Snitch.detection_services.global_io.check_collection(service_api, id, country_code, country_code)
 	if collection_object.type not in illegal_results:
 		return collection_object.json
 	else:

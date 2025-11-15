@@ -78,5 +78,3 @@ async def get_song_preview(id: str, country_code: str = 'us') -> str:
 		)
 		await log(error, [discord.File(fp = StringIO(json.dumps(lookup_json, indent = 4)), filename = f'{id}.json')])
 		return error
-	
-print("[SnitchAPI] Apple Music API initialized")

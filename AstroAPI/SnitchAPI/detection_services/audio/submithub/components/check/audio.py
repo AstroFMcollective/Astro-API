@@ -1,15 +1,15 @@
 from AstroAPI.InternalComponents.Legacy import *
 from AstroAPI.SnitchAPI.components.media import Meta, Analysis
 from AstroAPI.InternalComponents.CredentialsManager.snitch_services.submithub.credentials import submithub_credentials
-from AstroAPI.SnitchAPI.tools.audio.submithub.components.generic import *
+from AstroAPI.SnitchAPI.detection_services.audio.submithub.components.generic import *
 
 import aiohttp
 
 
 
-async def check_audio_for_generative_ai(audio_url: str) -> object:
+async def check_audio(audio_url: str) -> object:
 	# Prepare the request dictionary with search parameters
-	request = {'request': 'check_audio_for_generative_ai', 'audio_url': audio_url}
+	request = {'request': 'check_audio', 'audio_url': audio_url}
 	# Lookup JSON variable for later debugging
 	lookup_json = None
 	# Record the start time for processing time calculation
@@ -75,5 +75,3 @@ async def check_audio_for_generative_ai(audio_url: str) -> object:
 		)
 		await log(error, [discord.File(fp = StringIO(json.dumps(lookup_json, indent = 4)), filename = f'{audio_url}.json')])
 		return error
-	
-print("[SnitchAPI] SubmitHub API initialized")

@@ -1,15 +1,15 @@
 from AstroAPI.InternalComponents.Legacy import *
 from AstroAPI.SnitchAPI.components.media import Meta, Analysis
 from AstroAPI.InternalComponents.CredentialsManager.snitch_services.sightengine.credentials import sightengine_credentials
-from AstroAPI.SnitchAPI.tools.image.sightengine.components.generic import *
+from AstroAPI.SnitchAPI.detection_services.image.sightengine.components.generic import *
 
 import aiohttp
 
 
 
-async def check_image_for_generative_ai(image_url: str) -> object:
+async def check_image(image_url: str) -> object:
 	# Prepare the request dictionary with search parameters
-	request = {'request': 'check_image_for_generative_ai', 'image_url': image_url}
+	request = {'request': 'check_image', 'image_url': image_url}
 	# Lookup JSON variable for later debugging
 	lookup_json = None
 	# Record the start time for processing time calculation
@@ -71,5 +71,3 @@ async def check_image_for_generative_ai(image_url: str) -> object:
 		)
 		await log(error, [discord.File(fp = StringIO(json.dumps(lookup_json, indent = 4)), filename = f'{image_url}.json')])
 		return error
-	
-print("[SnitchAPI] SightEngine API initialized")

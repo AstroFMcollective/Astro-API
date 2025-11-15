@@ -1,2 +1,2 @@
-from AstroAPI.SnitchAPI.tools import snitch
+from AstroAPI.SnitchAPI import detection_services
 print("[SnitchAPI] Taking off!")
