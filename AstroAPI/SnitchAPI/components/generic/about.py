@@ -1,2 +1,2 @@
-service = 'snitch'
-component = 'Astro Snitch API'
+service = 'global_io'
+component = 'Astro Snitch Global Interface'
