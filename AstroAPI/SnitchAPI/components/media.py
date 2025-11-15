@@ -17,7 +17,7 @@ class Meta:
         self._service = service
         self._request = request
         self._http_code = http_code
-        self._processing_time = processing_time
+        self._processing_time = processing_time if isinstance(processing_time, dict) else {service: processing_time}
 
     @property
     def service(self):
@@ -53,7 +53,7 @@ class Meta:
         if isinstance(value, dict):
             self._processing_time = value
         else:
-            service = self.service
+            service = self._service
             self._processing_time = {service: value}
 
     @property
