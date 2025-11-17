@@ -78,7 +78,7 @@ async def check_media(media: dict, country_code: str = 'us') -> object :
                 meta = Meta(
                     service = gservice,
                     request = request,
-                    http_code = 401,
+                    http_code = 400,
                     processing_time = current_unix_time_ms() - start_time
                 )
             )
