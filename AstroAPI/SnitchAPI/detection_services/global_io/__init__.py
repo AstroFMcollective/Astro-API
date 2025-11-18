@@ -51,7 +51,7 @@ class GlobalIO:
 		"""
 		return await check_collection_ai(service = service, id = id, collection_country_code = collection_country_code, lookup_country_code = lookup_country_code)
 	
-	async def check_media(self, media: dict, country_code: str = 'us'):
+	async def check_media(self, media: dict):
 		"""
 			# Global Interface Media AI Check
 
@@ -60,7 +60,7 @@ class GlobalIO:
 			:param media: Astro media object JSON dict of the objecy you want to check.
 			:param country_code: The country code of the country in which you want to conduct the check.
 		"""
-		return await check_media_ai(media = media, country_code = country_code)
+		return await check_media_ai(media = media)
 
 
 	

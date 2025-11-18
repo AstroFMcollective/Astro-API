@@ -11,9 +11,9 @@ from asyncio import create_task, gather
 
 
 
-async def check_media(media: dict, country_code: str = 'us') -> object :
+async def check_media(media: dict) -> object:
     # Prepare the request metadata
-    request = {'request': 'check_media', 'country_code': country_code}
+    request = {'request': 'check_media'}
     # Record the start time for processing time calculation
     start_time = current_unix_time_ms()
     
@@ -35,7 +35,7 @@ async def check_media(media: dict, country_code: str = 'us') -> object :
             if apple_music.service in media['ids'] and media['type'] not in ['album', 'ep']:
                 tasks.append(
                     create_task(
-                        submithub_ai(await get_song_preview(media['ids'][apple_music.service], country_code))
+                        submithub_ai(await get_song_preview(media['ids'][apple_music.service], media['meta']['request']['song_country_code']))
                     )
                 )
 

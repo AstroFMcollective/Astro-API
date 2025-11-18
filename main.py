@@ -302,11 +302,10 @@ async def lookup_collection(media: str, service: str, id: str, id_service: str =
 
 
 @app.post("/snitch/media")
-async def snitch_media(media: Request, country_code: str = 'us'):
+async def snitch_media(media: Request):
 	media = await media.json()
 	# Prepare everything for the API request
-	country_code = country_code.lower()
-	media_object = await Snitch.detection_services.global_io.check_media(media, country_code)
+	media_object = await Snitch.detection_services.global_io.check_media(media)
 	if media_object.type not in illegal_results:
 		return media_object.json
 	else:
