@@ -34,7 +34,7 @@ async def search_music_video(artists: list, title: str, is_explicit: bool = None
 			mv_title = video['title']
 			
 			# If artist information is available in the result
-			if video['artists'] != []:
+			if 'artists' in video and video['artists'] != []:
 				# Build a list of Artist objects from the result's artists
 				mv_artists = [
 					Artist(

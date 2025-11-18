@@ -38,7 +38,7 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 			song_is_explicit = song['isExplicit']
 			
 			# If artist info is available in the song result
-			if song['artists'] != []:
+			if 'artists' in song and song['artists'] != []:
 				# Build Artist objects for each artist in the result
 				song_artists = [
 					Artist(
