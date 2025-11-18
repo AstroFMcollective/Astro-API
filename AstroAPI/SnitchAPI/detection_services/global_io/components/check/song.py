@@ -37,7 +37,7 @@ async def check_song(service: object, id: str, song_country_code: str = None, lo
         if apple_music.service in reference_media.ids:
             tasks.append(
                 create_task(
-                    submithub_ai(await get_song_preview(reference_media.ids[apple_music.service], lookup_country_code))
+                    submithub_ai(await get_song_preview(reference_media.ids[apple_music.service], song_country_code))
                 )
             )
 
