@@ -33,11 +33,18 @@ async def check_media(media: dict) -> object:
                     break
             
             if apple_music.service in media['ids'] and media['type'] not in ['album', 'ep']:
-                tasks.append(
-                    create_task(
-                        submithub_ai(await get_song_preview(media['ids'][apple_music.service], media['meta']['request']['song_country_code']))
+                if 'song_country_code' in media['meta']['request']:
+                    tasks.append(
+                        create_task(
+                            submithub_ai(await get_song_preview(media['ids'][apple_music.service], media['meta']['request']['song_country_code']))
+                        )
                     )
-                )
+                else:
+                    tasks.append(
+                        create_task(
+                            submithub_ai(await get_song_preview(media['ids'][apple_music.service], media['meta']['request']['country_code']))
+                        )
+                    )
 
             analysis = await gather(*tasks)
             processing_time = {}
