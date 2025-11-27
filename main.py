@@ -4,7 +4,6 @@ from fastapi import FastAPI, HTTPException, Request
 
 
 
-
 music_media_services = ['spotify', 'apple_music', 'youtube_music', 'deezer']
 knowledge_media_services = ['spotify', 'genius']
 snitch_media_types = ['image', 'audio']
