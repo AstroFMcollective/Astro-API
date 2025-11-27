@@ -46,7 +46,7 @@ async def get_song_preview(id: str, country_code: str = 'us') -> str:
 							)
 						)
 						await log(empty)
-						return empty
+						return None
 
 				else:
 					error = Error(
@@ -61,7 +61,7 @@ async def get_song_preview(id: str, country_code: str = 'us') -> str:
 						)
 					)
 					await log(error, [discord.File(fp = StringIO(json.dumps(lookup_json, indent = 4)), filename = f'{id}.json')])
-					return error
+					return None
 
 	# If sinister things happen
 	except Exception as error:
