@@ -16,48 +16,63 @@ async def check_audio(audio_url: str) -> object:
 	start_time = current_unix_time_ms()
 
 	try:
-		async with aiohttp.ClientSession() as session:
-			# Prepare request data and SubmitHub API endpoint
-			await submithub_credentials.get_credentials()
-			api_url = f'{api}/detect'
-			api_headers = {
-				'X-API-Key': submithub_credentials.client_key,
-				'Content-Type': 'application/json',
-			}
-			api_payload = {
-				'audioUrl': audio_url
-			}
-			timeout = aiohttp.ClientTimeout(total = 30)
+		if audio_url != None:
+			async with aiohttp.ClientSession() as session:
+				# Prepare request data and SubmitHub API endpoint
+				await submithub_credentials.get_credentials()
+				api_url = f'{api}/detect'
+				api_headers = {
+					'X-API-Key': submithub_credentials.client_key,
+					'Content-Type': 'application/json',
+				}
+				api_payload = {
+					'audioUrl': audio_url
+				}
+				timeout = aiohttp.ClientTimeout(total = 30)
 
-			async with session.post(url = api_url, timeout = timeout, headers = api_headers, json = api_payload) as response:
-				lookup_json = await response.json()
-				if response.status == 200:
-					return Analysis(
-						service = service,
-						media_type = 'audio',
-						ai_generated_confidence = lookup_json['result']['probability_ai_generated'],
-						meta = Meta(
+				async with session.post(url = api_url, timeout = timeout, headers = api_headers, json = api_payload) as response:
+					lookup_json = await response.json()
+					if response.status == 200:
+						return Analysis(
 							service = service,
-							request = request,
-							processing_time = current_unix_time_ms() - start_time,
-							http_code = response.status
+							media_type = 'audio',
+							ai_generated_confidence = lookup_json['result']['probability_ai_generated'],
+							meta = Meta(
+								service = service,
+								request = request,
+								processing_time = current_unix_time_ms() - start_time,
+								http_code = response.status
+							)
 						)
-					)
-				else:
-					# Handle non-OK HTTP responses by returning an Error object
-					error = Error(
-						service = service,
-						component = component,
-						error_msg = "HTTP error when checking audio for gen AI",
-						meta = Meta(
+					else:
+						# Handle non-OK HTTP responses by returning an Error object
+						error = Error(
 							service = service,
-							request = request,
-							processing_time = current_unix_time_ms() - start_time,
-							http_code = response.status 
+							component = component,
+							error_msg = "HTTP error when checking audio for gen AI",
+							meta = Meta(
+								service = service,
+								request = request,
+								processing_time = current_unix_time_ms() - start_time,
+								http_code = response.status 
+							)
 						)
-					)
-					await log(error, [discord.File(fp = StringIO(json.dumps(lookup_json, indent = 4)), filename = f'{audio_url}.json')])
-					return error
+						await log(error, [discord.File(fp = StringIO(json.dumps(lookup_json, indent = 4)), filename = f'{audio_url}.json')])
+						return error
+		else:
+			error = Error(
+				service = service,
+				component = component,
+				error_msg = "Invalid audio URL parsed internally",
+				meta = Meta(
+					service = service,
+					request = request,
+					processing_time = current_unix_time_ms() - start_time,
+					http_code = 500
+				)
+			)
+			await log(error)
+			return error
 
 
 
