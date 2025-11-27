@@ -50,9 +50,16 @@ async def check_media(media: dict) -> object:
             processing_time = {}
 
             if analysis != []:
-                analysis = [item for item in analysis if item.media_type in legal_results]
                 for item in analysis:
-                    processing_time[item.service] = item.meta.processing_time[item.service]
+                    if item != None:
+                        if item.media_type in legal_results:
+                            processing_time[item.service] = item.meta.processing_time[item.service]
+                        else:
+                            analysis.remove(item)
+                            continue
+                    else:
+                        analysis.remove(item)
+                        continue
             processing_time[gservice] = current_unix_time_ms() - start_time
 
             if analysis != []:
