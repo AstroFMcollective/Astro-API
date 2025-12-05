@@ -10,5 +10,4 @@ from AstroAPI.InternalComponents.Legacy.media import *
 from AstroAPI.InternalComponents.Legacy.text_manipulation import *
 from AstroAPI.InternalComponents.Legacy.time import *
 from AstroAPI.InternalComponents.Legacy.log import *
-from AstroAPI.InternalComponents.Legacy.sort_dicts import *
 from io import StringIO
