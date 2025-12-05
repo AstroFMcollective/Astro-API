@@ -3,6 +3,8 @@ from AstroAPI.ServiceCatalogAPI.media_services.music.global_io.components.generi
 from AstroAPI.ServiceCatalogAPI.media_services.music.global_io.components.generic import *
 from AstroAPI.ServiceCatalogAPI.media_services.music.global_io.components.generic.compile_global.artists import compiled_artists
 from AstroAPI.ServiceCatalogAPI.media_services.music.global_io.components.generic.compile_global.cover import compiled_cover
+from AstroAPI.ServiceCatalogAPI.components.global_io_components.sort_dicts import sort_dicts
+
 
 
 

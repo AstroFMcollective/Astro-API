@@ -3,6 +3,10 @@ from AstroAPI.ServiceCatalogAPI.media_services.knowledge.global_io.components.ge
 from AstroAPI.ServiceCatalogAPI.media_services.knowledge.global_io.components.generic import *
 from AstroAPI.ServiceCatalogAPI.media_services.knowledge.global_io.components.generic.compile_global.artists import compiled_artists
 from AstroAPI.ServiceCatalogAPI.media_services.knowledge.global_io.components.generic.compile_global.cover import compiled_cover
+from AstroAPI.ServiceCatalogAPI.components.global_io_components.sort_dicts import sort_dicts
+
+
+
 
 def compiled_collection(request: dict, unlabeled_collections: list) -> Collection:
 	while None in unlabeled_collections:
