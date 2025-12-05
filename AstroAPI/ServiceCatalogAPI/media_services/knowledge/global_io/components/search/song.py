@@ -1,4 +1,5 @@
 from AstroAPI.InternalComponents.Legacy import *
+from AstroAPI.ServiceCatalogAPI.components.global_io_components import *
 from AstroAPI.ServiceCatalogAPI.media_services.knowledge.global_io.components.generic import *
 from AstroAPI.ServiceCatalogAPI.media_services.knowledge.global_io.components.generic import service as gservice, component as gcomponent
 
@@ -24,22 +25,13 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 	try:
 		# Define the service objects to use for searching
 		service_objs = [spotify, genius]
-		# Extract the service names from the service objects
 		services = [obj.service for obj in service_objs]
 
-		# Define which result types are considered valid
 		legal_results = ['knowledge']
 
 		# Exclude services if they already have a premade media object
-		# This is to prevent duplicate searches and increase performance
-		ignore_in_excluded_services = []
-		for premade in include_premade_media:
-			# If the premade media's service is not already excluded, add it to the exclusion list
-			# Do this so we don't query the premade's service
-			if premade.service not in exclude_services:
-				exclude_services.append(premade.service)
-			# Track which services are being ignored in the exclusion process
-			ignore_in_excluded_services.append(premade.service)
+		# This is to prevent duplicate searches, increasing performance
+		exclude_services = excluded_services_with_premades(include_premade_media, exclude_services)
 
 		# Prepare asynchronous search tasks for each service not excluded
 		tasks = []
@@ -55,31 +47,10 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 				)
 
 		# Run all search tasks concurrently and collect their results
-		# This will be our list of unlabeled results
-		unlabeled_results = await gather(*tasks)
+		results = await gather(*tasks)
 
-		# Redefine excluded services to only include those not in the ignore list
-		exclude_services = [service for service in exclude_services if service not in ignore_in_excluded_services]
-		# Add premade media objects to the results
-		for premade in include_premade_media:
-			unlabeled_results.append(premade)
-		# For each excluded service not in the ignore list, add an Empty result for later processing
-		for service in exclude_services:
-			if service not in ignore_in_excluded_services:
-				unlabeled_results.append(
-					Empty(
-						service = service,
-						meta = Meta(
-							service = gservice, # Use Global IO service for metadata to indicate Empty result
-							request = request,
-							processing_time = current_unix_time_ms() - start_time,
-							filter_confidence_percentage = {service: 0.0},
-							http_code = 204 # No Content HTTP status code
-						)
-					)
-				)
-
-		# Create a dictionary mapping service names to their results
+		# Create labeled and unlabeled lists of results, used for 
+		unlabeled_results = [result for result in results if result.type in legal_results] + [premade for premade in include_premade_media if premade.type in legal_results]
 		labeled_results = {result.service: result for result in unlabeled_results}
 
 		# Define the order of preference for each field from different services
@@ -100,7 +71,7 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 
 		# Remove results that are not of a legal type from all order lists and results
 		for service in services:
-			if labeled_results[service].type not in legal_results:
+			if service not in labeled_results:
 				general_order.remove(service)
 				type_order.remove(service)
 				title_order.remove(service)
@@ -113,8 +84,6 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 				key_order.remove(service)
 				length_order.remove(service)
 				time_signature_order.remove(service)
-				del unlabeled_results[list(labeled_results.keys()).index(service)]
-				del labeled_results[service]
 
 		# Initialize variables for the final compiled result
 		result_type = None

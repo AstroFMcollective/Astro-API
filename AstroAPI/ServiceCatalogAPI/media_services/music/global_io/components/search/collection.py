@@ -1,4 +1,5 @@
 from AstroAPI.InternalComponents.Legacy import *
+from AstroAPI.ServiceCatalogAPI.components.global_io_components import *
 from AstroAPI.ServiceCatalogAPI.media_services.music.global_io.components.generic import *
 from AstroAPI.ServiceCatalogAPI.media_services.music.global_io.components.generic import service as gservice, component as gcomponent
 
@@ -29,11 +30,7 @@ async def search_collection(artists: list, title: str, year: int = None, country
 
 		# Exclude services if they already have a premade media object
 		# This is to prevent duplicate searches, increasing performance
-		ignore_in_excluded_services = []
-		for premade in include_premade_media:
-			if premade.service not in exclude_services:
-				exclude_services.append(premade.service)
-			ignore_in_excluded_services.append(premade.service)
+		exclude_services = excluded_services_with_premades(include_premade_media, exclude_services)
 		
 		# Search services for songs
 		tasks = []
@@ -48,27 +45,10 @@ async def search_collection(artists: list, title: str, year: int = None, country
 					)
 				)
 
-		unlabeled_results = await gather(*tasks)
+		results = await gather(*tasks)
 
-		# Redefine exluded services to only include those that are not in the ignore list
-		exclude_services = [service for service in exclude_services if service not in ignore_in_excluded_services]
-		for premade in include_premade_media:
-			unlabeled_results.append(premade) # Add premade media objects to the results
-		for service in exclude_services: # If a service is excluded, we add an Empty result for it so it can still be processed later
-			if service not in ignore_in_excluded_services:
-				unlabeled_results.append(
-					Empty(
-						service = service,
-						meta = Meta(
-							service = gservice, # We use the Global IO service for the metadata so we know it generated the Empty result
-							request = request,
-							processing_time = current_unix_time_ms() - start_time,
-							filter_confidence_percentage = {service: 0.0},
-							http_code = 204 # No Content HTTP status code
-						)
-					)
-				)
-
+		# Create labeled and unlabeled lists of results, used for 
+		unlabeled_results = [result for result in results if result.type in legal_results] + [premade for premade in include_premade_media if premade.type in legal_results]
 		labeled_results = {result.service: result for result in unlabeled_results}
 
 		# Results order based on service priority
@@ -81,14 +61,12 @@ async def search_collection(artists: list, title: str, year: int = None, country
 
 		# Removing errors and empty results from the order lists and results
 		for service in services:
-			if labeled_results[service].type not in legal_results:
+			if service not in labeled_results:
 				general_order.remove(service)
 				type_order.remove(service)
 				title_order.remove(service)
 				genre_order.remove(service)
 				release_year_order.remove(service)
-				del unlabeled_results[list(labeled_results.keys()).index(service)]
-				del labeled_results[service]
 		
 		# Declaring variables to hold the results
 		result_type = None
