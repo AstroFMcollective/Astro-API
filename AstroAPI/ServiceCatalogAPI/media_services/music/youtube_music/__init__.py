@@ -61,7 +61,7 @@ class YouTubeMusic:
         """
             # YouTube Music Query Knowledge Search
 
-            Search for song knowledge on YouTube Music via query.
+            Search for media metadata on YouTube Music via query.
 
             :param query: Your search query.
             :param country_code: The country code of the country in which you want to conduct the search.
