@@ -3,6 +3,7 @@ from .components.generic import *
 
 from .components.search.song import search_song
 from .components.search.collection import search_collection
+from .components.search.query import search_query
 from .components.lookup.song import lookup_song
 from .components.lookup.collection import lookup_collection
 
@@ -40,6 +41,18 @@ class Spotify:
             :param country_code: The country code of the country in which you want to conduct the search.
         """
         return await search_collection(artists = artists, title = title, year = year, country_code = country_code)
+    
+    async def search_query(self, query: str, filter_for_best_match: bool = True, country_code: str = 'us') -> list[Song, Collection] | Song | Collection | Empty | Error:
+        """
+            # Spotify Query Music Search
+
+            Search for media metadata on Spotify via query.
+
+            :param query: Your search query.
+            :param filter_for_best_match: Whether you want an Astro-style single best match, or all search results regardless of content as a response.
+            :param country_code: The country code of the country in which you want to conduct the search.
+        """
+        return await search_query(query = query, filter_for_best_match = filter_for_best_match, country_code = country_code)
 
     async def lookup_song(self, id: str, country_code: str = 'us') -> Song | Empty | Error:
         """
