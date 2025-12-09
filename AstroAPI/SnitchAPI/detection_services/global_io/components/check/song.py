@@ -19,7 +19,7 @@ async def check_song(service: object, id: str, song_country_code: str = None, lo
     start_time = current_unix_time_ms()
     
     try:
-        legal_results = ['image', 'audio']
+        legal_results = ['check']
         reference_media = await global_io.lookup_song(service, id, song_country_code, lookup_country_code)
 
         cover_order = [spotify.service, deezer.service, youtube_music.service, apple_music.service]
@@ -47,7 +47,7 @@ async def check_song(service: object, id: str, song_country_code: str = None, lo
         if analysis != []:
             for item in analysis:
                 if item != None:
-                    if item.media_type in legal_results:
+                    if item.type in legal_results:
                         processing_time[item.service] = item.meta.processing_time[item.service]
                     else:
                         analysis.remove(item)

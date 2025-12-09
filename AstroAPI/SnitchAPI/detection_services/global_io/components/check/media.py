@@ -18,7 +18,7 @@ async def check_media(media: dict) -> object:
     start_time = current_unix_time_ms()
     
     try:
-        legal_results = ['image', 'audio']
+        legal_results = ['check']
         cover_order = [spotify.service, deezer.service, youtube_music.service, apple_music.service]
         tasks = []
         
@@ -52,7 +52,7 @@ async def check_media(media: dict) -> object:
             if analysis != []:
                 for item in analysis:
                     if item != None:
-                        if item.media_type in legal_results:
+                        if item.type in legal_results:
                             processing_time[item.service] = item.meta.processing_time[item.service]
                         else:
                             analysis.remove(item)
