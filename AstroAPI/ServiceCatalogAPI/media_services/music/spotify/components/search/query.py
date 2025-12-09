@@ -32,15 +32,14 @@ async def search_query(query: str, filter_for_best_match: bool = True, country_c
 			async with session.get(url = api_url, headers = api_headers, timeout = timeout, params = api_params) as response:
 				lookup_json = await response.json()
 				if response.status == 200:
-					json_response = await response.json()
 					songs = await create_song_objects(
-						json_response = json_response,
+						json_response = lookup_json,
 						request = request,
 						start_time = start_time,
 						http_code = response.status
 					)
 					collections = await create_collection_objects(
-						json_response = json_response,
+						json_response = lookup_json,
 						request = request,
 						start_time = start_time,
 						http_code = response.status
