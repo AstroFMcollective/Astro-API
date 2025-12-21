@@ -98,7 +98,6 @@ async def lookup_artist(id: str, country_code: str = 'us') -> object:
 					await log(error, [discord.File(fp = StringIO(json.dumps(lookup_json, indent = 4)), filename = f'{id}.json')])
 					return error
 
-
 	# Handle any exceptions that occur during the lookup process
 	except Exception as error:
 		error = Error(
