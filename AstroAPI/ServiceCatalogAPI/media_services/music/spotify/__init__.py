@@ -42,7 +42,7 @@ class Spotify:
         """
         return await search_collection(artists = artists, title = title, year = year, country_code = country_code)
     
-    async def search_query(self, query: str, filter_for_best_match: bool = True, country_code: str = 'us') -> list[Song, Collection] | Song | Collection | Empty | Error:
+    async def search_query(self, query: str, filter_for_best_match: bool = True, media_types: list = None, is_explicit: bool = None, country_code: str = 'us') -> list[Song, Collection] | Song | Collection | Empty | Error:
         """
             # Spotify Query Music Search
 
@@ -50,9 +50,10 @@ class Spotify:
 
             :param query: Your search query.
             :param filter_for_best_match: Whether you want an Astro-style single best match, or all search results regardless of content as a response.
+            :param is_explicit: Whether the media is explicit or not.
             :param country_code: The country code of the country in which you want to conduct the search.
         """
-        return await search_query(query = query, filter_for_best_match = filter_for_best_match, country_code = country_code)
+        return await search_query(query = query, filter_for_best_match = filter_for_best_match, media_types = media_types, is_explicit = is_explicit, country_code = country_code)
 
     async def lookup_song(self, id: str, country_code: str = 'us') -> Song | Empty | Error:
         """
