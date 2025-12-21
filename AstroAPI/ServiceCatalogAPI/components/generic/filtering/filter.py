@@ -380,4 +380,188 @@ async def filter_collection(service: str, query_request: dict, collections: list
 		await log(empty_response)
 		return empty_response
 
+
+
+async def filter_query(service: str, query_request: dict, items: list, query: str, query_is_explicit: bool = None, query_country_code: str = None) -> Song :
+	"""
+		# Query filtering function
+
+		This is a built-in internal Service Catalog API function which iterates through a list of song media objects and
+		determines the single most accurate song with the most overlapping data out of the ones listed.
+
+		It can return two object types: `Song` (filtered song) and `Empty` (empty response).
+
+		 :param service: The string representation of the service whose songs you're filtering.
+		 :param query_request: The request data of an API function that called the filtering function.
+		 :param songs: A list of song objects.
+		 :param query_artists: The artists provided in the API search function query.
+		 :param query_title: The artists provided in the API search function query.
+		 :param query_song_type: The song type provided in the API search function query.
+		 :param query_collection: The artists provided in the API search function query.
+		 :param query_is_explicit: The song explicitness provided in the API search function query.
+		 :param query_country_code: The country code provided in the API search function query. This parameter is unused right now.
+	"""
+
+
+	start_time = current_unix_time_ms()
+
+	# This function relies on a "scoring" system out of which is then calculated the final percentage (for readability)
+	# The more crucial parameters are provided, the higher the score ceiling is (the more precise the filtering algorithm is)
+	max_score = 2000
+	if query_is_explicit != None:
+		max_score += 500
+
+	song_types = ['song', 'track', 'single']
+	collection_types = ['album', 'ep']
+	video_types = ['music_video']
+
+	data_with_similarity = [] # Empty list for items with their similiarity score
+	for item in items:
+		item_similarity = 0 # Song similarity overall score, the beginning score is always zero
+
+		artist_names = []
+		for artist in item.artists:
+			artist_names.append(bare_bones(artist.name))
+
+		query_input = bare_bones(query) # Strip down the query of any stylization and convert all characters into their latin counterparts
+		possible_queries = [ # Some possible queries
+			f'{bare_bones(item.title)}',
+			f'{bare_bones(item.title)}{' song' if item.type in song_types else ''}',
+			f'{bare_bones(item.title)}{f' {item.type}' if item.type in collection_types else ''}',
+			f'{bare_bones(item.title)}{' music video' if item.type in video_types else ''}',
+			f'{' '.join(artist_names)} {bare_bones(item.title)}',
+			f'{artist_names[0]} {bare_bones(item.title)}',
+			f'{bare_bones(item.title)} {' '.join(artist_names)}',
+			f'{bare_bones(item.title)} {artist_names[0]}',
+			f'{' '.join(artist_names)} {bare_bones(item.title)}{' song' if item.type in song_types else ''}',
+			f'{' '.join(artist_names)} {bare_bones(item.title)}{f' {item.type}' if item.type in collection_types else ''}',
+			f'{' '.join(artist_names)} {bare_bones(item.title)}{' music video' if item.type in video_types else ''}'
+		]
+		possible_queries = remove_duplicates(possible_queries)
+		queries_with_similarity = []
+
+		# This accounts all the artists in a song: checks their similarity with the query data, sorts that data from the highest to lowest, and then applies the highest score to the song similarity overall score
+		# In the distant future this will be able to use Artist objects but we're not there yet
+		for possible_query in possible_queries:
+			queries_with_similarity.append([calculate_similarity(possible_query, query_input), possible_query]) 
+		queries_with_similarity = sort_similarity_lists(queries_with_similarity)
+
+		winning_query = queries_with_similarity[0]
+
+		item_similarity += winning_query[0] # Calculates their similarity and adds it to the overall score
+
+		if query_is_explicit != None and item.is_explicit != None: # Since these are boolean values, you can just check them and then add the points or not
+			if query_is_explicit == item.is_explicit:
+				item_similarity += 500
+
+		data_with_similarity.append([item_similarity, item])
+	
+	data_with_similarity = sort_similarity_lists(data_with_similarity) # Sort the list from the biggest to smallest score
+	if data_with_similarity != []: # Check if the list is empty
+		top_result = data_with_similarity[0]
+		top_data = top_result[1]
+		filtering_time = current_unix_time_ms() - start_time
+		top_item = None
+		if percentage(max_score, top_result[0]) > 30: # Check if the similarity percentage is above 30%, if it's not discard the song and return an empty object
+			if top_data.type in song_types:
+				top_item = Song(
+					service = top_data.service,
+					type = top_data.type,
+					urls = top_data.urls,
+					ids =  top_data.ids,
+					title = top_data.title,
+					artists = top_data.artists,
+					collection = top_data.collection,
+					cover = top_data.cover,
+					genre = top_data.genre,
+					is_explicit = top_data.is_explicit,
+					meta = Meta(
+						service = top_data.service,
+						request = top_data.meta.request,
+						http_code = top_data.meta.http_code,
+						processing_time = top_data.meta.processing_time[top_data.service] + filtering_time,
+						filter_confidence_percentage = {top_data.service: percentage(max_score, top_result[0])}
+					)
+				)
+			elif top_data.type in collection_types:
+				top_item = Collection(
+					service = top_data.service,
+					type = top_data.type,
+					urls = top_data.urls,
+					ids =  top_data.ids,
+					title = top_data.title,
+					artists = top_data.artists,
+					cover = top_data.cover,
+					genre = top_data.genre,
+					release_year = top_data.release_year,
+					meta = Meta(
+						service = top_data.service,
+						request = top_data.meta.request,
+						http_code = top_data.meta.http_code,
+						processing_time = top_data.meta.processing_time[top_data.service] + filtering_time,
+						filter_confidence_percentage = {top_data.service: percentage(max_score, top_result[0])}
+					)
+				)
+			elif top_data.type in video_types:
+				top_item = MusicVideo(
+					service = top_data.service,
+					urls = top_data.urls,
+					ids =  top_data.ids,
+					title = top_data.title,
+					artists = top_data.artists,
+					cover = top_data.cover,
+					genre = top_data.genre,
+					is_explicit = top_data.is_explicit,
+					meta = Meta(
+						service = top_data.service,
+						request = top_data.meta.request,
+						http_code = top_data.meta.http_code,
+						processing_time = top_data.meta.processing_time[top_data.service] + filtering_time,
+						filter_confidence_percentage = {top_data.service: percentage(max_score, top_result[0])}
+					)
+				)
+			
+			if top_item != None:
+				return top_item
+			else:
+				response = Empty(
+					service = service,
+					meta = Meta(
+						service = top_data.service,
+						request = top_data.meta.request,
+						http_code = 204,
+						processing_time = top_data.meta.processing_time,
+						filter_confidence_percentage = {service: percentage(max_score, top_result[0])}
+					)
+				)
+				await log(response)
+				return response
+		else:
+			response = Empty(
+				service = service,
+				meta = Meta(
+					service = service,
+					request = query_request,
+					http_code = 204,
+					processing_time = 0,
+					filter_confidence_percentage = {service: 0.0}
+				)
+			)
+			await log(response)
+			return response
+
+	else: # Return empty if there is no song that has passed filtering
+		response = Empty(
+			service = service,
+			meta = Meta(
+				service = service,
+				request = query_request,
+				http_code = 204,
+				processing_time = 0,
+				filter_confidence_percentage = {service: 0.0}
+			)
+		)
+		await log(response)
+		return response
+
 print('[ServiceCatalogAPI] Filtering module initialized')

@@ -5,7 +5,6 @@
     Used for time-tracking, debugging, result filtering, accessing media type objects, text manipulation and cleanup, amongst other things.
 """
 
-from AstroAPI.InternalComponents.Legacy.filter import *
 from AstroAPI.InternalComponents.Legacy.media import *
 from AstroAPI.InternalComponents.Legacy.text_manipulation import *
 from AstroAPI.InternalComponents.Legacy.time import *
