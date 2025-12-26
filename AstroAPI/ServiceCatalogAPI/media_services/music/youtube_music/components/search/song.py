@@ -124,7 +124,6 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 		if filtered_song.type == 'track':
 			filtered_song.collection = await lookup_collection(browse_id = filtered_song.collection.ids[service], country_code = country_code)
 			# Regenerate the song's JSON representation
-			filtered_song.regenerate_json()
 		return filtered_song
 
 	# If sinister things happen

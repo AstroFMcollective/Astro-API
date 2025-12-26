@@ -34,8 +34,6 @@ async def search_query(query: str, country_code: str = 'us', exclude_services: l
 		
 			# Replace the request dict of the search one with the query one
 			obj.meta.request = request
-			obj.meta.regenerate_json()
-			obj.regenerate_json()
 
 			return obj
 		

@@ -36,8 +36,6 @@ async def lookup_music_video(service: object, id: str, mv_country_code: str = No
 
 		# Replace the request dict of the search one with the lookup one
 		music_video.meta.request = request
-		music_video.meta.regenerate_json()
-		music_video.regenerate_json()
 
 		return music_video
 
