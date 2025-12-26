@@ -1,5 +1,4 @@
 class Empty:
-
 	"""
 		# Astro API Empty Object
 
@@ -13,21 +12,48 @@ class Empty:
 	"""
 
 	def __init__(self, service: str, meta: object) -> object:
-		type = 'empty_response'
+		self._service = service
+		self._type = 'empty_response'
+		self._meta = meta
 
-		self.service = service
-		self.type = type
-		self.meta = meta
-		self.regenerate_json()
+	# Service
+	@property
+	def service(self):
+		return self._service
 
+	@service.setter
+	def service(self, value: str):
+		self._service = value
+
+	# Type
+	@property
+	def type(self):
+		return self._type
+
+	@type.setter
+	def type(self, value: str):
+		self._type = value
+
+	# Metadata
+	@property
+	def meta(self):
+		return self._meta
+
+	@meta.setter
+	def meta(self, value: object):
+		self._meta = value
+
+	# Compatibility method (kept for API parity)
 	def regenerate_json(self):
-		self.json = {
-			'service': self.service,
-			'type': self.type,
-			'meta': self.meta.json
-		}
-		self.json_lite = {
-			'service': self.service,
-			'type': self.type,
-			'meta': self.meta.json
+		# no-op because json/json_lite are properties
+		return self.json, self.json_lite
+
+	# JSON representation
+	@property
+	def json(self):
+		meta_val = self._meta.json if hasattr(self._meta, 'json') else self._meta
+		return {
+			'service': self._service,
+			'type': self._type,
+			'meta': meta_val
 		}

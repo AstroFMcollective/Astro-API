@@ -14,27 +14,61 @@ class Error:
 	"""
 
 	def __init__(self, service: str, component: str, meta: object, error_msg: str = None) -> object:
-		type = 'error'
+		self._service = service
+		self._type = 'error'
+		self._component = component
+		self._error_msg = error_msg
+		self._meta = meta
 
-		self.service = service
-		self.type = type
-		self.component = component
-		self.error_msg = error_msg
-		self.meta = meta
-		self.regenerate_json()
+	# Service
+	@property
+	def service(self):
+		return self._service
 
-	def regenerate_json(self):
-		self.json = {
-			'service': self.service,
-			'type': self.type,
-			'component': self.component,
-			'error_msg': self.error_msg,
-			'meta': self.meta.json
-		}
-		self.json_lite = {
-			'service': self.service,
-			'type': self.type,
-			'component': self.component,
-			'error_msg': self.error_msg,
-			'meta': self.meta.json
+	@service.setter
+	def service(self, value: str):
+		self._service = value
+
+	# Type (constant)
+	@property
+	def type(self):
+		return self._type
+
+	# Component
+	@property
+	def component(self):
+		return self._component
+
+	@component.setter
+	def component(self, value: str):
+		self._component = value
+
+	# Error message
+	@property
+	def error_msg(self):
+		return self._error_msg
+
+	@error_msg.setter
+	def error_msg(self, value: str):
+		self._error_msg = value
+
+	# Meta
+	@property
+	def meta(self):
+		return self._meta
+
+	@meta.setter
+	def meta(self, value: object):
+		self._meta = value
+
+	# JSON representation
+	@property
+	def json(self):
+		meta_val = self._meta.json if hasattr(self._meta, 'json') else self._meta
+		return {
+			'service': self._service,
+			'type': self._type,
+			'component': self._component,
+			'error_msg': self._error_msg,
+			'meta': meta_val
 		}
