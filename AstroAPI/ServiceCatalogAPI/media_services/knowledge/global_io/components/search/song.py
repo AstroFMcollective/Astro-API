@@ -1,3 +1,5 @@
+from AstroAPI.ServiceCatalogAPI.components import *
+from AstroAPI.InternalComponents.SystemMediaObjects import *
 from AstroAPI.InternalComponents.Legacy import *
 from AstroAPI.ServiceCatalogAPI.components.global_io import *
 from AstroAPI.ServiceCatalogAPI.media_services.knowledge.global_io.components.generic import *
@@ -152,7 +154,7 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 
 		# If a valid result type was found, return a compiled Knowledge object
 		if result_type is not None:
-			return Knowledge(
+			return SongKnowledge(
 				service = gservice,
 				media_type = result_media_type,
 				urls = result_urls,

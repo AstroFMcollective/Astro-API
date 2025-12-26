@@ -1,3 +1,5 @@
+from AstroAPI.SnitchAPI.components import *
+from AstroAPI.InternalComponents.SystemMediaObjects import *
 from AstroAPI.InternalComponents.Legacy import *
 from AstroAPI.SnitchAPI.components.media import Meta, Analysis
 from AstroAPI.InternalComponents.CredentialsManager.snitch_services.submithub.credentials import submithub_credentials

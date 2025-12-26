@@ -1,3 +1,5 @@
+from AstroAPI.ServiceCatalogAPI.components import *
+from AstroAPI.InternalComponents.SystemMediaObjects import *
 from AstroAPI.InternalComponents.Legacy import *
 from .components.generic import *
 
@@ -12,7 +14,7 @@ class Genius:
         self.service = service
         self.component = component
 
-    async def search_song(self, artists: list, title: str, song_type: str = None, collection: str = None, is_explicit: bool = None, country_code: str = 'us') -> Knowledge | Empty | Error:
+    async def search_song(self, artists: list, title: str, song_type: str = None, collection: str = None, is_explicit: bool = None, country_code: str = 'us') -> SongKnowledge | Empty | Error:
         """
             # Genius Song Knowledge Search
 
@@ -27,7 +29,7 @@ class Genius:
         """
         return await search_song(artists = artists, title = title, song_type = song_type, collection = collection, is_explicit = is_explicit, country_code = country_code)
     
-    async def search_query(self, query: str, country_code: str = 'us') -> Knowledge | Empty | Error:
+    async def search_query(self, query: str, country_code: str = 'us') -> SongKnowledge | Empty | Error:
         """
             # Genius Query Knowledge Search
 
@@ -38,7 +40,7 @@ class Genius:
         """
         return await search_query(query = query, country_code = country_code)
 
-    async def lookup_song(self, id: str, country_code: str = 'us') -> Knowledge | Empty | Error:
+    async def lookup_song(self, id: str, country_code: str = 'us') -> SongKnowledge | Empty | Error:
         """
             # Genius Song Knowledge Lookup
 

@@ -1,3 +1,5 @@
+from AstroAPI.ServiceCatalogAPI.components import *
+from AstroAPI.InternalComponents.SystemMediaObjects import *
 from .about import service
 from AstroAPI.InternalComponents.Legacy import *
 

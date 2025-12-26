@@ -1,3 +1,5 @@
+from AstroAPI.ServiceCatalogAPI.components import *
+from AstroAPI.InternalComponents.SystemMediaObjects import *
 from AstroAPI.InternalComponents.Legacy import *
 from AstroAPI.InternalComponents.CredentialsManager.media_services.genius.credentials import genius_credentials
 from AstroAPI.ServiceCatalogAPI.media_services.knowledge.genius.components.generic import *
@@ -152,7 +154,7 @@ async def lookup_song(id: str, country_code: str = 'us') -> object:
 
 
 			# Return a Knowledge object with all the song's knowledge metadata
-			return Knowledge(
+			return SongKnowledge(
 				service = service,
 				media_type = song_type,
 				urls = song_url,

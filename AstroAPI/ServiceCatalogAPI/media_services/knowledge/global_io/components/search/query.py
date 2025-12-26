@@ -1,3 +1,5 @@
+from AstroAPI.ServiceCatalogAPI.components import *
+from AstroAPI.InternalComponents.SystemMediaObjects import *
 from AstroAPI.InternalComponents.Legacy import *
 from AstroAPI.ServiceCatalogAPI.media_services.knowledge.global_io.components.generic import *
 from AstroAPI.ServiceCatalogAPI.media_services.knowledge.global_io.components.generic import service as gservice, component as gcomponent

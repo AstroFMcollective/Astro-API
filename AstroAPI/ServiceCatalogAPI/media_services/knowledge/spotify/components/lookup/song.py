@@ -1,3 +1,5 @@
+from AstroAPI.ServiceCatalogAPI.components import *
+from AstroAPI.InternalComponents.SystemMediaObjects import *
 from AstroAPI.InternalComponents.Legacy import *
 from AstroAPI.InternalComponents.CredentialsManager.media_services.spotify.token import spotify_token
 from AstroAPI.ServiceCatalogAPI.media_services.knowledge.spotify.components.generic import *
@@ -50,7 +52,7 @@ async def lookup_song(id: str, country_code: str = 'us') -> object:
 						song_time_signature = None
 
 				# Return a Knowledge object with all song details
-				return Knowledge(
+				return SongKnowledge(
 					service = service,
 					media_type = song_type,
 					urls = song_url,

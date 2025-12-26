@@ -1,5 +1,6 @@
+from AstroAPI.SnitchAPI.components import *
+from AstroAPI.InternalComponents.SystemMediaObjects import *
 from AstroAPI.InternalComponents.Legacy import *
-from AstroAPI.SnitchAPI.components.media import *
 from AstroAPI.SnitchAPI.detection_services.audio.apple_music.components.get.song_preview import get_song_preview
 from AstroAPI.SnitchAPI.detection_services.audio.submithub.components.check.audio import check_audio as submithub_ai
 from AstroAPI.SnitchAPI.detection_services.image.sightengine.components.check.image import check_image as sightengine_ai

@@ -1,5 +1,6 @@
+from AstroAPI.SnitchAPI.components import *
+from AstroAPI.InternalComponents.SystemMediaObjects import *
 from AstroAPI.InternalComponents.Legacy import *
-from AstroAPI.SnitchAPI.components.media import *
 from AstroAPI.SnitchAPI.detection_services.image.sightengine.components.check.image import check_image as sightengine_ai
 from AstroAPI.SnitchAPI.components.generic import service as gservice, component as gcomponent
 

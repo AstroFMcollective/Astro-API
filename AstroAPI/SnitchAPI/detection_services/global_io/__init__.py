@@ -1,5 +1,6 @@
-from AstroAPI.InternalComponents.Legacy import *
 from AstroAPI.SnitchAPI.components import *
+from AstroAPI.InternalComponents.SystemMediaObjects import *
+from AstroAPI.InternalComponents.Legacy import *
 from AstroAPI.SnitchAPI.detection_services.global_io.components.generic import *
 
 from AstroAPI.SnitchAPI.detection_services.global_io.components.check.song import check_song as check_song_ai

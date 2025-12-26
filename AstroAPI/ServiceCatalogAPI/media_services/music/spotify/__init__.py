@@ -1,3 +1,4 @@
+from AstroAPI.InternalComponents.SystemMediaObjects import *
 from AstroAPI.InternalComponents.Legacy import *
 from .components.generic import *
 
@@ -51,6 +52,7 @@ class Spotify:
 
 			:param query: Your search query.
 			:param filter_for_best_match: Whether you want an Astro-style single best match, or all search results regardless of content as a response.
+			:param media_types: Which media types you want to be included in the response.
 			:param is_explicit: Whether the media is explicit or not.
 			:param country_code: The country code of the country in which you want to conduct the search.
 		"""

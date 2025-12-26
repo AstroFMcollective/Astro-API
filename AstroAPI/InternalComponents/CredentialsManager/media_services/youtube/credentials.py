@@ -1,3 +1,5 @@
+from AstroAPI.ServiceCatalogAPI.components import *
+from AstroAPI.InternalComponents.SystemMediaObjects import *
 from AstroAPI.InternalComponents.Legacy import *
 from AstroAPI.InternalComponents.Legacy.ini import keys
 from AstroAPI.InternalComponents.Legacy.time import current_unix_time

@@ -1,5 +1,6 @@
-from AstroAPI.InternalComponents.Legacy import *
 from AstroAPI.SnitchAPI.components import *
+from AstroAPI.InternalComponents.SystemMediaObjects import *
+from AstroAPI.InternalComponents.Legacy import *
 from .components.generic import *
 
 from .components.check.image import check_image

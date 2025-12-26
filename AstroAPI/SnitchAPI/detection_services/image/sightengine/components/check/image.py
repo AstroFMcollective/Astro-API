@@ -1,5 +1,6 @@
+from AstroAPI.SnitchAPI.components import *
+from AstroAPI.InternalComponents.SystemMediaObjects import *
 from AstroAPI.InternalComponents.Legacy import *
-from AstroAPI.SnitchAPI.components.media import Meta, Analysis
 from AstroAPI.InternalComponents.CredentialsManager.snitch_services.sightengine.credentials import sightengine_credentials
 from AstroAPI.SnitchAPI.detection_services.image.sightengine.components.generic import *
 

@@ -1,7 +1,9 @@
-from AstroAPI.InternalComponents.Legacy.media import *
+from AstroAPI.InternalComponents.SystemMediaObjects import *
 from AstroAPI.InternalComponents.Legacy.log import *
 from AstroAPI.InternalComponents.Legacy.text_manipulation import *
 from AstroAPI.InternalComponents.Legacy.time import current_unix_time_ms
+
+from AstroAPI.ServiceCatalogAPI.components import *
 
 
 
@@ -109,7 +111,8 @@ async def filter_song(service: str, query_request: dict, songs: list, query_arti
 				service = top_data.service,
 				type = top_data.type,
 				urls = top_data.urls,
-				ids =  top_data.ids,
+				ids = top_data.ids,
+				previews = top_data.previews, 
 				title = top_data.title,
 				artists = top_data.artists,
 				collection = top_data.collection,
