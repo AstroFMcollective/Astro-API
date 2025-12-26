@@ -8,3 +8,4 @@ lyricsgenius
 fastapi[standard]
 uvicorn
 better-profanity
+aiocache

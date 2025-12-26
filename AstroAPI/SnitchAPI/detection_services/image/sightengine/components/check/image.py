@@ -6,8 +6,10 @@ from AstroAPI.SnitchAPI.detection_services.image.sightengine.components.generic 
 
 import aiohttp
 
+from aiocache import cached
 
 
+@cached()
 async def check_image(image_url: str) -> object:
 	# Prepare the request dictionary with search parameters
 	request = {'request': 'check_image', 'image_url': image_url}
