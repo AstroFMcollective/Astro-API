@@ -1,4 +1,5 @@
 from AstroAPI.InternalComponents.Legacy import *
+from AstroAPI.ServiceCatalogAPI.components import *
 from AstroAPI.ServiceCatalogAPI.media_services.music.spotify.components.generic import *
 
 
