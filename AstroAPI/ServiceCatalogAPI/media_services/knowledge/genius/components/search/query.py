@@ -36,7 +36,6 @@ async def search_query(query: str, country_code: str = 'us') -> object:
 			song.meta.processing_time[service] = current_unix_time_ms() - start_time
 			# Regenerate the song's JSON representation
 			# P.S. If you haven't read the media.py file; ALWAYS DO THIS WHEN YOU'RE MODDING MEDIA OBJECT VALUES
-			song.regenerate_json()
 			return song
 		else:
 			error = Error(
