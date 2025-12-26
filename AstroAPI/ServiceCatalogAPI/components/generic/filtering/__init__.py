@@ -1,1 +1,1 @@
-from AstroAPI.ServiceCatalogAPI.components.generic.filtering.filter import filter_song, filter_mv, filter_collection, filter_query
+from AstroAPI.ServiceCatalogAPI.components.filtering.filter import filter_song, filter_mv, filter_collection, filter_query
