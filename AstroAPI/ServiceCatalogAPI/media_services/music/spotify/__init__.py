@@ -44,7 +44,7 @@ class Spotify:
 		"""
 		return await search_collection(artists = artists, title = title, year = year, country_code = country_code)
 	
-	async def search_query(self, query: str, filter_for_best_match: bool = True, media_types: list = None, is_explicit: bool = None, country_code: str = 'us') -> list[Song, Collection] | Song | Collection | Empty | Error:
+	async def search_query(self, query: str, filter_for_best_match: bool = True, media_types: list = None, is_explicit: bool = None, country_code: str = 'us') -> Query | Song | Collection | Empty | Error:
 		"""
 			# Spotify Query Music Search
 
