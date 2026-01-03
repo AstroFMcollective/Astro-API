@@ -6,10 +6,13 @@ from .components.generic import *
 from .components.search.song import search_song
 from .components.search.collection import search_collection
 from .components.search.music_video import search_music_video
+from .components.search.query import search_query
 from .components.lookup.song import lookup_song
 from .components.lookup.collection import lookup_collection
 from .components.lookup.music_video import lookup_music_video
 from .components.lookup.artist import lookup_artist
+
+
 
 class AppleMusic:
 	def __init__(self):
@@ -18,87 +21,101 @@ class AppleMusic:
 
 	async def search_song(self, artists: list, title: str, song_type: str = None, collection: str = None, is_explicit: bool = None, country_code: str = 'us') -> Song | Empty | Error:
 		"""
-            # Apple Music Song Music Search
+			# Apple Music Song Music Search
 
-            Search for song metadata on Apple Music (via the iTunes API).
+			Search for song metadata on Apple Music (via the iTunes API).
 
-            :param artists: A list of artist names on the song that you're attempting to search.
-            :param title: Song title.
-            :param song_type: Whether the song is an album track or a single.
-            :param collection: The name of the collection (album, EP) the song is a part of.
-            :param is_explicit: Whether the song is explicit or not.
-            :param country_code: The country code of the country in which you want to conduct the search.
-        """
+			:param artists: A list of artist names on the song that you're attempting to search.
+			:param title: Song title.
+			:param song_type: Whether the song is an album track or a single.
+			:param collection: The name of the collection (album, EP) the song is a part of.
+			:param is_explicit: Whether the song is explicit or not.
+			:param country_code: The country code of the country in which you want to conduct the search.
+		"""
 		return await search_song(artists = artists, title = title, song_type = song_type, collection = collection, is_explicit = is_explicit, country_code = country_code)
 	
 	async def search_music_video(self, artists: list, title: str, is_explicit: bool = None, country_code: str = 'us') -> MusicVideo | Empty | Error:
 		"""
-            # Apple Music Music Video Music Search
+			# Apple Music Music Video Music Search
 
-            Search for music video metadata on Apple Music (via the iTunes API).
+			Search for music video metadata on Apple Music (via the iTunes API).
 
-            :param artists: A list of artist names on the music video that you're attempting to search.
-            :param title: Music video title.
-            :param is_explicit: Whether the music video is explicit or not.
-            :param country_code: The country code of the country in which you want to conduct the search.
-        """
+			:param artists: A list of artist names on the music video that you're attempting to search.
+			:param title: Music video title.
+			:param is_explicit: Whether the music video is explicit or not.
+			:param country_code: The country code of the country in which you want to conduct the search.
+		"""
 		return await search_music_video(artists = artists, title = title, is_explicit = is_explicit, country_code = country_code)
 
 	async def search_collection(self, artists: list, title: str, year: int = None, country_code: str = 'us') -> Collection | Empty | Error:
 		"""
-            # Apple Music Collection Music Search
+			# Apple Music Collection Music Search
 
-            Search for collection metadata on Apple Music (via the iTunes API).
+			Search for collection metadata on Apple Music (via the iTunes API).
 
-            :param artists: A list of artist names on the song that you're attempting to search.
-            :param title: Song title.
-            :param year: The name of the collection (album, EP) the song is a part of.
-            :param country_code: The country code of the country in which you want to conduct the search.
-        """
+			:param artists: A list of artist names on the song that you're attempting to search.
+			:param title: Song title.
+			:param year: The name of the collection (album, EP) the song is a part of.
+			:param country_code: The country code of the country in which you want to conduct the search.
+		"""
 		return await search_collection(artists = artists, title = title, year = year, country_code = country_code)
+
+	async def search_query(self, query: str, filter_for_best_match: bool = True, media_types: list = None, is_explicit: bool = None, country_code: str = 'us') -> Query | Song | MusicVideo | Collection | Empty | Error:
+		"""
+			# Apple Music Query Music Search
+
+			Search for media metadata on Apple Music (via the iTunes API) via query.
+
+			:param query: Your search query.
+			:param filter_for_best_match: Whether you want an Astro-style single best match, or all search results regardless of content as a response.
+			:param media_types: Which media types you want to be included in the response.
+			:param is_explicit: Whether the media is explicit or not.
+			:param country_code: The country code of the country in which you want to conduct the search.
+		"""
+		return await search_query(query = query, filter_for_best_match = filter_for_best_match, media_types = media_types, is_explicit = is_explicit, country_code = country_code)
 
 	async def lookup_song(self, id: str, country_code: str = 'us') -> Song | Empty | Error:
 		"""
-            # Apple Music Song Music Lookup
+			# Apple Music Song Music Lookup
 
-            Lookup for song metadata on Apple Music (via the iTunes API) via song ID.
+			Lookup for song metadata on Apple Music (via the iTunes API) via song ID.
 
-            :param id: Song ID.
-            :param country_code: The country code of the country in which you want to conduct the lookup.
-        """
+			:param id: Song ID.
+			:param country_code: The country code of the country in which you want to conduct the lookup.
+		"""
 		return await lookup_song(id = id, country_code = country_code)
 	
 	async def lookup_music_video(self, id: str, country_code: str = 'us') -> MusicVideo | Empty | Error:
 		"""
-            # Apple Music Music Video Music Lookup
+			# Apple Music Music Video Music Lookup
 
-            Lookup for music video metadata on Apple Music (via the iTunes API) via video ID.
+			Lookup for music video metadata on Apple Music (via the iTunes API) via video ID.
 
-            :param id: Video ID.
-            :param country_code: The country code of the country in which you want to conduct the lookup.
-        """
+			:param id: Video ID.
+			:param country_code: The country code of the country in which you want to conduct the lookup.
+		"""
 		return await lookup_music_video(id = id, country_code = country_code)
 
 	async def lookup_collection(self, id: str, country_code: str = 'us') -> Collection | Empty | Error:
 		"""
-            # Apple Music Collection Music Lookup
+			# Apple Music Collection Music Lookup
 
-            Lookup for collection metadata on Apple Music (via the iTunes API) via collection ID.
+			Lookup for collection metadata on Apple Music (via the iTunes API) via collection ID.
 
-            :param id: Collection ID.
-            :param country_code: The country code of the country in which you want to conduct the lookup.
-        """
+			:param id: Collection ID.
+			:param country_code: The country code of the country in which you want to conduct the lookup.
+		"""
 		return await lookup_collection(id = id, country_code = country_code)
 
 	async def lookup_artist(self, id: str, country_code: str = 'us') -> Song | Empty | Error:
 		"""
-            # Apple Music Artist Music Lookup
+			# Apple Music Artist Music Lookup
 
-            Lookup for artist metadata on Apple Music (via the iTunes API) via artist ID.
+			Lookup for artist metadata on Apple Music (via the iTunes API) via artist ID.
 
-            :param id: Artist ID.
-            :param country_code: The country code of the country in which you want to conduct the lookup.
-        """
+			:param id: Artist ID.
+			:param country_code: The country code of the country in which you want to conduct the lookup.
+		"""
 		return await lookup_artist(id = id, country_code = country_code)
 
 
