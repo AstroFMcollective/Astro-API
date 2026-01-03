@@ -1,7 +1,7 @@
-from AstroAPI.ServiceCatalogAPI.components import *
 from AstroAPI.InternalComponents.SystemMediaObjects import *
 from AstroAPI.InternalComponents.Legacy import *
 from AstroAPI.ServiceCatalogAPI.media_services.music.apple_music.components.generic import *
+from AstroAPI.ServiceCatalogAPI.components import *
 
 import aiohttp
 
@@ -30,7 +30,8 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 				'term': (f'{artists[0]} "{title}"' if collection == None or song_type == 'single' else f'{artists[0]} "{title}" {collection}'),
 				'entity': 'song',
 				'limit': 200,
-				'country': country_code.lower()
+				'country': country_code.lower(),
+				'explicit': 'Yes' if is_explicit else 'No'
 			}
 			timeout = aiohttp.ClientTimeout(total = 30) # Set a timeout for the HTTP request
 
@@ -38,93 +39,47 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 			async with session.get(url = api_url, timeout = timeout, params = api_params) as response:
 				lookup_json = await response.json(content_type = 'text/javascript')
 				if response.status == 200:
-					# Parse the JSON response
-					json_response = lookup_json
+					if 'results' in lookup_json:
+						if len(lookup_json['results']) > 0:
+							# Iterate through each song in the results
+							songs = await create_song_objects(
+								json_response = lookup_json,
+								request = request,
+								start_time = start_time,
+								http_code = response.status
+							)
+							# Filter and return the best matching song
+							return await filter_song(service = service, query_request = request, songs = songs, query_artists = artists, query_title = title, query_song_type = song_type, query_collection = collection, query_is_explicit = is_explicit, query_country_code = country_code)
 
-					# Iterate through each song in the results
-					for song in json_response['results']:
-						# Determine the song type based on collection name
-						song_type = 'track' if ' - Single' not in song['collectionName'] else 'single'
-						song_url = song['trackViewUrl']
-						song_id = song['trackId']
-						song_title = song['trackName']
-						# Determine if the song is explicit
-						song_is_explicit = not 'not' in song['trackExplicitness']
-						song_genre = song['primaryGenreName'] if 'primaryGenreName' in song else None
-
-						# Build a list of Artist objects for the song
-						song_artists = [
-							Artist(
+						else:
+							empty = Empty(
 								service = service,
-								urls = song['artistViewUrl'] if 'artistViewUrl' in song else f'https://music.apple.com/{country_code}/artist/{song['artistId']}', # Additional edge case if artistViewUrl is missing... this API is so weird
-								ids = song['artistId'],
-								name = artist,
 								meta = Meta(
 									service = service,
 									request = request,
 									processing_time = current_unix_time_ms() - start_time,
-									filter_confidence_percentage = 100.0,
+									filter_confidence_percentage = 0.0,
 									http_code = response.status
 								)
-							) for artist in split_artists(song['artistName'])
-						]
+							)
+							await log(empty)
+							return empty
 
-						# Create a Cover object for the song
-						song_cover = Cover(
+					else:
+						error = Error(
 							service = service,
-							media_type = song_type,
-							title = song_title,
-							artists = song_artists,
-							hq_urls = song['artworkUrl100'],
-							lq_urls = song['artworkUrl60'],
+							component = component,
+							error_msg = "Error when checking for results",
 							meta = Meta(
 								service = service,
 								request = request,
 								processing_time = current_unix_time_ms() - start_time,
-								filter_confidence_percentage = 100.0,
+								filter_confidence_percentage = 0.0,
 								http_code = response.status
 							)
 						)
-
-						# Create a Collection object for the song's collection
-						song_collection = Collection(
-							service = service,
-							type = 'album' if ' - EP' not in song['collectionName'] else 'ep' if song_type != 'single' else song_type,
-							urls = song['collectionViewUrl'],
-							ids = song['collectionId'],
-							title = clean_up_collection_title(song['collectionName']),
-							artists = song_artists,
-							cover = song_cover,
-							meta = Meta(
-								service = service,
-								request = request,
-								processing_time = current_unix_time_ms() - start_time,
-								filter_confidence_percentage = 100.0,
-								http_code = response.status
-							)
-						)
-
-						# Append the constructed Song object to the songs list
-						songs.append(Song(
-							service = service,
-							type = song_type,
-							urls = song_url,
-							ids = song_id,
-							title = song_title,
-							artists = song_artists,
-							collection = song_collection,
-							is_explicit = song_is_explicit,
-							cover = song_cover,
-							genre = song_genre,
-							meta = Meta(
-								service = service,
-								request = request,
-								processing_time = current_unix_time_ms() - start_time,
-								http_code = response.status
-							)
-						))
-					# Filter and return the best matching song
-					return await filter_song(service = service, query_request = request, songs = songs, query_artists = artists, query_title = title, query_song_type = song_type, query_collection = collection, query_is_explicit = is_explicit, query_country_code = country_code)
+						await log(error, [discord.File(fp = StringIO(json.dumps(lookup_json, indent = 4)), filename = f'{title}.json')])
+						return error
 
 				else:
 					error = Error(
