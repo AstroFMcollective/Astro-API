@@ -1,8 +1,8 @@
-from AstroAPI.ServiceCatalogAPI.components import *
 from AstroAPI.InternalComponents.SystemMediaObjects import *
 from AstroAPI.InternalComponents.Legacy import *
 from AstroAPI.ServiceCatalogAPI.media_services.music.apple_music.components.generic import *
 from AstroAPI.ServiceCatalogAPI.media_services.music.apple_music.components.lookup.artist import lookup_artist
+from AstroAPI.ServiceCatalogAPI.components import *
 
 import aiohttp
 
