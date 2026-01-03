@@ -44,7 +44,7 @@ class Meta:
 		self._request = request
 		self._http_code = http_code
 		self._processing_time = processing_time if isinstance(processing_time, dict) else {service: processing_time}
-		self._filter_confidence_percentage = filter_confidence_percentage
+		self._filter_confidence_percentage = filter_confidence_percentage if isinstance(filter_confidence_percentage, dict) else {service: filter_confidence_percentage}
 
 	@property
 	def service(self):
@@ -89,7 +89,12 @@ class Meta:
 
 	@filter_confidence_percentage.setter
 	def filter_confidence_percentage(self, value: int | float | dict | None):
-		self._filter_confidence_percentage = value
+		# If given a dict, store it directly.
+		if isinstance(value, dict):
+			self._filter_confidence_percentage = value
+		else:
+			service = self._service
+			self._filter_confidence_percentage = {service: value}
 
 	@property
 	def json(self):
@@ -130,7 +135,7 @@ class Song:
 	def __init__(self, service: str, type: str, urls: str | dict, ids: str | dict, title: str, artists: list[object], cover: object, meta: object, previews: str | dict = None, collection: object = None, genre: str = None, is_explicit: bool = None) -> object:
 		urls = {service: urls} if not isinstance(urls, dict) else urls
 		ids = {service: str(ids)} if not isinstance(ids, dict) else ids
-		previews = {service: previews} if not isinstance(previews, dict) else previews
+		previews = {service: previews} if not isinstance(previews, dict) or previews == None else previews
 		censored_title = censor_text(title)
 		
 		self._service = service
@@ -337,7 +342,7 @@ class MusicVideo:
 		type = 'music_video'
 		urls = {service: urls} if not isinstance(urls, dict) else urls
 		ids = {service: str(ids)} if not isinstance(ids, dict) else ids
-		previews = {service: previews} if not isinstance(previews, dict) else previews
+		previews = {service: previews} if not isinstance(previews, dict) or previews == None else previews
 		censored_title = censor_text(title)
 		
 		self._service = service
@@ -1580,7 +1585,6 @@ class CollectionKnowledge:
 			'cover': self._cover.json_lite if self._cover else None,
 			'genre': self._genre,
 		}
-
 
 
 
