@@ -2,6 +2,7 @@ from AstroAPI.InternalComponents.Legacy import *
 from AstroAPI.ServiceCatalogAPI.components import *
 from AstroAPI.InternalComponents.CredentialsManager.media_services.spotify.token import spotify_token
 from AstroAPI.ServiceCatalogAPI.media_services.music.spotify.components.generic import *
+
 import aiohttp
 
 
@@ -17,7 +18,7 @@ async def search_query(query: str, filter_for_best_match: bool = True, media_typ
 	try:
 		async with aiohttp.ClientSession() as session:
 			# Prepare for API call
-			if media_types != None:
+			if media_types == None:
 				query_media = 'track,album'
 			else:
 				spotified_types = []
