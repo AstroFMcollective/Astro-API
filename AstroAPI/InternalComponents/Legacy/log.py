@@ -121,7 +121,10 @@ async def log(media: object, files: list = None):
 			except:
 				# Okay if this really REALLY doesn't work just give up
 				webhook = Webhook.from_url(url = keys['webhooks'][f'{deployment_channel}'], session = session)
-				await webhook.send(f"{api_dev_ping} Logging keeps failing for some reason, here's the json of the response", username = 'Astro API', avatar_url = text['images']['astro_trans'], files = [media.json])
+				try:
+					await webhook.send(f"{api_dev_ping} Logging keeps failing for some reason, here's the json of the response", username = 'Astro API', avatar_url = text['images']['astro_trans'], files = [media.json])
+				except:
+					await webhook.send(f"{api_dev_ping} Logging keeps failing for some reason, here's the json of the response", username = 'Astro API', avatar_url = text['images']['astro_trans'], files = [media])
 				return
 		
 print('[ServiceCatalogAPI] Logging to Discord initialized')
