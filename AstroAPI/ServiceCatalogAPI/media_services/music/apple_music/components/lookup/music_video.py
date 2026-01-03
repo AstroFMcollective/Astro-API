@@ -38,6 +38,7 @@ async def lookup_music_video(id: str, country_code: str = 'us') -> object:
 						video = video['results'][0]
 						mv_url = video['trackViewUrl']
 						mv_id = video['trackId']
+						mv_preview = video['previewUrl']
 						mv_title = video['trackName']
 						# Lookup the artist details using the artist ID
 						mv_artist = await lookup_artist(id = video['artistId'], country_code = country_code)
@@ -67,6 +68,7 @@ async def lookup_music_video(id: str, country_code: str = 'us') -> object:
 							service = service,
 							urls = mv_url,
 							ids = mv_id,
+							previews = mv_preview,
 							title = mv_title,
 							artists = mv_artist,
 							is_explicit = mv_is_explicit,

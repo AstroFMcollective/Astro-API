@@ -41,6 +41,7 @@ async def lookup_song(id: str, country_code: str = 'us') -> object:
 						song_type = 'track' if ' - Single' not in song['collectionName'] else 'single'
 						song_url = song['trackViewUrl']
 						song_id = song['trackId']
+						song_preview = song['previewUrl']
 						song_title = song['trackName']
 						# Lookup the artist information asynchronously
 						song_artists = await lookup_artist(id = song['artistId'], country_code = country_code)
@@ -73,6 +74,7 @@ async def lookup_song(id: str, country_code: str = 'us') -> object:
 							type = song_type,
 							urls = song_url,
 							ids = song_id,
+							previews = song_preview,
 							title = song_title,
 							artists = song_artists,
 							collection = song_collection,
