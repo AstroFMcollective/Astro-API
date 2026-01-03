@@ -4,6 +4,7 @@ from AstroAPI.InternalComponents.Legacy.text_manipulation import *
 from AstroAPI.InternalComponents.Legacy.time import current_unix_time_ms
 
 from AstroAPI.ServiceCatalogAPI.components import *
+from AstroAPI.ServiceCatalogAPI.components.generic.media import *
 
 
 
@@ -226,6 +227,7 @@ async def filter_mv(service: str, query_request: dict, videos: list, query_artis
 				service = top_data.service,
 				urls = top_data.urls,
 				ids =  top_data.ids,
+				previews = top_data.previews,
 				title = top_data.title,
 				artists = top_data.artists,
 				cover = top_data.cover,
@@ -472,9 +474,29 @@ async def filter_query(service: str, query_request: dict, items: list, query: st
 					type = top_data.type,
 					urls = top_data.urls,
 					ids =  top_data.ids,
+					previews = top_data.previews,
 					title = top_data.title,
 					artists = top_data.artists,
 					collection = top_data.collection,
+					cover = top_data.cover,
+					genre = top_data.genre,
+					is_explicit = top_data.is_explicit,
+					meta = Meta(
+						service = top_data.service,
+						request = top_data.meta.request,
+						http_code = top_data.meta.http_code,
+						processing_time = top_data.meta.processing_time[top_data.service] + filtering_time,
+						filter_confidence_percentage = {top_data.service: percentage(max_score, top_result[0])}
+					)
+				)
+			elif top_data.type in video_types:
+				top_item = MusicVideo(
+					service = top_data.service,
+					urls = top_data.urls,
+					ids =  top_data.ids,
+					previews = top_data.previews,
+					title = top_data.title,
+					artists = top_data.artists,
 					cover = top_data.cover,
 					genre = top_data.genre,
 					is_explicit = top_data.is_explicit,
@@ -497,24 +519,6 @@ async def filter_query(service: str, query_request: dict, items: list, query: st
 					cover = top_data.cover,
 					genre = top_data.genre,
 					release_year = top_data.release_year,
-					meta = Meta(
-						service = top_data.service,
-						request = top_data.meta.request,
-						http_code = top_data.meta.http_code,
-						processing_time = top_data.meta.processing_time[top_data.service] + filtering_time,
-						filter_confidence_percentage = {top_data.service: percentage(max_score, top_result[0])}
-					)
-				)
-			elif top_data.type in video_types:
-				top_item = MusicVideo(
-					service = top_data.service,
-					urls = top_data.urls,
-					ids =  top_data.ids,
-					title = top_data.title,
-					artists = top_data.artists,
-					cover = top_data.cover,
-					genre = top_data.genre,
-					is_explicit = top_data.is_explicit,
 					meta = Meta(
 						service = top_data.service,
 						request = top_data.meta.request,
