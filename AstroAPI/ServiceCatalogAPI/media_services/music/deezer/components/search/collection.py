@@ -39,60 +39,13 @@ async def search_collection(artists: list, title: str, year: int = None, country
 				lookup_json = await response.json()
 				if response.status == 200:
 					# Parse the JSON response
-					json_response = lookup_json
-
-					# Iterate over each album found in the response data
-					for data in json_response['data']:
-						# Fetch detailed album information by album ID because the base results don't have much artist info needed for accurate filtering
-						async with session.get(url = f'{api}/album/{data["id"]}', headers = api_headers) as result:
-							# Parse the album details
-							collection_json = await result.json()
-							collection = collection_json
-
-							# Determine the collection type (album or ep)
-							collection_type = 'album' if collection['record_type'] != 'ep' else 'ep'
-							collection_url = collection['link']
-							collection_id = collection['id']
-							collection_title = remove_feat(collection['title'])
-							collection_year = collection['release_date'][:4]
-							collection_genre = collection['genres']['data'][0]['name'] if collection['genres']['data'] != [] else None
-							collection_artists = get_artists_of_media(request, collection['contributors'])
-
-							# Create a Cover object for the collection
-							collection_cover = Cover(
-								service = service,
-								media_type = collection_type,
-								title = collection_title,
-								artists = collection_artists,
-								hq_urls = collection['cover_xl'],
-								lq_urls = collection['cover_medium'],
-								meta = Meta(
-									service = service,
-									request = request,
-									processing_time = current_unix_time_ms() - start_time,
-									filter_confidence_percentage = {service: 100.0},
-									http_code = response.status
-								)
-							)
-
-							# Append the collection object to the collections list
-							collections.append(Collection(
-								service = service,
-								type = collection_type,
-								urls = collection_url,
-								ids = collection_id,
-								title = collection_title,
-								artists = collection_artists,
-								release_year = collection_year,
-								cover = collection_cover,
-								genre = collection_genre,
-								meta = Meta(
-									service = service,
-									request = request,
-									processing_time = current_unix_time_ms() - start_time,
-									http_code = response.status
-								)
-							))
+					collections = create_collection_objects(
+						json_response = lookup_json,
+						request = request,
+						start_time = start_time,
+						http_code = response.status
+					)
+					
 					# Filter and return the collection based on the query
 					return await filter_collection(service = service, query_request = request, collections = collections, query_artists = artists, query_title = title, query_year = year, query_country_code = country_code)
 				

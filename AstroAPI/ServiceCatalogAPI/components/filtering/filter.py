@@ -4,7 +4,7 @@ from AstroAPI.InternalComponents.Legacy.text_manipulation import *
 from AstroAPI.InternalComponents.Legacy.time import current_unix_time_ms
 
 from AstroAPI.ServiceCatalogAPI.components import *
-from AstroAPI.ServiceCatalogAPI.components.generic.media import *
+from AstroAPI.ServiceCatalogAPI.components.media import *
 
 
 

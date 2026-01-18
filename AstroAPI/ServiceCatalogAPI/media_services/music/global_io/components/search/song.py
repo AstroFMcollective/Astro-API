@@ -1,7 +1,7 @@
 from AstroAPI.ServiceCatalogAPI.components import *
 from AstroAPI.InternalComponents.SystemMediaObjects import *
 from AstroAPI.InternalComponents.Legacy import *
-from AstroAPI.ServiceCatalogAPI.components.global_io import *
+from AstroAPI.ServiceCatalogAPI.components import *
 from AstroAPI.ServiceCatalogAPI.media_services.music.global_io.components.generic import *
 from AstroAPI.ServiceCatalogAPI.media_services.music.global_io.components.generic import service as gservice, component as gcomponent
 
@@ -13,7 +13,7 @@ from asyncio import create_task, gather
 
 
 
-async def search_song(artists: list, title: str, song_type: str = None, collection: str = None, is_explicit: bool = None, country_code: str = 'us', include_premade_media: list = None, exclude_services: list = None) -> object:
+async def search_song(artists: list, title: str, song_type: str = None, collection: str = None, is_explicit: bool = None, country_code: str = 'us', include_premade_media: list = None, exclude_services: list = None, incomplete_artist_info: bool = True) -> object:
 	# SINCE WHEN ARE FUNCTION VARIABLES PERSISTENT??????
 	if include_premade_media is None:
 		include_premade_media = []
@@ -44,6 +44,12 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 					create_task(
 						obj.search_song(
 							artists, title, song_type, collection, is_explicit, country_code
+						),
+						name = obj.service
+					) if obj.service != 'deezer' else 
+					create_task(
+						obj.search_song(
+							artists, title, song_type, collection, is_explicit, country_code, incomplete_artist_info
 						),
 						name = obj.service
 					)
