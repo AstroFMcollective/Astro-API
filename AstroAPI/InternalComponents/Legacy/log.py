@@ -1,6 +1,6 @@
 import discord as discord
 from discord import Webhook
-from AstroAPI.InternalComponents.Legacy.ini import config, keys, text
+from AstroAPI.InternalComponents.Legacy.ini import config, keys, text, credentials
 import aiohttp
 
 

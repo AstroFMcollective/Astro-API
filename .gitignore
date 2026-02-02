@@ -10,3 +10,4 @@ credentials.json
 oauth.json
 browser.json
 .vscode
+gcloud.json

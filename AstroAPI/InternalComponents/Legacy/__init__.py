@@ -8,4 +8,5 @@
 from AstroAPI.InternalComponents.Legacy.text_manipulation import *
 from AstroAPI.InternalComponents.Legacy.time import *
 from AstroAPI.InternalComponents.Legacy.log import *
+from AstroAPI.InternalComponents.Legacy.ini import credentials
 from io import StringIO
