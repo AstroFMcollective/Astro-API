@@ -7,7 +7,7 @@ import aiohttp
 
 
 
-async def search_song(artists: list, title: str, song_type: str = None, collection: str = None, is_explicit: bool = None, country_code: str = 'us', advanced_data_lookup: bool = False) -> object:
+async def search_song(artists: list, title: str, song_type: str = None, collection: str = None, is_explicit: bool = None, country_code: str = 'us', advanced_data_lookup: bool = True) -> object:
 	# Prepare the request dictionary with all input parameters
 	request = {'request': 'search_song', 'artists': artists, 'title': title, 'song_type': song_type, 'collection': collection, 'is_explicit': is_explicit, 'country_code': country_code}
 	# Lookup JSON variable for later debugging
@@ -45,7 +45,7 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 						request = request,
 						start_time = start_time,
 						http_code = response.status,
-						advanced_data_lookup = advanced_data_lookup
+						incomplete_artist_info = advanced_data_lookup
 					)
 
 					# Filter and return the best matching song
