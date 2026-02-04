@@ -46,12 +46,6 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 							artists, title, song_type, collection, is_explicit, country_code
 						),
 						name = obj.service
-					) if obj.service != 'deezer' else 
-					create_task(
-						obj.search_song(
-							artists, title, song_type, collection, is_explicit, country_code, incomplete_artist_info
-						),
-						name = obj.service
 					)
 				)
 
