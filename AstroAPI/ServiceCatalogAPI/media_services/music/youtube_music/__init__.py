@@ -59,7 +59,7 @@ class YouTubeMusic:
         """
         return await search_collection(artists = artists, title = title, year = year, country_code = country_code)
     
-    async def search_query(self, query: str, country_code: str = 'us') -> Song | Collection | Empty | Error:
+    async def search_query(self, query: str, filter_for_best_match: bool = True, media_types: list = None, is_explicit: bool = True, country_code: str = 'us') -> Song | Collection | Empty | Error:
         """
             # YouTube Music Query Knowledge Search
 
@@ -68,7 +68,7 @@ class YouTubeMusic:
             :param query: Your search query.
             :param country_code: The country code of the country in which you want to conduct the search.
         """
-        return await search_query(query = query, country_code = country_code)
+        return await search_query(query = query, filter_for_best_match = filter_for_best_match, is_explicit = is_explicit, country_code = country_code)
 
     async def lookup_song(self, id: str, country_code: str = 'us') -> Song | Empty | Error:
         """
