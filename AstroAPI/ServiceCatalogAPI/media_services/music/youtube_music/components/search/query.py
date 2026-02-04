@@ -6,7 +6,7 @@ from AstroAPI.InternalComponents.CredentialsManager.media_services.youtube.crede
 
 
 
-async def search_query(query: str, country_code: str = 'us') -> object:
+async def search_query(query: str, filter_for_best_match: bool = True, media_types: list = None, is_explicit: bool = None, country_code: str = 'us') -> object:
 	# Prepare the request dictionary with query details
 	request = {'request': 'search_query', 'query': query, 'country_code': country_code}
 	# Lookup JSON variable for later debugging
@@ -25,15 +25,34 @@ async def search_query(query: str, country_code: str = 'us') -> object:
 		result = results[0]
 		# Get the type of the result (song, album, video, etc.)
 		result_type = result['resultType']
+		
+		if filter_for_best_match:
+			if result_type == 'song':
+				# Build a list of Artist objects for the song's artists
+				result_artists = [
+					Artist(
+						service = service,
+						urls = f'https://music.youtube.com/channel/{artist["id"]}',
+						ids = artist['id'],
+						name = artist['name'],
+						meta = Meta(
+							service = service,
+							request = request,
+							processing_time = current_unix_time_ms() - start_time,
+							filter_confidence_percentage = {service: 100.0},
+							http_code = 200
+						)
+					) for artist in result['artists']
+				]
 
-		if result_type == 'song':
-			# Build a list of Artist objects for the song's artists
-			result_artists = [
-				Artist(
+				# Create a Cover object for the song
+				result_cover = Cover(
 					service = service,
-					urls = f'https://music.youtube.com/channel/{artist["id"]}',
-					ids = artist['id'],
-					name = artist['name'],
+					media_type = 'track',
+					title = result['title'],
+					artists = result_artists,
+					hq_urls = result['thumbnails'][0]['url'],
+					lq_urls = result['thumbnails'][len(result['thumbnails'])-1]['url'],
 					meta = Meta(
 						service = service,
 						request = request,
@@ -41,53 +60,72 @@ async def search_query(query: str, country_code: str = 'us') -> object:
 						filter_confidence_percentage = {service: 100.0},
 						http_code = 200
 					)
-				) for artist in result['artists']
-			]
-
-			# Create a Cover object for the song
-			result_cover = Cover(
-				service = service,
-				media_type = 'track',
-				title = result['title'],
-				artists = result_artists,
-				hq_urls = result['thumbnails'][0]['url'],
-				lq_urls = result['thumbnails'][len(result['thumbnails'])-1]['url'],
-				meta = Meta(
-					service = service,
-					request = request,
-					processing_time = current_unix_time_ms() - start_time,
-					filter_confidence_percentage = {service: 100.0},
-					http_code = 200
 				)
-			)
 
-			# Return a Song object with all relevant details
-			return Song(
-				service = service,
-				type = 'track',
-				urls = f'https://music.youtube.com/watch?v={result["videoId"]}',
-				ids = result['videoId'],
-				title = result['title'],
-				artists = result_artists,
-				collection = None,
-				is_explicit = None,
-				cover = result_cover,
-				meta = Meta(
+				# Return a Song object with all relevant details
+				return Song(
 					service = service,
-					request = request,
-					processing_time = current_unix_time_ms() - start_time,
-					filter_confidence_percentage = {service: 100.0},
-					http_code = 200
+					type = 'track',
+					urls = f'https://music.youtube.com/watch?v={result["videoId"]}',
+					ids = result['videoId'],
+					title = result['title'],
+					artists = result_artists,
+					collection = None,
+					is_explicit = None,
+					cover = result_cover,
+					meta = Meta(
+						service = service,
+						request = request,
+						processing_time = current_unix_time_ms() - start_time,
+						filter_confidence_percentage = {service: 100.0},
+						http_code = 200
+					)
 				)
-			)
-		elif result_type == 'album':
-			# Build a list of Artist objects for the album's artists
-			result_artists = [
-				Artist(
+			elif result_type == 'album':
+				# Build a list of Artist objects for the album's artists
+				result_artists = [
+					Artist(
+						service = service,
+						urls = f'https://music.youtube.com/playlist?list={result["playlistId"]}',
+						ids = 0, # ytmusicapi does not provide artist IDs for albums via query search, WHY?????????????
+						name = artist['name'],
+						meta = Meta(
+							service = service,
+							request = request,
+							processing_time = current_unix_time_ms() - start_time,
+							filter_confidence_percentage = {service: 100.0},
+							http_code = 200
+						)
+					) for artist in result['artists']
+				]
+
+				# Create a Cover object for the album
+				result_cover = Cover(
 					service = service,
+					media_type = 'track',
+					title = result['title'],
+					artists = result_artists,
+					hq_urls = result['thumbnails'][0]['url'],
+					lq_urls = result['thumbnails'][len(result['thumbnails'])-1]['url'],
+					meta = Meta(
+						service = service,
+						request = request,
+						processing_time = current_unix_time_ms() - start_time,
+						filter_confidence_percentage = {service: 100.0},
+						http_code = 200
+					)
+				)
+
+				# Return a Collection object representing the album
+				return Collection(
+					service = service,
+					type = 'album',
 					urls = f'https://music.youtube.com/playlist?list={result["playlistId"]}',
-					ids = 0, # ytmusicapi does not provide artist IDs for albums via query search, WHY?????????????
-					name = artist['name'],
+					ids = result['playlistId'],
+					title = result['title'],
+					artists = result_artists,
+					release_year = None,
+					cover = result_cover,
 					meta = Meta(
 						service = service,
 						request = request,
@@ -95,52 +133,33 @@ async def search_query(query: str, country_code: str = 'us') -> object:
 						filter_confidence_percentage = {service: 100.0},
 						http_code = 200
 					)
-				) for artist in result['artists']
-			]
-
-			# Create a Cover object for the album
-			result_cover = Cover(
-				service = service,
-				media_type = 'track',
-				title = result['title'],
-				artists = result_artists,
-				hq_urls = result['thumbnails'][0]['url'],
-				lq_urls = result['thumbnails'][len(result['thumbnails'])-1]['url'],
-				meta = Meta(
-					service = service,
-					request = request,
-					processing_time = current_unix_time_ms() - start_time,
-					filter_confidence_percentage = {service: 100.0},
-					http_code = 200
 				)
-			)
+			elif result_type == 'video':
+				# Build a list of Artist objects for the video's artists
+				result_artists = [
+					Artist(
+						service = service,
+						urls = f'https://music.youtube.com/channel/{artist["id"]}',
+						ids = artist['id'],
+						name = artist['name'],
+						meta = Meta(
+							service = service,
+							request = request,
+							processing_time = current_unix_time_ms() - start_time,
+							filter_confidence_percentage = {service: 100.0},
+							http_code = 200
+						)
+					) for artist in result['artists']
+				]
 
-			# Return a Collection object representing the album
-			return Collection(
-				service = service,
-				type = 'album',
-				urls = f'https://music.youtube.com/playlist?list={result["playlistId"]}',
-				ids = result['playlistId'],
-				title = result['title'],
-				artists = result_artists,
-				release_year = None,
-				cover = result_cover,
-				meta = Meta(
+				# Create a Cover object for the video
+				result_cover = Cover(
 					service = service,
-					request = request,
-					processing_time = current_unix_time_ms() - start_time,
-					filter_confidence_percentage = {service: 100.0},
-					http_code = 200
-				)
-			)
-		elif result_type == 'video':
-			# Build a list of Artist objects for the video's artists
-			result_artists = [
-				Artist(
-					service = service,
-					urls = f'https://music.youtube.com/channel/{artist["id"]}',
-					ids = artist['id'],
-					name = artist['name'],
+					media_type = 'track',
+					title = result['title'],
+					artists = result_artists,
+					hq_urls = result['thumbnails'][0]['url'],
+					lq_urls = result['thumbnails'][len(result['thumbnails'])-1]['url'],
 					meta = Meta(
 						service = service,
 						request = request,
@@ -148,56 +167,84 @@ async def search_query(query: str, country_code: str = 'us') -> object:
 						filter_confidence_percentage = {service: 100.0},
 						http_code = 200
 					)
-				) for artist in result['artists']
-			]
-
-			# Create a Cover object for the video
-			result_cover = Cover(
-				service = service,
-				media_type = 'track',
-				title = result['title'],
-				artists = result_artists,
-				hq_urls = result['thumbnails'][0]['url'],
-				lq_urls = result['thumbnails'][len(result['thumbnails'])-1]['url'],
-				meta = Meta(
-					service = service,
-					request = request,
-					processing_time = current_unix_time_ms() - start_time,
-					filter_confidence_percentage = {service: 100.0},
-					http_code = 200
 				)
-			)
 
-			# Return a MusicVideo object with all relevant details
-			return MusicVideo(
-				service = service,
-				urls = f'https://music.youtube.com/watch?v={result["videoId"]}',
-				ids = result['videoId'],
-				title = remove_music_video_declaration(result['title']),
-				artists = result_artists,
-				is_explicit = None,
-				cover = result_cover,
-				meta = Meta(
+				# Return a MusicVideo object with all relevant details
+				return MusicVideo(
 					service = service,
-					request = request,
-					processing_time = current_unix_time_ms() - start_time,
-					filter_confidence_percentage = {service: 100.0},
-					http_code = 200
+					urls = f'https://music.youtube.com/watch?v={result["videoId"]}',
+					ids = result['videoId'],
+					title = remove_music_video_declaration(result['title']),
+					artists = result_artists,
+					is_explicit = None,
+					cover = result_cover,
+					meta = Meta(
+						service = service,
+						request = request,
+						processing_time = current_unix_time_ms() - start_time,
+						filter_confidence_percentage = {service: 100.0},
+						http_code = 200
+					)
 				)
-			)
+			else:
+				empty_response = Empty(
+					service = service,
+					meta = Meta(
+						service = service,
+						request = request,
+						processing_time = current_unix_time_ms() - start_time,
+						filter_confidence_percentage = {service: 0.0},
+						http_code = 204
+					)
+				)
+				await log(empty_response)
+				return empty_response
 		else:
-			empty_response = Empty(
-				service = service,
-				meta = Meta(
-					service = service,
-					request = request,
-					processing_time = current_unix_time_ms() - start_time,
-					filter_confidence_percentage = {service: 0.0},
-					http_code = 204
-				)
+			songs = await create_song_objects(
+				results = lookup_json,
+				request = request,
+				start_time = start_time,
+				http_code = 200
 			)
-			await log(empty_response)
-			return empty_response
+			collections = await create_collection_objects(
+				results = lookup_json,
+				request = request,
+				start_time = start_time,
+				http_code = 200
+			)
+			videos = await create_music_video_objects(
+				results = lookup_json,
+				request = request,
+				start_time = start_time,
+				http_code = 200
+			)
+			if songs != [] or collections != [] or videos != []:
+				return Query(
+					service = service,
+					songs = songs,
+					collections = collections,
+					music_videos = collections,
+					meta = Meta(
+						service = service,
+						request = request,
+						processing_time = current_unix_time_ms() - start_time,
+						filter_confidence_percentage = 0.0, # Because there was no filtering involved
+						http_code = 200
+					)
+				)
+			else:
+				empty_response = Empty(
+					service = service,
+					meta = Meta(
+						service = service,
+						request = request,
+						processing_time = current_unix_time_ms() - start_time,
+						filter_confidence_percentage = {service: 0.0},
+						http_code = 204
+					)
+				)
+				await log(empty_response)
+				return empty_response
 
 	# If sinister things happen
 	except Exception as msg:
