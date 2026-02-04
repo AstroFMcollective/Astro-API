@@ -7,7 +7,7 @@ import aiohttp
 
 
 
-async def search_query(query: str, filter_for_best_match: bool = True, media_types: list = None, is_explicit: bool = None, country_code: str = 'us'):
+async def search_query(query: str, filter_for_best_match: bool = True, media_types: list = None, is_explicit: bool = None, country_code: str = 'us') -> object:
 	# Prepare the request dictionary with search parameters
 	request = {'request': 'search_query', 'query': query, 'country_code': country_code}
 	# Lookup JSON variable for later debugging
@@ -36,6 +36,7 @@ async def search_query(query: str, filter_for_best_match: bool = True, media_typ
 				'limit': 50,
 				'offset': 0
 			}
+			
 			api_headers = {'Authorization': f'Bearer {await spotify_token.get_token()}'}
 			timeout = aiohttp.ClientTimeout(total = 30) # Set a timeout for the HTTP request
 
