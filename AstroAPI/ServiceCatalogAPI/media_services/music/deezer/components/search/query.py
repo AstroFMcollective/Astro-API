@@ -45,7 +45,7 @@ async def search_query(query: str, filter_for_best_match: bool = True, media_typ
 		collections = []
 
 		for media_type in query_media:
-			if media_type == 'song':
+			if media_type == 'track':
 				songs = await create_song_objects(
 					json_response = results[query_media.index(media_type)],
 					request = request,
@@ -53,7 +53,7 @@ async def search_query(query: str, filter_for_best_match: bool = True, media_typ
 					http_code = 200,
 					incomplete_artist_info = True
 				)
-			elif media_type == 'collection':
+			elif media_type == 'album':
 				songs = await create_collection_objects(
 					json_response = results[query_media.index(media_type)],
 					request = request,
