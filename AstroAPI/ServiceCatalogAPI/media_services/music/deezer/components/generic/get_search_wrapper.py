@@ -1,6 +1,6 @@
 from AstroAPI.InternalComponents.SystemMediaObjects import *
 from AstroAPI.InternalComponents.Legacy import *
-from AstroAPI.ServiceCatalogAPI.media_services.music.apple_music.components.generic import *
+from AstroAPI.ServiceCatalogAPI.media_services.music.deezer.components.generic import *
 from AstroAPI.ServiceCatalogAPI.components import *
 
 import aiohttp
@@ -14,8 +14,9 @@ async def get_search_wrapper(media: str, query: str):
 	"""
 
 	request = {
-		'q': str,
+		'q': query,
 	}
+	lookup_json = None
 	start_time = current_unix_time_ms()
 	
 	try:
