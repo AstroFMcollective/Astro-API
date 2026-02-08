@@ -533,7 +533,7 @@ class Collection:
 		self._title = title
 		self._censored_title = censored_title
 		self._artists = artists
-		self._release_year = release_year
+		self._release_year = release_year if isinstance(release_year, int) or release_year == None else int(release_year)
 		self._cover = cover
 		self._genre = genre
 		self._meta = meta
@@ -608,7 +608,7 @@ class Collection:
 
 	@release_year.setter
 	def release_year(self, value: int):
-		self._release_year = value
+		self._release_year = value if isinstance(value, int) else int(value)
 
 	# Cover
 	@property
@@ -1612,7 +1612,7 @@ class Query:
 	def songs(self):
 		return self._songs
 
-	@service.setter
+	@songs.setter
 	def songs(self, value: list):
 		self._songs = value
 
