@@ -81,7 +81,7 @@ class GlobalIO:
 				exclude_services.append(premade.service)
 		return await search_collection_music(artists, title, year, country_code, include_premade_media, exclude_services)
 
-	async def search_query(self, query: str, country_code: str = 'us', exclude_services: list = []) -> Song | MusicVideo | Collection | Empty | Error:
+	async def search_query(self, query: str, filter_for_best_match: bool = True, media_types: list = None, is_explicit: bool = None, country_code: str = 'us', exclude_services: list = []) -> Song | MusicVideo | Collection | Empty | Error:
 		"""
 			# Global Interface Query Music Search
 
@@ -93,7 +93,7 @@ class GlobalIO:
 		"""
 		exclude_services.extend(self.exclude_services)
 		exclude_services = remove_duplicates(exclude_services)
-		return await search_query_music(query, country_code, exclude_services)
+		return await search_query_music(query, filter_for_best_match, media_types, is_explicit, country_code, exclude_services)
 	
 	async def lookup_song(self, service: object, id: str, song_country_code: str = None, lookup_country_code: str = 'us') -> Song | Empty | Error:
 		"""
