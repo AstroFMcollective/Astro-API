@@ -35,7 +35,20 @@ async def get_song_preview(id: str, country_code: str = 'us') -> str:
 					
 					if song['results'] != []: # Check if there was any song data returned
 						song = song['results'][0]
-						return song['previewUrl']
+						if 'previewUrl' in song:
+							return song['previewUrl']
+						else:
+							empty = Empty(
+								service = service,
+								meta = Meta(
+									service = service,
+									request = request,
+									processing_time = current_unix_time_ms() - start_time,
+									http_code = 204
+								)
+							)
+							await log(empty)
+							return None
 
 					else: # If not, return an empty object and log it
 						empty = Empty(

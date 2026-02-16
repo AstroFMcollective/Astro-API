@@ -38,7 +38,7 @@ async def lookup_music_video(id: str, country_code: str = 'us') -> object:
 						video = video['results'][0]
 						mv_url = video['trackViewUrl']
 						mv_id = video['trackId']
-						mv_preview = video['previewUrl']
+						mv_preview = video['previewUrl'] if 'previewUrl' in video else None
 						mv_title = video['trackName']
 						# Lookup the artist details using the artist ID
 						mv_artist = await lookup_artist(id = video['artistId'], country_code = country_code)
