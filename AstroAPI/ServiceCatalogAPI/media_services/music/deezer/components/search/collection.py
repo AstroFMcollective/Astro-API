@@ -39,7 +39,7 @@ async def search_collection(artists: list, title: str, year: int = None, country
 				lookup_json = await response.json()
 				if response.status == 200:
 					# Parse the JSON response
-					collections = create_collection_objects(
+					collections = await create_collection_objects(
 						json_response = lookup_json,
 						request = request,
 						start_time = start_time,

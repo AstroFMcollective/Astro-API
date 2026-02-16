@@ -82,6 +82,7 @@ class Analysis:
 
 	def __init__(self, service: str, media_type: str, ai_generated_confidence: float, meta: object):
 		self._service = service
+		self._type = 'check'
 		self._media_type = media_type
 		self._ai_generated_confidence = float(ai_generated_confidence)
 		self._meta = meta
@@ -94,6 +95,10 @@ class Analysis:
 	def service(self, value: str):
 		self._service = value
 
+	@property
+	def type(self):
+		return self._type
+	
 	@property
 	def media_type(self):
 		return self._media_type
@@ -130,6 +135,7 @@ class Analysis:
 		meta_val = self._meta.json if hasattr(self._meta, 'json') else self._meta
 		return {
 			'service': self._service,
+			'type': self._type,
 			'media_type': self._media_type,
 			'ai_generated_confidence': self._ai_generated_confidence,
 			'meta': meta_val,
@@ -139,6 +145,7 @@ class Analysis:
 	def json_lite(self):
 		return {
 			'service': self._service,
+			'type': self._type,
 			'media_type': self._media_type,
 			'ai_generated_confidence': self._ai_generated_confidence,
 		}
