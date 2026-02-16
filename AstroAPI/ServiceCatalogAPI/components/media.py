@@ -44,7 +44,10 @@ class Meta:
 		self._request = request
 		self._http_code = http_code
 		self._processing_time = processing_time if isinstance(processing_time, dict) else {service: processing_time}
-		self._filter_confidence_percentage = filter_confidence_percentage if isinstance(filter_confidence_percentage, dict) else {service: filter_confidence_percentage}
+		if isinstance(filter_confidence_percentage, dict):
+			self._filter_confidence_percentage = filter_confidence_percentage
+		else:
+			self._filter_confidence_percentage = {service: 0.0} if filter_confidence_percentage is None else {service: filter_confidence_percentage}
 
 	@property
 	def service(self):
@@ -142,7 +145,7 @@ class Song:
 		self._type = type
 		self._urls = urls
 		self._ids = ids
-		self._previews = previews
+		self._previews = {k: v for k, v in previews.items() if v is not None}
 		self._title = title
 		self._censored_title = censored_title
 		self._artists = artists
@@ -194,8 +197,11 @@ class Song:
 		return self._previews
 
 	@previews.setter
-	def previews(self, value: str):
-		self._previews = {self._service: value} if not isinstance(value, dict) else value
+	def previews(self, value: str | dict):
+		if not isinstance(value, dict):
+			value = {self._service: value}
+		# Automatically remove None values from the dictionary
+		self._previews = {k: v for k, v in value.items() if v is not None}
 
 	# Title
 	@property
@@ -349,7 +355,7 @@ class MusicVideo:
 		self._type = type
 		self._urls = urls
 		self._ids = ids
-		self._previews = previews
+		self._previews = {k: v for k, v in previews.items() if v is not None}
 		self._title = title
 		self._censored_title = censored_title
 		self._artists = artists
@@ -367,7 +373,7 @@ class MusicVideo:
 	def service(self, value: str):
 		self._service = value
 
-	# Type (constant)
+	# Type
 	@property
 	def type(self):
 		return self._type
@@ -396,8 +402,11 @@ class MusicVideo:
 		return self._previews
 
 	@previews.setter
-	def previews(self, value: str):
-		self._previews = {self._service: value} if not isinstance(value, dict) else value
+	def previews(self, value: str | dict):
+		if not isinstance(value, dict):
+			value = {self._service: value}
+		# Automatically remove None values from the dictionary
+		self._previews = {k: v for k, v in value.items() if v is not None}
 
 	# Title
 	@property
@@ -713,7 +722,7 @@ class Artist:
 	def service(self, value: str):
 		self._service = value
 
-	# Type (constant)
+	# Type
 	@property
 	def type(self):
 		return self._type
@@ -844,7 +853,7 @@ class Cover:
 	def service(self, value: str):
 		self._service = value
 
-	# Type (constant)
+	# Type
 	@property
 	def type(self):
 		return self._type
@@ -979,7 +988,7 @@ class ProfilePicture:
 	def service(self, value: str):
 		self._service = value
 
-	# Type (constant)
+	# Type
 	@property
 	def type(self):
 		return self._type
@@ -1607,6 +1616,11 @@ class Query:
 	def service(self, value: str):
 		self._service = value
 
+	# Type
+	@property
+	def type(self):
+		return self._type
+	
 	# Songs
 	@property
 	def songs(self):

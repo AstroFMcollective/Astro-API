@@ -77,6 +77,7 @@ async def search_music_video(artists: list, title: str, is_explicit: bool = None
 		result_type = None
 		result_urls = {}
 		result_ids = {}
+		result_previews = {}
 		result_title = None
 		result_artists = compiled_artists(request, [song.artists for song in unlabeled_results])
 		result_is_explicit = None
@@ -103,6 +104,11 @@ async def search_music_video(artists: list, title: str, is_explicit: bool = None
 				for result in unlabeled_results:
 					result_ids[result.service] = result.ids[result.service]
 				result_ids = sort_dicts(result_ids, general_order)
+			if result_previews == {}:
+				for result in unlabeled_results:
+					if result.previews:
+						result_previews.update(result.previews)
+				result_previews = sort_dicts(result_previews, general_order)
 			if result_processing_time == {}:
 				for result in unlabeled_results:
 					result_processing_time[result.service] = result.meta.processing_time[result.service]
@@ -122,6 +128,7 @@ async def search_music_video(artists: list, title: str, is_explicit: bool = None
 				service = gservice,
 				urls = result_urls,
 				ids = result_ids,
+				previews = result_previews,
 				title = result_title,
 				artists = result_artists,
 				is_explicit = result_is_explicit,

@@ -76,6 +76,7 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 		result_type = None
 		result_urls = {}
 		result_ids = {}
+		result_previews = {}
 		result_title = None
 		result_artists = compiled_artists(request, [song.artists for song in unlabeled_results])
 		result_collection = compiled_collection(request, [collection.collection for collection in unlabeled_results])
@@ -103,6 +104,11 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 				for result in unlabeled_results:
 					result_ids[result.service] = result.ids[result.service]
 				result_ids = sort_dicts(result_ids, general_order)
+			if result_previews == {}:
+				for result in unlabeled_results:
+					if result.previews:
+						result_previews.update(result.previews)
+				result_previews = sort_dicts(result_previews, general_order)
 			if result_processing_time == {}:
 				for result in unlabeled_results:
 					result_processing_time[result.service] = result.meta.processing_time[result.service]
@@ -123,6 +129,7 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 				type = result_type,
 				urls = result_urls,
 				ids = result_ids,
+				previews = result_previews,
 				title = result_title,
 				artists = result_artists,
 				collection = result_collection,
