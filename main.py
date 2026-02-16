@@ -39,7 +39,7 @@ print(f"[AstroAPI] Deployment channel: {ServiceCatalog.deployment_channel}")
 @app.get("/{media}/{service}/search_song")
 async def search_song(media: str, service: str, artist: str, title: str, song_type: str = None, collection_title: str = None, is_explicit: str = None, country_code: str = 'us', exclude_services: str = None):
 	# Prepare everything for the API request
-	is_explicit = False if is_explicit is 'false' else True if is_explicit != None else None # Convert the is_explicit string to a boolean
+	is_explicit = False if is_explicit == 'false' else True if is_explicit != None else None # Convert the is_explicit string to a boolean
 	country_code = country_code.lower()
 	exclude_services = exclude_services.lower().split(',') if exclude_services is not None else [] # Split the exclude_services string into a list (ex. 'spotify,deezer' -> ['spotify', 'deezer'])
 	service_api = get_service_catalog_api(media, service)
@@ -75,7 +75,7 @@ async def search_song(media: str, service: str, artist: str, title: str, song_ty
 @app.get("/{media}/{service}/search_music_video")
 async def search_music_video(media: str, service: str, artist: str, title: str, is_explicit: str = None, country_code: str = 'us', exclude_services: str = None):
 	# Prepare everything for the API request
-	is_explicit = False if is_explicit is 'false' else True if is_explicit != None else None # Convert the is_explicit string to a boolean
+	is_explicit = False if is_explicit == 'false' else True if is_explicit != None else None # Convert the is_explicit string to a boolean
 	country_code = country_code.lower()
 	exclude_services = exclude_services.lower().split(',') if exclude_services is not None else [] # Split the exclude_services string into a list (ex. 'spotify,deezer' -> ['spotify', 'deezer'])
 	service_api = get_service_catalog_api(media, service)
@@ -139,8 +139,8 @@ async def search_collection(media: str, service: str, artist: str, title: str, y
 @app.get("/{media}/{service}/search_query")
 async def search_music_video(media: str, service: str, query: str, filter_for_best_match: str = 'true', media_types: str = None, is_explicit: str = None, country_code: str = 'us', exclude_services: str = None):
 	# Prepare everything for the API request
-	is_explicit = False if is_explicit is 'false' else True if is_explicit != None else None # Convert the is_explicit string to a boolean
-	filter_for_best_match = False if filter_for_best_match is 'false' else True # Convert the filter_for_best_match string to a boolean
+	is_explicit = False if is_explicit == 'false' else True if is_explicit != None else None # Convert the is_explicit string to a boolean
+	filter_for_best_match = False if filter_for_best_match == 'false' else True # Convert the filter_for_best_match string to a boolean
 	country_code = country_code.lower()
 	media_types = media_types.lower().split(',') if media_types is not None else None # Split the media_types string into a list (ex. 'song,collection' -> ['song', 'collection'])
 	exclude_services = exclude_services.lower().split(',') if exclude_services is not None else [] # Split the exclude_services string into a list (ex. 'spotify,deezer' -> ['spotify', 'deezer'])
