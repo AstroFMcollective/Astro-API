@@ -23,7 +23,7 @@ async def create_song_objects(results: dict, request: dict, start_time: int, htt
             song_url = f'https://music.youtube.com/watch?v={song['videoId']}'
             song_id = song['videoId']
             song_title = song['title']
-            song_is_explicit = song['isExplicit']
+            song_is_explicit = song['isExplicit'] if 'isExplicit' in song else None
             
             # If artist info is available in the song result
             if 'artists' in song and song['artists'] != []:
@@ -66,24 +66,27 @@ async def create_song_objects(results: dict, request: dict, start_time: int, htt
             )
 
             # Build Collection object for the song's album
-            if song['album'] != None:
-                song_collection = Collection(
-                    service = service,
-                    type = 'album',
-                    urls = f'https://music.youtube.com/playlist?list={song['album']['id']}',
-                    ids = song['album']['id'],
-                    title = song['album']['name'],
-                    artists = [song_artists[0]],
-                    release_year = song['album']['year'] if 'year' in song['album'] else None,
-                    cover = song_cover,
-                    meta = Meta(
+            if 'album' in song:
+                if song['album'] != None:
+                    song_collection = Collection(
                         service = service,
-                        request = request,
-                        processing_time = current_unix_time_ms() - start_time,
-                        http_code = http_code,
-                        filter_confidence_percentage = 100.0
+                        type = 'album',
+                        urls = f'https://music.youtube.com/playlist?list={song['album']['id']}',
+                        ids = song['album']['id'],
+                        title = song['album']['name'],
+                        artists = [song_artists[0]],
+                        release_year = song['album']['year'] if 'year' in song['album'] else None,
+                        cover = song_cover,
+                        meta = Meta(
+                            service = service,
+                            request = request,
+                            processing_time = current_unix_time_ms() - start_time,
+                            http_code = http_code,
+                            filter_confidence_percentage = 100.0
+                        )
                     )
-                )
+                else:
+                    song_collection = None
             else:
                 song_collection = None
 
