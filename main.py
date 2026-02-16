@@ -27,6 +27,10 @@ print(f"[AstroAPI] Deployment channel: {ServiceCatalog.deployment_channel}")
 
 
 
+
+
+
+
 # ------------------------------------
 # --- Service Search API Endpoints ---
 # ------------------------------------
@@ -133,22 +137,31 @@ async def search_collection(media: str, service: str, artist: str, title: str, y
 
 # Query Search for media services
 @app.get("/{media}/{service}/search_query")
-async def search_music_video(media: str, service: str, query: str, country_code: str = 'us', exclude_services: str = None):
+async def search_music_video(media: str, service: str, query: str, filter_for_best_match: str = 'true', media_types: list = None, is_explicit: str = None, country_code: str = 'us', exclude_services: str = None):
 	# Prepare everything for the API request
+	is_explicit = False if is_explicit is None else is_explicit.lower() == 'true' # Convert the is_explicit string to a boolean
+	filter_for_best_match = False if filter_for_best_match is None else filter_for_best_match.lower() == 'true' # Convert the filter_for_best_match string to a boolean
 	country_code = country_code.lower()
+	media_types = media_types.lower().split(',') if media_types is not None else None # Split the media_types string into a list (ex. 'song,collection' -> ['song', 'collection'])
 	exclude_services = exclude_services.lower().split(',') if exclude_services is not None else [] # Split the exclude_services string into a list (ex. 'spotify,deezer' -> ['spotify', 'deezer'])
 	service_api = get_service_catalog_api(media, service)
 
 	# Check if the queried service is the Global Interface, so we know whether we need to plug in the exclude_services parameter into it or not
-	if service == 'global_io': 
+	if service == 'global_io':
 		query_object = await service_api.search_query(
 			query = query,
+			filter_for_best_match = filter_for_best_match,
+			media_types = media_types,
+			is_explicit = is_explicit,
 			country_code = country_code,
 			exclude_services = exclude_services
 		)
 	else:
 		query_object = await service_api.search_query(
 			query = query,
+			filter_for_best_match = filter_for_best_match,
+			media_types = media_types,
+			is_explicit = is_explicit,
 			country_code = country_code
 		)
 	if query_object.type not in illegal_results:
@@ -297,8 +310,40 @@ async def lookup_collection(media: str, service: str, id: str, id_service: str =
 		return collection_object.json
 	else:
 		raise HTTPException(status_code = collection_object.meta.http_code, detail = collection_object.error_msg if collection_object.type == 'error' else None)
-	
 
+
+
+# Artist Lookup for media services
+@app.get("/{media}/{service}/lookup_artist")
+async def lookup_artist(media: str, service: str, id: str, id_service: str = None, country_code: str = 'us'):
+	# Prepare everything for the API request
+	media = media.lower()
+	service = service.lower()
+	id_service = id_service.lower() if id_service is not None else None
+	country_code = country_code.lower()
+
+	# Explicitly deny Global IO and Cross-Service Lookups as they are not supported for artists
+	if service == 'global_io' or (id_service is not None and id_service != service):
+		raise HTTPException(status_code = 404, detail = "Artist lookup not supported for Global Interface or with foreign service IDs.")
+
+	# Request from the correct API endpoint
+	service_api = get_service_catalog_api(media, service)
+	artist_object = await service_api.lookup_artist(id, country_code)
+
+	if artist_object.type not in illegal_results:
+		return artist_object.json
+	else:
+		raise HTTPException(status_code = artist_object.meta.http_code, detail = artist_object.error_msg if artist_object.type == 'error' else None)
+
+
+
+
+
+
+
+# ----------------------------
+# --- Snitch API Endpoints ---
+# ----------------------------
 
 @app.post("/snitch/media")
 async def snitch_media(media: Request):
