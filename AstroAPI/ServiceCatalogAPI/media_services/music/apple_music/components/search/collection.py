@@ -20,7 +20,7 @@ async def search_collection(artists: list, title: str, year: int = None, country
 		async with aiohttp.ClientSession() as session:
 			# Optimize strings for query search
 			artists = [optimize_for_search(artist) for artist in artists]
-			title = clean_up_collection_title(optimize_for_search(replace_with_ascii(title)))
+			title = clean_up_collection_title(optimize_for_search(transliterate_to_ascii(title)))
 				
 			collections = []
 			# Prepare for API call

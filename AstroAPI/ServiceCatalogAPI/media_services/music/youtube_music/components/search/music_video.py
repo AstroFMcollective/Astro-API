@@ -18,7 +18,7 @@ async def search_music_video(artists: list, title: str, is_explicit: bool = None
 	try:
 		# Optimize strings for query search
 		artists = [optimize_for_search(artist) for artist in artists]
-		title = optimize_for_search(replace_with_ascii(title).lower())
+		title = optimize_for_search(transliterate_to_ascii(title).lower())
 		
 		videos = []
 		# Perform a search on YouTube Music for videos matching the first artist and the title

@@ -19,7 +19,7 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 	try:
 		# Optimize strings for query search
 		artists = [optimize_for_search(artist) for artist in artists]
-		title = optimize_for_search(replace_with_ascii(title).lower())
+		title = optimize_for_search(transliterate_to_ascii(title).lower())
 		collection = clean_up_collection_title(optimize_for_search(collection)) if collection != None else None
 			
 		songs = []
