@@ -455,9 +455,10 @@ async def filter_query(service: str, query_request: dict, items: list, query: st
 
 		item_similarity += winning_query[0] # Calculates their similarity and adds it to the overall score
 
-		if query_is_explicit != None and item.is_explicit != None: # Since these are boolean values, you can just check them and then add the points or not
-			if query_is_explicit == item.is_explicit:
-				item_similarity += 500
+		if hasattr(item, 'is_explicit'):
+			if query_is_explicit != None and item.is_explicit != None: # Since these are boolean values, you can just check them and then add the points or not
+				if query_is_explicit == item.is_explicit:
+					item_similarity += 500
 
 		data_with_similarity.append([item_similarity, item])
 	
