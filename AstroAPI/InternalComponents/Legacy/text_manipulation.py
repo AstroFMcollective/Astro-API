@@ -13,9 +13,19 @@ from discord.utils import escape_markdown
 
 # --- CONSTANTS & PATTERNS ---
 
+# List of characters that should be replaced with no character ('') instead of a space.
+# Add any future characters to this list to ensure they are deleted entirely.
+CHARS_TO_REMOVE_COMPLETELY = [
+	"'", 
+	"’"  # Smart apostrophe commonly used by Apple Music and Spotify
+]
+
+# Dynamically compile the pattern from the list
+REMOVE_COMPLETELY_PATTERN = re.compile(f"[{re.escape(''.join(CHARS_TO_REMOVE_COMPLETELY))}]")
+
 # Regex for punctuation removal
 # "All" includes everything standard.
-PUNC_ALL_PATTERN = re.compile(r'[!()[\];:\'",<>./?@#$%^&*`_~]')
+PUNC_ALL_PATTERN = re.compile(r'[!()[\];:\'",<>./?@#$%^*`_~]')
 # "Some" excludes @, #, $, %, ^, &, * (common in stylizations)
 PUNC_SOME_PATTERN = re.compile(r'[!()[\];:\'",<>./?`_~]')
 
@@ -39,12 +49,16 @@ MV_DECLARATIONS = [
 
 def remove_punctuation(text: str, remove_all: bool = True) -> str:
 	"""Removes punctuation from the string using compiled regex."""
+	text = REMOVE_COMPLETELY_PATTERN.sub('', text)
+	
 	if remove_all:
 		return PUNC_ALL_PATTERN.sub('', text)
 	return PUNC_SOME_PATTERN.sub('', text)
 
 def replace_punctuation_with_spaces(text: str) -> str:
 	"""Replaces certain punctuation marks with a space."""
+	text = REMOVE_COMPLETELY_PATTERN.sub('', text)
+	
 	return PUNC_TO_SPACE_PATTERN.sub(' ', text)
 
 def transliterate_to_ascii(text: str) -> str:
@@ -60,12 +74,12 @@ def bare_bones(text: str, remove_all_punctuation: bool = True) -> str:
 	text = unidecode(text)
 	# 2. Lowercase
 	text = text.lower()
-	# 3. Remove punctuation (if remove_all=False, hashes from step 1 might persist)
+	# 3. Remove punctuation
 	text = remove_punctuation(text, remove_all_punctuation)
 	# 4. Fix whitespace
 	return ' '.join(text.split())
 
-def optimize_for_search(text: str) -> str:
+def optimize_for_search(text: str, encode_special_chars: bool = True) -> str:
 	"""
 	Heavy optimization for API queries. 
 	Fixes edge cases like block characters turning into hashes.
@@ -73,15 +87,19 @@ def optimize_for_search(text: str) -> str:
 	# 1. Remove Feature Credits first (to avoid matching them after other manipulations)
 	text = remove_feat(text)
 	
-	# 2. Replace punctuation with spaces to separate words joined by symbols
+	# 2. Encode special URL characters (# and &)
+	# We do this BEFORE bare_bones so they aren't treated as punctuation or artifacts.
+	if encode_special_chars:
+		text = text.replace('#', '%23')
+		text = text.replace('&', '%26')
+	
+	# 3. Replace punctuation with spaces (excluding apostrophes)
+	# "It's a/b" -> "It's a b"
 	text = replace_punctuation_with_spaces(text)
 	
-	# 3. Run bare_bones (Transliterate -> Lower -> Remove Punctuation(False))
 	text = bare_bones(text, remove_all_punctuation=False)
 	
-	# 4. Explicitly clean up artifacts that survive bare_bones(False)
 	text = text.replace('#', '')
-	
 	# 5. Fix leading '&' edge case
 	if text.startswith('&'):
 		text = text[1:]
