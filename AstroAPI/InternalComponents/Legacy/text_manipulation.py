@@ -97,12 +97,15 @@ def optimize_for_search(text: str, encode_special_chars: bool = True) -> str:
 	# "It's a/b" -> "It's a b"
 	text = replace_punctuation_with_spaces(text)
 	
+	# 4. Run bare_bones (Transliterate -> Lower -> Remove Punctuation(False))
+	# remove_punctuation(False) will remove apostrophes ("It's" -> "its")
+	# It preserves '%' so our encoded characters survive.
 	text = bare_bones(text, remove_all_punctuation=False)
 	
+	# 5. Explicitly clean up artifacts that survive bare_bones(False)
+	# Since we encoded real '#' to '%23' in step 2, any '#' remaining here 
+	# must be an artifact from transliteration.
 	text = text.replace('#', '')
-	# 5. Fix leading '&' edge case
-	if text.startswith('&'):
-		text = text[1:]
 		
 	# 6. Normalize " l " to pipes (often used in Apple Music titles)
 	if ' l ' in text:
