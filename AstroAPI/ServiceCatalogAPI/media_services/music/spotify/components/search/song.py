@@ -19,10 +19,10 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 		# Create an aiohttp session for making HTTP requests
 		async with aiohttp.ClientSession() as session:
 			# Remove any special characters from artists and title thay may throw off the search
-			artists = [optimize_for_search(artist) for artist in artists]
-			title = optimize_for_search(title)
+			artists = [artist for artist in artists]
+			title = title
 			# Clean up collection title from any suffixes if provided
-			collection = clean_up_collection_title(optimize_for_search(collection)) if collection != None else None
+			collection = clean_up_collection_title(collection) if collection != None else None
 				
 			songs = []
 			api_url = f'{api}/search'

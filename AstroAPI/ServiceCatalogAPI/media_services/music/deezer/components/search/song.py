@@ -19,8 +19,8 @@ async def search_song(artists: list, title: str, song_type: str = None, collecti
 		# Create an aiottp session
 		async with aiohttp.ClientSession() as session:
 			# Optimize strings for query search
-			artists = [optimize_for_search(artist) for artist in artists]
-			title = optimize_for_search(title)
+			artists = [artist for artist in artists]
+			title = remove_feat(title)
 			collection = clean_up_collection_title(optimize_for_search(collection)) if collection != None else None
 			
 			songs = []
