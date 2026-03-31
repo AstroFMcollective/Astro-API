@@ -39,6 +39,10 @@ print(f"[AstroAPI] Deployment channel: {ServiceCatalog.deployment_channel}")
 @app.get("/{media}/{service}/search_song")
 async def search_song(media: str, service: str, artist: str, title: str, song_type: str = None, collection_title: str = None, is_explicit: str = None, country_code: str = 'us', exclude_services: str = None):
 	# Prepare everything for the API request
+	media = media.lower()
+	if media == 'knowledge':
+		raise HTTPException(status_code=404, detail="The knowledge endpoint has been deprecated as of March 31st, 2026, due to Genius TOS changes.")
+		
 	is_explicit = False if is_explicit == 'false' else True if is_explicit != None else None # Convert the is_explicit string to a boolean
 	country_code = country_code.lower()
 	exclude_services = exclude_services.lower().split(',') if exclude_services is not None else [] # Split the exclude_services string into a list (ex. 'spotify,deezer' -> ['spotify', 'deezer'])
@@ -75,6 +79,9 @@ async def search_song(media: str, service: str, artist: str, title: str, song_ty
 @app.get("/{media}/{service}/search_music_video")
 async def search_music_video(media: str, service: str, artist: str, title: str, is_explicit: str = None, country_code: str = 'us', exclude_services: str = None):
 	# Prepare everything for the API request
+	media = media.lower()
+	if media == 'knowledge':
+		raise HTTPException(status_code=404, detail="The knowledge endpoint has been deprecated as of March 31st, 2026, due to Genius TOS changes.")
 	is_explicit = False if is_explicit == 'false' else True if is_explicit != None else None # Convert the is_explicit string to a boolean
 	country_code = country_code.lower()
 	exclude_services = exclude_services.lower().split(',') if exclude_services is not None else [] # Split the exclude_services string into a list (ex. 'spotify,deezer' -> ['spotify', 'deezer'])
@@ -107,6 +114,9 @@ async def search_music_video(media: str, service: str, artist: str, title: str, 
 @app.get("/{media}/{service}/search_collection")
 async def search_collection(media: str, service: str, artist: str, title: str, year: str = None, country_code: str = 'us', exclude_services: str = None):
 	# Prepare everything for the API request
+	media = media.lower()
+	if media == 'knowledge':
+		raise HTTPException(status_code=404, detail="The knowledge endpoint has been deprecated as of March 31st, 2026, due to Genius TOS changes.")
 	year = int(year) if year is not None else None
 	country_code = country_code.lower()
 	exclude_services = exclude_services.lower().split(',') if exclude_services is not None else [] # Split the exclude_services string into a list (ex. 'spotify,deezer' -> ['spotify', 'deezer'])
@@ -139,6 +149,9 @@ async def search_collection(media: str, service: str, artist: str, title: str, y
 @app.get("/{media}/{service}/search_query")
 async def search_music_video(media: str, service: str, query: str, filter_for_best_match: str = 'true', media_types: str = None, is_explicit: str = None, country_code: str = 'us', exclude_services: str = None):
 	# Prepare everything for the API request
+	media = media.lower()
+	if media == 'knowledge':
+		raise HTTPException(status_code=404, detail="The knowledge endpoint has been deprecated as of March 31st, 2026, due to Genius TOS changes.")
 	is_explicit = False if is_explicit == 'false' else True if is_explicit != None else None # Convert the is_explicit string to a boolean
 	filter_for_best_match = False if filter_for_best_match == 'false' else True # Convert the filter_for_best_match string to a boolean
 	country_code = country_code.lower()
@@ -184,6 +197,8 @@ async def search_music_video(media: str, service: str, query: str, filter_for_be
 async def lookup_song(media: str, service: str, id: str, id_service: str = None, country_code: str = 'us'):
 	# Prepare everything for the API request
 	media = media.lower()
+	if media == 'knowledge':
+		raise HTTPException(status_code=404, detail="The knowledge endpoint has been deprecated as of March 31st, 2026, due to Genius TOS changes.")
 	service = service.lower()
 	id_service = id_service.lower() if id_service is not None else None
 	country_code = country_code.lower()
@@ -230,6 +245,8 @@ async def lookup_song(media: str, service: str, id: str, id_service: str = None,
 async def lookup_music_video(media: str, service: str, id: str, id_service: str = None, country_code: str = 'us'):
 	# Prepare everything for the API request
 	media = media.lower()
+	if media == 'knowledge':
+		raise HTTPException(status_code=404, detail="The knowledge endpoint has been deprecated as of March 31st, 2026, due to Genius TOS changes.")
 	service = service.lower()
 	id_service = id_service.lower() if id_service is not None else None
 	country_code = country_code.lower()
@@ -274,6 +291,8 @@ async def lookup_music_video(media: str, service: str, id: str, id_service: str 
 async def lookup_collection(media: str, service: str, id: str, id_service: str = None, country_code: str = 'us'):
 	# Prepare everything for the API request
 	media = media.lower()
+	if media == 'knowledge':
+		raise HTTPException(status_code=404, detail="The knowledge endpoint has been deprecated as of March 31st, 2026, due to Genius TOS changes.")
 	service = service.lower()
 	id_service = id_service.lower() if id_service is not None else None
 	country_code = country_code.lower()
@@ -318,6 +337,8 @@ async def lookup_collection(media: str, service: str, id: str, id_service: str =
 async def lookup_artist(media: str, service: str, id: str, id_service: str = None, country_code: str = 'us'):
 	# Prepare everything for the API request
 	media = media.lower()
+	if media == 'knowledge':
+		raise HTTPException(status_code=404, detail="The knowledge endpoint has been deprecated as of March 31st, 2026, due to Genius TOS changes.")
 	service = service.lower()
 	id_service = id_service.lower() if id_service is not None else None
 	country_code = country_code.lower()
