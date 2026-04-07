@@ -9,7 +9,7 @@ async def create_collection_objects(json_response: dict, request: dict, start_ti
 
 	# Iterate over each collection in the results
 	for collection in json_response['results']:
-		if collection['kind'] == 'album':
+		if 'collectionId' in collection:
 			# Determine if the collection is an album or EP
 			collection_type = ('album' if ' - EP' not in collection['collectionName'] else 'ep')
 			collection_url = collection['collectionViewUrl']
